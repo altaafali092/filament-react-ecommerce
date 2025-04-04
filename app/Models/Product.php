@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filament\Resources\ProductResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,10 +13,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Product extends Model implements HasMedia
 {
     use InteractsWithMedia;
+
+   
+
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
-        ->width( 100);
+            ->width(100);
         $this->addMediaConversion('small')
             ->width(300);
         $this->addMediaConversion('large')
@@ -29,10 +33,14 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Category::class);
     }
-
     public function variationTypes(): HasMany
     {
         return $this->hasMany(VariationType::class);
     }
 
+
+    public function variations(): HasMany
+    {
+        return $this->hasMany(ProductVariation::class, 'product_id');
+    }
 }

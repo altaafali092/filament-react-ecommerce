@@ -6,6 +6,7 @@ use App\Enums\ProductEnum;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\Pages\EditProduct;
 use App\Filament\Resources\ProductResource\Pages\ProductImage;
+use App\Filament\Resources\ProductResource\Pages\ProductVariations;
 use App\Filament\Resources\ProductResource\Pages\ProductVariationType;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
@@ -31,13 +32,17 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
 {
+
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-queue-list';
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
 
-
+public static function getEloquentQuery(): Builder
+{
+  return parent::getEloquentQuery();
+}
 
     public static function form(Form $form): Form
     {
@@ -153,6 +158,8 @@ class ProductResource extends Resource
             'edit' => Pages\EditProduct::route('/{record}/edit'),
             'images' => Pages\ProductImage::route('/{record}/images'),
             'variation-types' => Pages\ProductVariationType::route('/{record}/variation-types'),
+            'variations' => Pages\ProductVariations::route('/{record}/variations'),
+
         ];
     }
     public static function getRecordSubNavigation(Page $page): array
@@ -162,6 +169,8 @@ class ProductResource extends Resource
                 EditProduct::class,
                 ProductImage::class,
                 ProductVariationType::class,
+                ProductVariations::class,
+
             ]);
     }
 }

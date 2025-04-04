@@ -1,16 +1,21 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import Navbar from './layout/Navbar';
-import Slider from './Frontend/Slider';
+
 import AuthLayout from './layout/AuthLayout';
 import ShopByCategory from './index/ShopByCatregory';
 import Trending from './index/Trending';
+
 import NewsAndBlogs from './index/NewsAndBlog';
 import CustomerReviews from './index/Review';
+import NewArrivial from './index/NewArrivial';
+import { IFrontProduct } from '@/types/frontend';
+import Slider from './index/Slider';
 
 
 export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth  } = usePage<SharedData>().props;
+    const{products}=usePage<{products:IFrontProduct[]}>().props;
 
     return (
         <>
@@ -26,6 +31,9 @@ export default function Welcome() {
                 </div>
                 <div className="relative z-10">
                     <ShopByCategory />
+                </div>
+                <div className="relative z-10">
+                <NewArrivial products={products?.data ?? []} />
                 </div>
                 <div className="relative z-10">
                     <Trending />

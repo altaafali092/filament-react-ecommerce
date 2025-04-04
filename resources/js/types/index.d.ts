@@ -40,3 +40,26 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+
+//product
+export interface Product {
+    id: number;
+    title: string;
+    slug: string;
+    price: number;
+    quantity: number;
+    description: string;
+    image: string;
+    user:{
+        id: number;
+        name: string;
+    };
+    department:{
+        id: number;
+        name: string;
+    }
+}
+export type paginationProps<T>={
+    data:Array<T>;
+}

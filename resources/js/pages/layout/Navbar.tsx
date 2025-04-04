@@ -295,7 +295,7 @@ const Navbar = ({ auth }: NavbarProps) => {
             )}
 
             {/* Add some extra space at the bottom for the fixed navbar */}
-            <style jsx global>{`
+            <style >{`
                 @keyframes slideDown {
                     from {
                         opacity: 0;

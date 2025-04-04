@@ -43,7 +43,7 @@ export default function Trending() {
 
 
     return (
-        <section className="py-12 px-4 md:px-8 text-white">
+        <section className="py-12 px-4 md:px-8 bg-gradient-to-b from-pink-50 to-pink-100">
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -77,7 +77,7 @@ export default function Trending() {
 
                             {/* Content */}
                             <div className="absolute bottom-4 left-4 right-4">
-                                <h3 className="text-2xl font-bold">{category.name}</h3>
+                                <h3 className="text-2xl text-gray-100 font-bold">{category.name}</h3>
                                 <p className="text-gray-300 text-sm mb-4">{category.description}</p>
                                 <Link
                                     href={`/category/${category.id}`}

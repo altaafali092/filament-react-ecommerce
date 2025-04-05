@@ -8,7 +8,9 @@ use Inertia\Inertia;
 //     return Inertia::render('welcome');
 // })->name('home');
  Route::get('/',[FrontendController::class, 'index'])->name('index');
- Route::get('product-detail',[FrontendController::class, 'detail'])->name('product-detail');
+ Route::get('product-detail/{product:slug}',[FrontendController::class, 'productDetail'])->name('product-detail');
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');

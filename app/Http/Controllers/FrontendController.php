@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
@@ -16,9 +17,12 @@ class FrontendController extends Controller
             'products'=>ProductResource::collection($products),
         ]);
     }
-    public function detail()
-    {
-        return Inertia::render('Frontend/Product/ProductDetail');
+    public function productDetail(Product $product)
+{
+    return Inertia::render('Frontend/Product/ProductDetail', [
+        'product' => new ProductDetailResource($product),
+        'variationOptions' => request('options',[]),
+    ]);
+}
 
-    }
 }

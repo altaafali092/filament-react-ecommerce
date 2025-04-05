@@ -1,568 +1,399 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowLeft, Heart, Share2, ShoppingBag, Star, Truck, RefreshCw, MessageCircle } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Head, Link } from "@inertiajs/react"
 import AuthLayout from "@/pages/layout/AuthLayout"
+import type { IFrontProduct, VariationTypeOption } from "@/types/frontend"
+import { Head, router, useForm, usePage } from "@inertiajs/react"
+import { Heart, Minus, Plus } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 
-export default function ProductDetail({ params }: { params: { id: string } }) {
-    // Dummy product data
-    const product = {
-        id: 1,
-        title: "Neon Dreams Oversized Hoodie",
-        description:
-            "Ultra-comfy oversized hoodie with neon accents. Made from 70% recycled materials. Perfect for your TikTok OOTD videos.",
-        price: 59.99,
-        discountPrice: 49.99,
-        colors: ["#FF3366", "#33CCFF", "#FFCC00", "#000000"],
-        sizes: ["XS", "S", "M", "L", "XL"],
-        rating: 4.8,
-        reviewCount: 423,
-        tags: ["Sustainable", "Trending", "Limited Edition"],
+interface Props {
+  product: IFrontProduct
+  variationOptions: Record<number, number>
+}
+
+const ProductDetail = () => {
+  const { product, variationOptions } = usePage<Props>().props
+
+  const form = useForm<{
+    option_ids: Record<string, number>
+    quantity: number
+    price: number | null
+  }>({
+    option_ids: {},
+    quantity: 1,
+    price: null,
+  })
+
+  const url = usePage().url
+  const route = window.route
+
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, VariationTypeOption>>({})
+  const [activeImage, setActiveImage] = useState(0)
+  const [liked, setLiked] = useState(false)
+
+  const arraysAreEqual = (a: any[], b: any[]) => {
+    return a.length === b.length && a.every((v, i) => v === b[i])
+  }
+
+  const computedProduct = useMemo(() => {
+    const selectedOptionIds = Object.values(selectedOptions)
+      .map((op) => op.id)
+      .sort()
+
+    for (const variation of product.variations) {
+      const optionIds = (variation.variation_type_ids ?? []).sort()
+      if (arraysAreEqual(selectedOptionIds, optionIds)) {
+        return {
+          price: variation.price,
+          quantity: variation.quantity ?? 0,
+        }
+      }
     }
 
-    // Dummy product images
-    const productImages = [
-        "https://i.pinimg.com/736x/53/2a/85/532a85bbf7b22fcbc18b5fb967dbb1be.jpg",
-        "https://i.pinimg.com/736x/50/34/f7/5034f78faeb149739bf0337bbca9482d.jpg",
-        "https://i.pinimg.com/736x/50/34/f7/5034f78faeb149739bf0337bbca9482d.jpg",
-        "https://i.pinimg.com/736x/a1/da/83/a1da834a824be38b4ee524f31e5b8b1a.jpg",
-    ]
+    return {
+      price: product.price,
+      quantity: product.quantity,
+    }
+  }, [product, selectedOptions])
 
-    // Dummy related products
-    const relatedProducts = [
-        {
-            id: 101,
-            title: "Cyber Punk Crop Top",
-            price: 34.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-        {
-            id: 102,
-            title: "Digital Wave Joggers",
-            price: 45.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-        {
-            id: 103,
-            title: "Retro Pixel Beanie",
-            price: 24.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-        {
-            id: 104,
-            title: "Vaporwave Bucket Hat",
-            price: 29.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-    ]
+  const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
-    // Dummy recently viewed products
-    const recentlyViewed = [
-        {
-            id: 201,
-            title: "Y2K Graphic Tee",
-            price: 32.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-        {
-            id: 202,
-            title: "Aesthetic Crossbody Bag",
-            price: 38.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-        {
-            id: 203,
-            title: "Glitch Effect Sneakers",
-            price: 79.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-        {
-            id: 204,
-            title: "Lo-Fi Wireless Earbuds",
-            price: 59.99,
-            image: "/placeholder.svg?height=300&width=300",
-        },
-    ]
+  const images = useMemo(() => {
+    for (const typeId in selectedOptions) {
+      const option = selectedOptions[typeId]
+      if (option.images?.length > 0) return option.images
+    }
+    return product.images
+  }, [product, selectedOptions])
 
-    // Dummy reviews
-    const reviews = [
-        {
-            id: 1,
-            author: "Jamie D.",
-            initials: "JD",
-            gradientFrom: "pink-500",
-            gradientTo: "purple-500",
-            rating: 5,
-            title: "Perfect for my aesthetic!",
-            content:
-                "This hoodie is everything! The oversized fit is perfect and the neon accents pop in my IG stories. I've gotten so many DMs asking where I got it. Definitely worth the price!",
-            date: "3 days ago",
-            helpful: 24,
-            hasImages: true,
-        },
-        {
-            id: 2,
-            author: "Tyler K.",
-            initials: "TK",
-            gradientFrom: "blue-500",
-            gradientTo: "green-500",
-            rating: 4,
-            title: "Great quality but runs large",
-            content:
-                "Love the vibe of this hoodie and the hidden phone pocket is genius! Just a heads up that it runs pretty big. I'm usually a medium but should have gone with a small. Still keeping it though because the oversized look is in.",
-            date: "1 week ago",
-            helpful: 17,
-            hasImages: false,
-        },
-        {
-            id: 3,
-            author: "Alex M.",
-            initials: "AM",
-            gradientFrom: "yellow-500",
-            gradientTo: "orange-500",
-            rating: 5,
-            title: "Obsessed with this hoodie!",
-            content:
-                "The quality is insane for the price. Super soft inside and the thumb holes are such a vibe. Already ordered another color because I'm literally living in this hoodie.",
-            date: "2 weeks ago",
-            helpful: 32,
-            hasImages: true,
-        },
-    ]
+  const getOptionIdsMap = (newOptions: Record<number, VariationTypeOption>) => {
+    return Object.fromEntries(Object.entries(newOptions).map(([k, v]) => [k, v.id]))
+  }
 
-    const [selectedColor, setSelectedColor] = useState<string | null>(null)
-    const [selectedSize, setSelectedSize] = useState<string | null>(null)
-    const [quantity, setQuantity] = useState(1)
-    const [activeImage, setActiveImage] = useState(0)
-    const [liked, setLiked] = useState(false)
+  const chooseOption = (typeId: number, option: VariationTypeOption | null, updateRouter = true) => {
+    if (!option) return
 
-    return (
-        <>
-            <Head title="Product Detail">
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-            </Head>
-            <div className="relative">
-                <AuthLayout>
-                    <div className="min-h-screen text-white bg-zinc-300 dark:bg-black">
-                        <div className="container mx-auto max-w-7xl py-8 px-4 mt-10">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-25">
-                                {/* Product Images */}
-                                <div className="space-y-4">
-                                    <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-900">
-                                        <img
-                                            src={productImages[activeImage] || "/placeholder.svg"}
-                                            alt={product.title}
+    setSelectedOptions((prev) => {
+      const newOptions = {
+        ...prev,
+        [typeId]: option,
+      }
 
-                                            className="object-cover transition-all duration-500 hover:scale-105"
-                                        />
-                                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-cyan-500 to-purple-400 border-0">
-                                            New Drop
-                                        </Badge>
-                                        <button
-                                            onClick={() => setLiked(!liked)}
-                                            className="absolute top-4 right-4 bg-black/40 backdrop-blur-sm p-2 rounded-full"
-                                        >
-                                            <Heart className={`h-5 w-5 ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
-                                        </button>
-                                    </div>
+      if (updateRouter) {
+        router.get(
+          url,
+          {
+            options: getOptionIdsMap(newOptions),
+          },
+          {
+            preserveScroll: true,
+            preserveState: true,
+          },
+        )
+      }
 
-                                    {/* Thumbnail gallery */}
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {productImages.map((img, index) => (
-                                            <button
-                                                key={index}
-                                                className={`aspect-square rounded-lg overflow-hidden border-2 ${activeImage === index ? "border-purple-400" : "border-transparent"}`}
-                                                onClick={() => setActiveImage(index)}
-                                            >
-                                                <img
-                                                    src={img || "/placeholder.svg"}
-                                                    alt={`Product view ${index + 1}`}
-                                                    width={100}
-                                                    height={100}
-                                                    className="object-cover w-full h-full"
-                                                />
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+      // Reset quantity to 1 if it exceeds the new variation's quantity
+      const newSelectedOptionIds = Object.values(newOptions)
+        .map((op) => op.id)
+        .sort()
 
-                                {/* Product Info */}
-                                <div className="space-y-6">
-                                    {/* Tags */}
-                                    <div className="flex flex-wrap gap-2">
-                                        {product.tags?.map((tag) => (
-                                            <Badge key={tag} variant="outline" className="border-purple-400 text-purple-400">
-                                                {tag}
-                                            </Badge>
-                                        ))}
-                                    </div>
+      for (const variation of product.variations) {
+        const optionIds = (variation.variation_type_ids ?? []).sort()
+        if (arraysAreEqual(newSelectedOptionIds, optionIds)) {
+          const maxQuantity = variation.quantity || 0
+          if (form.data.quantity > maxQuantity) {
+            form.setData("quantity", maxQuantity > 0 ? 1 : 0)
+          }
+          form.setData("price", variation.price)
+          break
+        }
+      }
 
-                                    {/* Title and price */}
-                                    <div>
-                                        <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-cyan-500 to-purple-400 bg-clip-text text-transparent">
-                                            {product.title}
-                                        </h1>
-                                        <div className="flex items-center mt-2 space-x-4">
-                                            <div className="flex items-center">
-                                                {Array(5)
-                                                    .fill(0)
-                                                    .map((_, i) => (
-                                                        <Star
-                                                            key={i}
-                                                            className={`h-4 w-4 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-500"}`}
-                                                        />
-                                                    ))}
-                                                <span className="ml-2 text-sm text-white">
-                                                    {product.rating} ({product.reviewCount} reviews)
-                                                </span>
-                                            </div>
-                                            {/* <button className="text-sm text-gray-300 hover:text-white flex items-center">
-                                                <Share2 className="h-4 w-4 mr-1" /> Share
-                                            </button> */}
-                                        </div>
-                                    </div>
+      return newOptions
+    })
+  }
 
-                                    {/* Price */}
-                                    <div className="flex items-center space-x-3">
-                                        {product.discountPrice ? (
-                                            <>
-                                                <span className="text-3xl font-bold">${product.discountPrice}</span>
-                                                <span className="text-xl text-gray-500 line-through">${product.price}</span>
-                                                <Badge className="bg-green-500 text-white border-0">
-                                                    {Math.round(((product.price - product.discountPrice) / product.price) * 100)}% OFF
-                                                </Badge>
-                                            </>
-                                        ) : (
-                                            <span className="text-3xl font-bold">${product.price}</span>
-                                        )}
-                                    </div>
+  const addToCart = () => {
+    form.post(route("cart.store", product.id), {
+      preserveScroll: true,
+      preserveState: true,
+      onError: (err) => console.log(err),
+    })
+  }
 
-                                    {/* Description */}
-                                    <p className="text-gray-50">{product.description}</p>
+  const incrementQuantity = () => {
+    if (form.data.quantity < computedProduct.quantity) {
+      form.setData("quantity", form.data.quantity + 1)
+    }
+  }
 
-                                    {/* Color selection */}
-                                    <div>
-                                        <h3 className="text-sm font-medium mb-3">Color</h3>
-                                        <div className="flex space-x-3">
-                                            {product.colors?.map((color) => (
-                                                <button
-                                                    key={color}
-                                                    className={`w-8 h-8 rounded-full transition-all ${selectedColor === color ? "ring-2 ring-offset-2 ring-offset-black ring-white" : ""}`}
-                                                    style={{ backgroundColor: color }}
-                                                    onClick={() => setSelectedColor(color)}
-                                                    aria-label={`Select color ${color}`}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
+  const decrementQuantity = () => {
+    if (form.data.quantity > 1) {
+      form.setData("quantity", form.data.quantity - 1)
+    }
+  }
 
-                                    {/* Size selection */}
-                                    <div>
-                                        <div className="flex justify-between items-center mb-3">
-                                            <h3 className="text-sm font-medium">Size</h3>
+  const renderProductVariationTypes = () =>
+    product.variationTypes.map((type) => (
+      <div key={type.id} className="mb-10">
+        <h3 className="text-xs uppercase tracking-widest mb-6">{type.name}</h3>
+        {type.type === "image" && (
+          <div className="flex flex-wrap gap-6">
+            {type.options.map((option) => {
+              // Find variation with this option to check stock
+              const optionIds = [
+                ...Object.values(selectedOptions)
+                  .map((op) => op.id)
+                  .filter((id) => id !== option.id),
+                option.id,
+              ].sort()
+              const variation = product.variations.find((v) =>
+                arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
+              )
+              const isAvailable = variation ? variation.quantity > 0 : true
 
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {product.sizes?.map((size) => (
-                                                <button
-                                                    key={size}
-                                                    className={`px-4 py-2 rounded-full border ${selectedSize === size
-                                                        ? "bg-white text-black border-white"
-                                                        : "border-gray-900 text-white hover:border-gray-400"
-                                                        }`}
-                                                    onClick={() => setSelectedSize(size)}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Quantity */}
-                                    <div>
-                                        <h3 className="text-sm font-medium mb-3">Quantity</h3>
-                                        <div className="flex items-center space-x-3">
-                                            <button
-                                                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center"
-                                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            >
-                                                -
-                                            </button>
-                                            <span>{quantity}</span>
-                                            <button
-                                                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center"
-                                                onClick={() => setQuantity(quantity + 1)}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Add to cart */}
-                                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                        <Button className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-400 hover:from-cyan-600 hover:to-purple-500 text-white rounded-full py-6">
-                                            <ShoppingBag className="mr-2 h-5 w-5" /> Add to Bag
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1 border-white/30 text-green-400 hover:bg-pink-200 rounded-full py-6"
-                                        >
-                                            Buy Now
-                                        </Button>
-                                    </div>
-
-                                    {/* Shipping info */}
-                                    <div className="flex items-center text-sm text-gray-300 pt-4">
-                                        <Truck className="h-4 w-4 mr-2" />
-                                        <span>Free shipping on orders over $50</span>
-                                    </div>
-
-                                    {/* Social proof */}
-                                    <div className="bg-gray-900/50 rounded-xl p-4 mt-6">
-                                        <p className="text-sm italic text-gray-300">
-                                            "Just got mine today and already posted on TikTok. The quality is fire! 🔥"
-                                        </p>
-                                        <div className="flex items-center mt-2">
-                                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-orange-400"></div>
-                                            <span className="text-xs ml-2">@fashionista_z • 2 hours ago</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Product details tabs */}
-                            <div className="mt-16">
-                                <Tabs defaultValue="details">
-                                    <TabsList className="w-full justify-start border-b border-gray-800 bg-transparent">
-                                        <TabsTrigger
-                                            value="details"
-                                            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-purple-400 rounded-none"
-                                        >
-                                            Details
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="sustainability"
-                                            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-purple-400 rounded-none"
-                                        >
-                                            Sustainability
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="reviews"
-                                            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-purple-400 rounded-none"
-                                        >
-                                            Reviews
-                                        </TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="details" className="pt-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <div>
-                                                <h3 className="text-xl font-bold mb-4">Product Features</h3>
-                                                <ul className="space-y-2 text-gray-600">
-                                                    <li>• Oversized fit for maximum comfort and style</li>
-                                                    <li>• Heavyweight 400 GSM cotton-poly blend</li>
-                                                    <li>• Neon accents that pop in UV light</li>
-                                                    <li>• Hidden phone pocket with earbud routing</li>
-                                                    <li>• Thumb holes for extra coziness</li>
-                                                </ul>
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-bold mb-4">Care Instructions</h3>
-                                                <ul className="space-y-2 text-gray-600">
-                                                    <li>• Machine wash cold with similar colors</li>
-                                                    <li>• Do not bleach</li>
-                                                    <li>• Tumble dry low</li>
-                                                    <li>• Cool iron if needed</li>
-                                                    <li>• Do not dry clean</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </TabsContent>
-                                    <TabsContent value="sustainability" className="pt-6">
-                                        <div className="bg-gradient-to-br from-green-900/20 to-transparent p-6 rounded-xl">
-                                            <h3 className="text-xl font-bold mb-4 flex items-center">
-                                                <Badge className="mr-2 bg-green-500 text-white border-0">Planet Friendly</Badge>
-                                                Our Sustainability Commitment
-                                            </h3>
-                                            <p className="mb-4 text-gray-500">
-                                                This product is part of our commitment to reduce environmental impact:
-                                            </p>
-                                            <ul className="space-y-3 text-gray-600">
-                                                <li className="flex items-start">
-                                                    <div className="bg-green-500 rounded-full p-1 mr-3 mt-1">
-                                                        <RefreshCw className="h-3 w-3 text-black" />
-                                                    </div>
-                                                    <span>Made with 70% recycled polyester from post-consumer plastic bottles</span>
-                                                </li>
-                                                <li className="flex items-start">
-                                                    <div className="bg-green-500 rounded-full p-1 mr-3 mt-1">
-                                                        <RefreshCw className="h-3 w-3 text-black" />
-                                                    </div>
-                                                    <span>Water-saving dyeing process reduces water usage by 60%</span>
-                                                </li>
-                                                <li className="flex items-start">
-                                                    <div className="bg-green-500 rounded-full p-1 mr-3 mt-1">
-                                                        <RefreshCw className="h-3 w-3 text-black" />
-                                                    </div>
-                                                    <span>Carbon-neutral shipping on all orders</span>
-                                                </li>
-                                                <li className="flex items-start">
-                                                    <div className="bg-green-500 rounded-full p-1 mr-3 mt-1">
-                                                        <RefreshCw className="h-3 w-3 text-black" />
-                                                    </div>
-                                                    <span>Packaging made from 100% recycled materials</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </TabsContent>
-                                    <TabsContent value="reviews" className="pt-6">
-                                        <div className="space-y-8">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <h3 className="text-xl font-bold">Customer Reviews</h3>
-                                                    <div className="flex items-center mt-1">
-                                                        <div className="flex">
-                                                            {Array(5)
-                                                                .fill(0)
-                                                                .map((_, i) => (
-                                                                    <Star
-                                                                        key={i}
-                                                                        className={`h-5 w-5 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-500"}`}
-                                                                    />
-                                                                ))}
-                                                        </div>
-                                                        <span className="ml-2 text-gray-300">Based on {product.reviewCount} reviews</span>
-                                                    </div>
-                                                </div>
-                                                {/* <Button className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                                    <MessageCircle className="mr-2 h-4 w-4" /> Write a Review
-                                                </Button> */}
-                                            </div>
-
-
-
-                                            {/* Sample reviews */}
-                                            <div className="space-y-6">
-                                                {reviews.map((review) => (
-                                                    <div key={review.id} className="border-b border-gray-800 pb-6">
-                                                        <div className="flex justify-between items-start">
-                                                            <div className="flex items-center">
-                                                                <div
-                                                                    className={`w-10 h-10 rounded-full bg-gradient-to-r from-${review.gradientFrom} to-${review.gradientTo} flex items-center justify-center text-white font-bold`}
-                                                                >
-                                                                    {review.initials}
-                                                                </div>
-                                                                <div className="ml-3">
-                                                                    <h4 className="font-semibold">{review.author}</h4>
-                                                                    <p className="text-xs text-gray-500">Posted {review.date}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex">
-                                                                {Array(5)
-                                                                    .fill(0)
-                                                                    .map((_, i) => (
-                                                                        <Star
-                                                                            key={i}
-                                                                            className={`h-4 w-4 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-500"}`}
-                                                                        />
-                                                                    ))}
-                                                            </div>
-                                                        </div>
-                                                        <h5 className="font-medium mt-3">{review.title}</h5>
-                                                        <p className="text-gray-300 mt-2">{review.content}</p>
-
-                                                        {review.hasImages && (
-                                                            <div className="flex mt-4 space-x-2">
-                                                                <div className="w-16 h-16 rounded-md bg-gray-800"></div>
-                                                                <div className="w-16 h-16 rounded-md bg-gray-800"></div>
-                                                            </div>
-                                                        )}
-
-
-                                                    </div>
-                                                ))}
-
-
-                                            </div>
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
-                            </div>
-
-                            {/* You may also like */}
-                            <div className="mt-20">
-                                <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {relatedProducts.map((item) => (
-                                        <div key={item.id} className="group relative rounded-xl overflow-hidden">
-                                            <Link href={`/product/${item.id}`} className="absolute inset-0 z-10">
-                                                <span className="sr-only">View product</span>
-                                            </Link>
-                                            <div className="aspect-square bg-gray-900 relative overflow-hidden">
-                                                <img
-                                                    src={item.image || "/placeholder.svg"}
-                                                    alt={item.title}
-
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                            </div>
-                                            <div className="p-3">
-                                                <h3 className="font-medium text-sm truncate">{item.title}</h3>
-                                                <p className="text-gray-400 text-sm">${item.price}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Recently viewed */}
-                            <div className="mt-16 mb-12">
-                                <h2 className="text-2xl font-bold mb-6">Recently Viewed</h2>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {recentlyViewed.map((item) => (
-                                        <div key={item.id} className="group relative rounded-xl overflow-hidden">
-                                            <Link href={`/product/${item.id}`} className="absolute inset-0 z-10">
-                                                <span className="sr-only">View product</span>
-                                            </Link>
-                                            <div className="aspect-square bg-gray-900 relative overflow-hidden">
-                                                <img
-                                                    src={item.image || "/placeholder.svg"}
-                                                    alt={item.title}
-
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                            </div>
-                                            <div className="p-3">
-                                                <h3 className="font-medium text-sm truncate">{item.title}</h3>
-                                                <p className="text-gray-400 text-sm">${item.price}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+              return (
+                <div
+                  key={option.id}
+                  onClick={() => isAvailable && chooseOption(type.id, option)}
+                  className={`cursor-pointer relative ${!isAvailable ? "opacity-30 cursor-not-allowed" : ""}`}
+                >
+                  {option.images?.[0]?.thumb && (
+                    <div
+                      className={`
+                      w-20 h-20 overflow-hidden transition-all duration-200
+                      ${
+                        selectedOptions[type.id]?.id === option.id
+                          ? "outline outline-1 outline-offset-4 outline-black dark:outline-white"
+                          : "opacity-80 hover:opacity-100"
+                      }
+                    `}
+                    >
+                      <img
+                        src={option.images[0].thumb || "/placeholder.svg"}
+                        alt={option.name || ""}
+                        className="w-full h-full object-cover"
+                      />
+                      {!isAvailable && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm">
+                          <span className="text-xs uppercase">Sold out</span>
                         </div>
-
-                        {/* Sticky add to cart for mobile */}
-                        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md p-4 border-t border-gray-800">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-300">{product.title}</p>
-                                    <p className="font-bold">${product.discountPrice || product.price}</p>
-                                </div>
-                                <Button className="bg-gradient-to-r from-cyan-500 to-purple-400 hover:from-cyan-600 hover:to-purple-500 text-white rounded-full">
-                                    Add to Bag
-                                </Button>
-                            </div>
-                        </div>
+                      )}
                     </div>
-                </AuthLayout>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+        {type.type === "radio" && (
+          <div className="flex flex-wrap gap-4">
+            {type.options.map((option) => {
+              // Find variation with this option to check stock
+              const optionIds = [
+                ...Object.values(selectedOptions)
+                  .map((op) => op.id)
+                  .filter((id) => id !== option.id),
+                option.id,
+              ].sort()
+              const variation = product.variations.find((v) =>
+                arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
+              )
+              const isAvailable = variation ? variation.quantity > 0 : true
+
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => isAvailable && chooseOption(type.id, option)}
+                  disabled={!isAvailable}
+                  className={`
+                    px-6 py-3 text-sm transition-all duration-200
+                    ${
+                      selectedOptions[type.id]?.id === option.id
+                        ? "bg-black text-white dark:bg-white dark:text-black"
+                        : "bg-transparent border border-black/20 text-black hover:border-black dark:border-white/20 dark:text-white dark:hover:border-white"
+                    }
+                    ${!isAvailable ? "opacity-30 cursor-not-allowed" : ""}
+                  `}
+                >
+                  {option.name}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    ))
+
+  useEffect(() => {
+    for (const type of product.variationTypes) {
+      const selectedOptionId = variationOptions[type.id]
+      const foundOption = type.options.find((op) => op.id === selectedOptionId) || type.options[0]
+      chooseOption(type.id, foundOption, false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const idsMap = Object.fromEntries(Object.entries(selectedOptions).map(([typeId, option]) => [typeId, option.id]))
+    form.setData("option_ids", idsMap)
+  }, [selectedOptions])
+
+  return (
+    <>
+      <Head title={product.title} />
+      <div className="relative">
+        <AuthLayout>
+          <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
+            <div className="container mx-auto px-4 py-16 max-w-6xl">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                {/* Product Gallery - Left Side */}
+                <div>
+                  {/* Main image */}
+                  <div className="relative mb-8">
+                    <img
+                      src={images[activeImage]?.large || "/placeholder.svg?height=600&width=500"}
+                      alt={product.title}
+                      className="w-full aspect-[3/3] object-cover"
+                    />
+
+                    {!isInStock && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+                        <div className="text-lg uppercase tracking-widest">Out of Stock</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Thumbnail gallery */}
+                  {images.length > 1 && (
+                    <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+                      {images.map((img, index) => (
+                        <button
+                          key={index}
+                          className={`
+                            min-w-[80px] w-[80px] aspect-square transition-all duration-200
+                            ${
+                              activeImage === index
+                                ? "outline outline-1 outline-offset-2 outline-black dark:outline-white"
+                                : "opacity-40 hover:opacity-100"
+                            }
+                          `}
+                          onClick={() => setActiveImage(index)}
+                        >
+                          <img
+                            src={img?.thumb || "/placeholder.svg?height=100&width=100"}
+                            alt={`Product view ${index + 1}`}
+                            className="object-cover w-full h-full"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Info - Right Side */}
+                <div className="space-y-10 pt-8">
+                  {/* Product title and category */}
+                  <div>
+                    <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+                      {product.category || "Product"}
+                    </div>
+
+                    <h1 className="text-4xl font-light mb-4 tracking-tight">{product.title}</h1>
+
+                    <div>
+                        <p className="mb-2"> Descritpion : </p>
+                    <div
+                      className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm"
+                      dangerouslySetInnerHTML={{ __html: product.description }}
+                    />
+                    </div>
+                  </div>
+
+                  {/* Price */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl font-light">${computedProduct.price}</span>
+                    {computedProduct.price < product.price && (
+                      <span className="text-gray-500 line-through">${product.price}</span>
+                    )}
+                  </div>
+
+                  {/* Variation Types */}
+                  {renderProductVariationTypes()}
+
+                  {/* Stock information */}
+                  <div className="text-sm">
+                    {isInStock ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span>In stock: {computedProduct.quantity} available</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <span>Out of stock</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quantity */}
+                  {isInStock && (
+                    <div>
+                      <h3 className="text-xs uppercase tracking-widest mb-4">Quantity</h3>
+                      <div className="flex border border-black/20 dark:border-white/20 w-32">
+                        <button
+                          onClick={decrementQuantity}
+                          disabled={form.data.quantity <= 1}
+                          className="w-10 h-10 flex items-center justify-center disabled:opacity-50"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </button>
+                        <div className="flex-1 h-10 flex items-center justify-center">{form.data.quantity}</div>
+                        <button
+                          onClick={incrementQuantity}
+                          disabled={form.data.quantity >= computedProduct.quantity}
+                          className="w-10 h-10 flex items-center justify-center disabled:opacity-50"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add to Cart */}
+                  <div className="flex gap-4 pt-4">
+                    <Button
+                      className="flex-1 bg-black hover:bg-black/80 text-white dark:bg-white dark:hover:bg-white/80 dark:text-black py-7 rounded-none"
+                      onClick={addToCart}
+                      disabled={
+                        !isInStock || Object.keys(selectedOptions).length < (product.variationTypes?.length || 0)
+                      }
+                    >
+                      {isInStock ? "Add to Cart" : "Out of Stock"}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="w-14 h-14 border-black/20 text-black hover:bg-transparent hover:border-black dark:border-white/20 dark:text-white dark:hover:border-white rounded-none p-0"
+                      onClick={() => setLiked(!liked)}
+                    >
+                      <Heart className={`h-5 w-5 ${liked ? "fill-black dark:fill-white" : ""}`} />
+                    </Button>
+                  </div>
+
+                  {/* Shipping info */}
+                  <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 pt-4">
+                    Free shipping on orders over $50
+                  </div>
+                </div>
+              </div>
             </div>
-        </>
-    )
+          </div>
+        </AuthLayout>
+      </div>
+    </>
+  )
 }
+
+export default ProductDetail
 

@@ -42,6 +42,7 @@ class ProductDetailResource extends JsonResource
                 'name' => $this->department->name,
             ],
 
+
             'variationTypes' => $this->variationTypes->map(function ($variationType) {
                 return [
                     'id' => $variationType->id,
@@ -65,14 +66,14 @@ class ProductDetailResource extends JsonResource
                 ];
             }),
 
-            'variations' => $this->variations ? $this->variations->map(function ($variation) {
+            'variations' => $this->variations->map(function ($variation) {
                 return [
                     'id' => $variation->id,
                     'variation_type_option_ids' => $variation->variation_types_option_ids,
                     'quantity' => $variation->quantity,
                     'price' => $variation->price,
                 ];
-            }) : [],
+            })
 
         ];
     }

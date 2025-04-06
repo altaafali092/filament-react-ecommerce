@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
 import AuthLayout from "@/pages/layout/AuthLayout"
 import type { IFrontProduct, VariationTypeOption } from "@/types/frontend"
@@ -15,19 +13,21 @@ interface Props {
 const ProductDetail = () => {
   const { product, variationOptions } = usePage<Props>().props
 
+  // Log the product and variation options
+  console.log("Product Data:", product);
+  console.log("Variation Options:", variationOptions);
+
   const form = useForm<{
-    option_ids: Record<string, number>;
-    quantity: number;
-    price: number | null;
+    option_ids: Record<string, number>
+    quantity: number
+    price: number | null
   }>({
     option_ids: {},
     quantity: 1,
     price: null,
   })
 
-  const {url} = usePage();
-
-
+  const { url } = usePage()
 
   const [selectedOptions, setSelectedOptions] = useState<Record<number, VariationTypeOption>>({})
   const [activeImage, setActiveImage] = useState(0)
@@ -37,96 +37,31 @@ const ProductDetail = () => {
     return a.length === b.length && a.every((v, i) => v === b[i])
   }
 
-  const computedProduct = useMemo(() => {
-
+// In computedProduct memo:
+const computedProduct = useMemo(() => {
+    console.log("Product Variations:", product.variations);
     const selectedOptionIds = Object.values(selectedOptions)
       .map((op) => op.id)
       .sort();
 
+    // Find matching variation
+    const matchedVariation = product.variations.find(v =>
+      arraysAreEqual(
+        (v.variation_type_option_ids || []).sort(),
+        selectedOptionIds
+      )
+    );
 
-    for (const variation of product.variations) {
-      const optionIds = (variation.variation_type_option_ids ?? []).sort();
-
-      if (arraysAreEqual(selectedOptionIds, optionIds)) {
-        return {
-          price: variation.price,
-          quantity: variation.quantity ?? 0,
-        };
-      }
-    }
-
-    // Fallback to the default product price and quantity if no matching variation is found
-    return {
+    return matchedVariation ? {
+      price: matchedVariation.price,
+      quantity: matchedVariation.quantity ?? 0,
+    } : {
       price: product.price,
       quantity: product.quantity,
     };
   }, [product, selectedOptions]);
 
-
-  const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
-
-  const images = useMemo(() => {
-    for (const typeId in selectedOptions) {
-      const option = selectedOptions[typeId]
-      if (option.images?.length > 0) return option.images
-    }
-    return product.images
-  }, [product, selectedOptions])
-
-  const getOptionIdsMap = (newOptions: Record<number, VariationTypeOption>) => {
-    return Object.fromEntries(Object.entries(newOptions).map(([k, v]) => [k, v.id]))
-  }
-
-  const chooseOption = (typeId: number, option: VariationTypeOption | null, updateRouter = true) => {
-    if (!option) return
-
-    setSelectedOptions((prev) => {
-      const newOptions = {
-        ...prev,
-        [typeId]: option,
-      }
-
-      if (updateRouter) {
-        router.get(
-          url,
-          {
-            options: getOptionIdsMap(newOptions),
-          },
-          {
-            preserveScroll: true,
-            preserveState: true,
-          },
-        )
-      }
-
-      // Update form data with option IDs
-      const optionIdsMap = getOptionIdsMap(newOptions)
-      form.setData("option_ids", optionIdsMap)
-
-      return newOptions
-    })
-  }
-
-  const addToCart = () => {
-    form.post(route("cart.store", product.id), {
-      preserveScroll: true,
-      preserveState: true,
-      onError: (err) => console.log(err),
-    })
-  }
-
-  const incrementQuantity = () => {
-    if (form.data.quantity < computedProduct.quantity) {
-      form.setData("quantity", form.data.quantity + 1)
-    }
-  }
-
-  const decrementQuantity = () => {
-    if (form.data.quantity > 1) {
-      form.setData("quantity", form.data.quantity - 1)
-    }
-  }
-
+  // In renderProductVariationTypes (stock check):
   const renderProductVariationTypes = () =>
     product.variationTypes.map((type) => (
       <div key={type.id} className="mb-10">
@@ -134,13 +69,12 @@ const ProductDetail = () => {
         {type.type === "image" && (
           <div className="flex flex-wrap gap-6">
             {type.options.map((option) => {
-              // Find variation with this option to check stock
               const optionIds = [
                 ...Object.values(selectedOptions)
-                  .map((op) => op.id)
-                  .filter((id) => id !== option.id),
+                  .map(op => op.id)
+                  .filter(id => id !== option.id),
                 option.id,
-              ].sort()
+              ].sort();
               const variation = product.variations.find((v) =>
                 arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
               )
@@ -183,7 +117,6 @@ const ProductDetail = () => {
         {type.type === "radio" && (
           <div className="flex flex-wrap gap-4">
             {type.options.map((option) => {
-              // Find variation with this option to check stock
               const optionIds = [
                 ...Object.values(selectedOptions)
                   .map((op) => op.id)
@@ -246,6 +179,70 @@ const ProductDetail = () => {
       form.setData("quantity", 1)
     }
   }, [computedProduct, selectedOptions])
+
+  const getOptionIdsMap = (newOptions: Record<number, VariationTypeOption>) => {
+    return Object.fromEntries(Object.entries(newOptions).map(([k, v]) => [k, v.id]))
+  }
+
+  const chooseOption = (typeId: number, option: VariationTypeOption | null, updateRouter = true) => {
+    if (!option) return
+
+    setSelectedOptions((prev) => {
+      const newOptions = {
+        ...prev,
+        [typeId]: option,
+      }
+
+      if (updateRouter) {
+        router.get(
+          url,
+          {
+            options: getOptionIdsMap(newOptions),
+          },
+          {
+            preserveScroll: true,
+            preserveState: true,
+          },
+        )
+      }
+
+      // Update form data with option IDs
+      const optionIdsMap = getOptionIdsMap(newOptions)
+      form.setData("option_ids", optionIdsMap)
+
+      return newOptions
+    })
+  }
+
+  const addToCart = () => {
+    form.post(route("cart.store", product.id), {
+      preserveScroll: true,
+      preserveState: true,
+      onError: (err) => console.log(err),
+    })
+  }
+
+  const incrementQuantity = () => {
+    if (form.data.quantity < computedProduct.quantity) {
+      form.setData("quantity", form.data.quantity + 1)
+    }
+  }
+
+  const decrementQuantity = () => {
+    if (form.data.quantity > 1) {
+      form.setData("quantity", form.data.quantity - 1)
+    }
+  }
+
+  const images = useMemo(() => {
+    for (const typeId in selectedOptions) {
+      const option = selectedOptions[typeId]
+      if (option.images?.length > 0) return option.images
+    }
+    return product.images
+  }, [product, selectedOptions])
+
+  const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
   return (
     <>
@@ -318,31 +315,38 @@ const ProductDetail = () => {
                     </div>
                   </div>
 
-                  {/* Price */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-3xl font-light">${computedProduct.price}</span>
-                    {computedProduct.price < product.price && (
-                      <span className="text-gray-500 line-through">${product.price}</span>
+                  {/* Price and Availability */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl font-light">${computedProduct.price}</span>
+                      {computedProduct.price < product.price && (
+                        <span className="text-gray-500 line-through">${product.price}</span>
+                      )}
+                    </div>
+
+                    {/* Selected variation details */}
+                    {Object.keys(selectedOptions).length > 0 && (
+                      <div className="text-sm bg-gray-50 dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1">
+                          {Object.entries(selectedOptions).map(([typeId, option]) => (
+                            <div key={typeId} className="flex items-center gap-1">
+                              <span className="font-medium">
+                                {product.variationTypes.find((t) => t.id === Number(typeId))?.name}:
+                              </span>
+                              <span>{option.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${isInStock ? "bg-green-500" : "bg-red-500"}`}></div>
+                          <span>{isInStock ? `In stock: ${computedProduct.quantity} available` : "Out of stock"}</span>
+                        </div>
+                      </div>
                     )}
                   </div>
 
                   {/* Variation Types */}
                   {renderProductVariationTypes()}
-
-                  {/* Stock information */}
-                  <div className="text-sm">
-                    {isInStock ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <span>In stock: {computedProduct.quantity} available</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                        <span>Out of stock</span>
-                      </div>
-                    )}
-                  </div>
 
                   {/* Quantity */}
                   {isInStock && (

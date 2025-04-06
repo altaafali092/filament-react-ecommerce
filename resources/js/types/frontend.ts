@@ -42,11 +42,11 @@ export interface IFrontProduct {
     };
     variationTypes: VariationType[], // safe default: []
     variations: Array<{
-      id: number;
-      variation_type_option_ids: number[];
-      quantity:number;
-      price: number;
-    }>; // safe default: []
+        id: number;
+        variation_type_option_ids: string[];
+        quantity:number;
+        price: number;
+      }> // safe default: []
 }
 export type paginationProps<T>={
     data:Array<T>;

@@ -1,410 +1,440 @@
+import CurrencyFormatter from "@/components/CurrencyFormatter"
 import { Button } from "@/components/ui/button"
 import AuthLayout from "@/pages/layout/AuthLayout"
 import type { IFrontProduct, VariationTypeOption } from "@/types/frontend"
 import { Head, router, useForm, usePage } from "@inertiajs/react"
-import { Heart, Minus, Plus } from "lucide-react"
+import { Heart, Minus, Plus, ShieldCheck, Truck } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 
 interface Props {
-  product: IFrontProduct
-  variationOptions: Record<number, number>
+    product: IFrontProduct
+    variationOptions: Record<number, number>
 }
 
 const ProductDetail = () => {
-  const { product, variationOptions } = usePage<Props>().props
+    const { product, variationOptions } = usePage<Props>().props
 
-  // Log the product and variation options
-  console.log("Product Data:", product);
-  console.log("Variation Options:", variationOptions);
+    // Log the product and variation options
+    console.log("Product Data:", product);
+    console.log("Variation Options:", variationOptions);
 
-  const form = useForm<{
-    option_ids: Record<string, number>
-    quantity: number
-    price: number | null
-  }>({
-    option_ids: {},
-    quantity: 1,
-    price: null,
-  })
+    const form = useForm<{
+        option_ids: Record<string, number>
+        quantity: number
+        price: number | null
+    }>({
+        option_ids: {},
+        quantity: 1,
+        price: null,
+    })
 
-  const { url } = usePage()
+    const { url } = usePage()
 
-  const [selectedOptions, setSelectedOptions] = useState<Record<number, VariationTypeOption>>({})
-  const [activeImage, setActiveImage] = useState(0)
-  const [liked, setLiked] = useState(false)
+    const [selectedOptions, setSelectedOptions] = useState<Record<number, VariationTypeOption>>({})
+    const [activeImage, setActiveImage] = useState(0)
+    const [liked, setLiked] = useState(false)
 
-  const arraysAreEqual = (a: any[], b: any[]) => {
-    return a.length === b.length && a.every((v, i) => v === b[i])
-  }
+    const arraysAreEqual = (a: any[], b: any[]) => {
+        return a.length === b.length && a.every((v, i) => v === b[i])
+    }
 
-// In computedProduct memo:
-const computedProduct = useMemo(() => {
-    console.log("Product Variations:", product.variations);
-    const selectedOptionIds = Object.values(selectedOptions)
-      .map((op) => op.id)
-      .sort();
+    // In computedProduct memo:
+    const computedProduct = useMemo(() => {
+        console.log("Product Variations:", product.variations);
+        const selectedOptionIds = Object.values(selectedOptions)
+            .map((op) => op.id)
+            .sort();
 
-    // Find matching variation
-    const matchedVariation = product.variations.find(v =>
-      arraysAreEqual(
-        (v.variation_type_option_ids || []).sort(),
-        selectedOptionIds
-      )
-    );
+        // Find matching variation
+        const matchedVariation = product.variations.find(v =>
+            arraysAreEqual(
+                (v.variation_type_option_ids || []).sort(),
+                selectedOptionIds
+            )
+        );
 
-    return matchedVariation ? {
-      price: matchedVariation.price,
-      quantity: matchedVariation.quantity ?? 0,
-    } : {
-      price: product.price,
-      quantity: product.quantity,
-    };
-  }, [product, selectedOptions]);
+        return matchedVariation ? {
+            price: matchedVariation.price,
+            quantity: matchedVariation.quantity ?? 0,
+        } : {
+            price: product.price,
+            quantity: product.quantity,
+        };
+    }, [product, selectedOptions]);
 
-  // In renderProductVariationTypes (stock check):
-  const renderProductVariationTypes = () =>
-    product.variationTypes.map((type) => (
-      <div key={type.id} className="mb-10">
-        <h3 className="text-xs uppercase tracking-widest mb-6">{type.name}</h3>
-        {type.type === "image" && (
-          <div className="flex flex-wrap gap-6">
-            {type.options.map((option) => {
-              const optionIds = [
-                ...Object.values(selectedOptions)
-                  .map(op => op.id)
-                  .filter(id => id !== option.id),
-                option.id,
-              ].sort();
-              const variation = product.variations.find((v) =>
-                arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
-              )
-              const isAvailable = variation ? variation.quantity > 0 : true
+    // In renderProductVariationTypes (stock check):
+    const renderProductVariationTypes = () =>
+        product.variationTypes.map((type) => (
+            <div key={type.id} className="mb-10">
+                <h3 className="text-xs uppercase tracking-widest mb-6">{type.name}</h3>
+                {type.type === "image" && (
+                    <div className="flex flex-wrap gap-6">
+                        {type.options.map((option) => {
+                            const optionIds = [
+                                ...Object.values(selectedOptions)
+                                    .map(op => op.id)
+                                    .filter(id => id !== option.id),
+                                option.id,
+                            ].sort();
+                            const variation = product.variations.find((v) =>
+                                arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
+                            )
+                            const isAvailable = variation ? variation.quantity > 0 : true
 
-              return (
-                <div
-                  key={option.id}
-                  onClick={() => isAvailable && chooseOption(type.id, option)}
-                  className={`cursor-pointer relative ${!isAvailable ? "opacity-30 cursor-not-allowed" : ""}`}
-                >
-                  {option.images?.[0]?.thumb && (
-                    <div
-                      className={`
+                            return (
+                                <div
+                                    key={option.id}
+                                    onClick={() => isAvailable && chooseOption(type.id, option)}
+                                    className={`cursor-pointer relative ${!isAvailable ? "opacity-30 cursor-not-allowed" : ""}`}
+                                >
+                                    {option.images?.[0]?.thumb && (
+                                        <div
+                                            className={`
                       w-20 h-20 overflow-hidden transition-all duration-200
-                      ${
-                        selectedOptions[type.id]?.id === option.id
-                          ? "outline outline-1 outline-offset-4 outline-black dark:outline-white"
-                          : "opacity-80 hover:opacity-100"
-                      }
+                      ${selectedOptions[type.id]?.id === option.id
+                                                    ? "outline outline-1 outline-offset-4 outline-black dark:outline-white"
+                                                    : "opacity-80 hover:opacity-100"
+                                                }
                     `}
-                    >
-                      <img
-                        src={option.images[0].thumb || "/placeholder.svg"}
-                        alt={option.name || ""}
-                        className="w-full h-full object-cover"
-                      />
-                      {!isAvailable && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm">
-                          <span className="text-xs uppercase">Sold out</span>
-                        </div>
-                      )}
+                                        >
+                                            <img
+                                                src={option.images[0].thumb || "/placeholder.svg"}
+                                                alt={option.name || ""}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            {!isAvailable && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm">
+                                                    <span className="text-xs uppercase">Sold out</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })}
                     </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {type.type === "radio" && (
-          <div className="flex flex-wrap gap-4">
-            {type.options.map((option) => {
-              const optionIds = [
-                ...Object.values(selectedOptions)
-                  .map((op) => op.id)
-                  .filter((id) => id !== option.id),
-                option.id,
-              ].sort()
-              const variation = product.variations.find((v) =>
-                arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
-              )
-              const isAvailable = variation ? variation.quantity > 0 : true
+                )}
+                {type.type === "radio" && (
+                    <div className="flex flex-wrap gap-4">
+                        {type.options.map((option) => {
+                            const optionIds = [
+                                ...Object.values(selectedOptions)
+                                    .map((op) => op.id)
+                                    .filter((id) => id !== option.id),
+                                option.id,
+                            ].sort()
+                            const variation = product.variations.find((v) =>
+                                arraysAreEqual((v.variation_type_ids || []).sort(), optionIds),
+                            )
+                            const isAvailable = variation ? variation.quantity > 0 : true
 
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => isAvailable && chooseOption(type.id, option)}
-                  disabled={!isAvailable}
-                  className={`
+                            return (
+                                <button
+                                    key={option.id}
+                                    onClick={() => isAvailable && chooseOption(type.id, option)}
+                                    disabled={!isAvailable}
+                                    className={`
                     px-6 py-3 text-sm transition-all duration-200
-                    ${
-                      selectedOptions[type.id]?.id === option.id
-                        ? "bg-black text-white dark:bg-white dark:text-black"
-                        : "bg-transparent border border-black/20 text-black hover:border-black dark:border-white/20 dark:text-white dark:hover:border-white"
-                    }
+                    ${selectedOptions[type.id]?.id === option.id
+                                            ? "bg-black text-white dark:bg-white dark:text-black"
+                                            : "bg-transparent border border-black/20 text-black hover:border-black dark:border-white/20 dark:text-white dark:hover:border-white"
+                                        }
                     ${!isAvailable ? "opacity-30 cursor-not-allowed" : ""}
                   `}
-                >
-                  {option.name}
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </div>
-    ))
+                                >
+                                    {option.name}
+                                </button>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
+        ))
 
-  useEffect(() => {
-    for (const type of product.variationTypes) {
-      const selectedOptionId = variationOptions[type.id]
-      const foundOption = type.options.find((op) => op.id === selectedOptionId) || type.options[0]
-      chooseOption(type.id, foundOption, false)
+    useEffect(() => {
+        for (const type of product.variationTypes) {
+            const selectedOptionId = variationOptions[type.id]
+            const foundOption = type.options.find((op) => op.id === selectedOptionId) || type.options[0]
+            chooseOption(type.id, foundOption, false)
+        }
+
+        // Initialize price with the default computed price
+        form.setData("price", product.price)
+    }, [])
+
+    useEffect(() => {
+        const idsMap = Object.fromEntries(Object.entries(selectedOptions).map(([typeId, option]) => [typeId, option.id]))
+        form.setData("option_ids", idsMap)
+    }, [selectedOptions])
+
+    useEffect(() => {
+        // Update price and quantity when selected options change
+        form.setData("price", computedProduct.price)
+
+        // Reset quantity to 1 if it exceeds the new variation's quantity
+        if (form.data.quantity > computedProduct.quantity) {
+            form.setData("quantity", computedProduct.quantity > 0 ? 1 : 0)
+        } else if (form.data.quantity === 0 && computedProduct.quantity > 0) {
+            form.setData("quantity", 1)
+        }
+    }, [computedProduct, selectedOptions])
+
+    const getOptionIdsMap = (newOptions: Record<number, VariationTypeOption>) => {
+        return Object.fromEntries(Object.entries(newOptions).map(([k, v]) => [k, v.id]))
     }
 
-    // Initialize price with the default computed price
-    form.setData("price", product.price)
-  }, [])
+    const chooseOption = (typeId: number, option: VariationTypeOption | null, updateRouter = true) => {
+        if (!option) return
 
-  useEffect(() => {
-    const idsMap = Object.fromEntries(Object.entries(selectedOptions).map(([typeId, option]) => [typeId, option.id]))
-    form.setData("option_ids", idsMap)
-  }, [selectedOptions])
+        setSelectedOptions((prev) => {
+            const newOptions = {
+                ...prev,
+                [typeId]: option,
+            }
 
-  useEffect(() => {
-    // Update price and quantity when selected options change
-    form.setData("price", computedProduct.price)
+            if (updateRouter) {
+                router.get(
+                    url,
+                    {
+                        options: getOptionIdsMap(newOptions),
+                    },
+                    {
+                        preserveScroll: true,
+                        preserveState: true,
+                    },
+                )
+            }
 
-    // Reset quantity to 1 if it exceeds the new variation's quantity
-    if (form.data.quantity > computedProduct.quantity) {
-      form.setData("quantity", computedProduct.quantity > 0 ? 1 : 0)
-    } else if (form.data.quantity === 0 && computedProduct.quantity > 0) {
-      form.setData("quantity", 1)
+            // Update form data with option IDs
+            const optionIdsMap = getOptionIdsMap(newOptions)
+            form.setData("option_ids", optionIdsMap)
+
+            return newOptions
+        })
     }
-  }, [computedProduct, selectedOptions])
 
-  const getOptionIdsMap = (newOptions: Record<number, VariationTypeOption>) => {
-    return Object.fromEntries(Object.entries(newOptions).map(([k, v]) => [k, v.id]))
-  }
-
-  const chooseOption = (typeId: number, option: VariationTypeOption | null, updateRouter = true) => {
-    if (!option) return
-
-    setSelectedOptions((prev) => {
-      const newOptions = {
-        ...prev,
-        [typeId]: option,
-      }
-
-      if (updateRouter) {
-        router.get(
-          url,
-          {
-            options: getOptionIdsMap(newOptions),
-          },
-          {
+    const addToCart = () => {
+        form.post(route("cart.store", product.id), {
             preserveScroll: true,
             preserveState: true,
-          },
-        )
-      }
-
-      // Update form data with option IDs
-      const optionIdsMap = getOptionIdsMap(newOptions)
-      form.setData("option_ids", optionIdsMap)
-
-      return newOptions
-    })
-  }
-
-  const addToCart = () => {
-    form.post(route("cart.store", product.id), {
-      preserveScroll: true,
-      preserveState: true,
-      onError: (err) => console.log(err),
-    })
-  }
-
-  const incrementQuantity = () => {
-    if (form.data.quantity < computedProduct.quantity) {
-      form.setData("quantity", form.data.quantity + 1)
+            onError: (err) => console.log(err),
+        })
     }
-  }
 
-  const decrementQuantity = () => {
-    if (form.data.quantity > 1) {
-      form.setData("quantity", form.data.quantity - 1)
+    const incrementQuantity = () => {
+        if (form.data.quantity < computedProduct.quantity) {
+            form.setData("quantity", form.data.quantity + 1)
+        }
     }
-  }
 
-  const images = useMemo(() => {
-    for (const typeId in selectedOptions) {
-      const option = selectedOptions[typeId]
-      if (option.images?.length > 0) return option.images
+    const decrementQuantity = () => {
+        if (form.data.quantity > 1) {
+            form.setData("quantity", form.data.quantity - 1)
+        }
     }
-    return product.images
-  }, [product, selectedOptions])
 
-  const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
+    const images = useMemo(() => {
+        for (const typeId in selectedOptions) {
+            const option = selectedOptions[typeId]
+            if (option.images?.length > 0) return option.images
+        }
+        return product.images
+    }, [product, selectedOptions])
 
-  return (
-    <>
-      <Head title={product.title} />
-      <div className="relative">
-        <AuthLayout>
-          <div className="min-h-screen bg-gradient-to-b from-indigo-300 to-grenn-100 dark:from-black dark:to-white text-black dark:text-white">
-            <div className="container mx-auto px-4 py-16 max-w-6xl">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mt-20">
-                {/* Product Gallery - Left Side */}
-                <div>
-                  {/* Main image */}
-                  <div className="relative mb-8">
-                    <img
-                      src={images[activeImage]?.large || "/placeholder.svg?height=600&width=500"}
-                      alt={product.title}
-                      className="w-full aspect-[3/3] object-cover"
-                    />
+    const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
-                    {!isInStock && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-black/80 backdrop-blur-sm">
-                        <div className="text-lg uppercase tracking-widest">Out of Stock</div>
-                      </div>
-                    )}
-                  </div>
+    return (
+        <>
+            <Head title={product.title} />
+            <div className="relative bg-gradient-to-r from-gray-300 to-purple-300 dark:from-blue-700 dark:to-purple-700">
+                <AuthLayout>
+                    <div className="min-h-screen">
+                        <div className="container mx-auto px-4 py-12 max-w-6xl">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-40">
+                                {/* Image Gallery */}
+                                <div className="space-y-6">
+                                    <div className="aspect-square bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden border">
+                                        <img
+                                            src={images[activeImage]?.large}
+                                            alt={product.title}
+                                            className="w-full h-full object-cover transition-opacity duration-300"
+                                        />
+                                        {!isInStock && (
+                                            <div className="absolute inset-0 bg-white/90 dark:bg-black/90 backdrop-blur-sm flex items-center justify-center">
+                                                <div className="text-xl font-medium">Out of Stock</div>
+                                            </div>
+                                        )}
+                                    </div>
 
-                  {/* Thumbnail gallery */}
-                  {images.length > 1 && (
-                    <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
-                      {images.map((img, index) => (
-                        <button
-                          key={index}
-                          className={`
-                            min-w-[80px] w-[80px] aspect-square transition-all duration-200
-                            ${
-                              activeImage === index
-                                ? "outline outline-1 outline-offset-2 outline-black dark:outline-white"
-                                : "opacity-40 hover:opacity-100"
-                            }
-                          `}
-                          onClick={() => setActiveImage(index)}
-                        >
-                          <img
-                            src={img?.thumb || "/placeholder.svg?height=100&width=100"}
-                            alt={`Product view ${index + 1}`}
-                            className="object-cover w-full h-full"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                                    {images.length > 1 && (
+                                        <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+                                            {images.map((img, index) => (
+                                                <button
+                                                    key={index}
+                                                    className={`shrink-0 w-20 h-20 rounded-lg overflow-hidden border transition-colors ${activeImage === index
+                                                        ? 'border-gray-900 dark:border-gray-100'
+                                                        : 'border-transparent opacity-75'
+                                                        }`}
+                                                    onClick={() => setActiveImage(index)}
+                                                >
+                                                    <img
+                                                        src={img?.thumb}
+                                                        alt={`Thumbnail ${index + 1}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
-                {/* Product Info - Right Side */}
-                <div className="space-y-10 pt-8">
-                  {/* Product title and category */}
-                  <div>
-                    <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                      {product.category || "Product"}
-                    </div>
+                                {/* Product Info */}
+                                <div className="space-y-8">
+                                    {/* Header Section */}
+                                    <div className="space-y-4 pb-2 border-b dark:border-gray-800">
+                                        <div>
+                                            <h1 className="text-3xl font-light text-gray-900 dark:text-white mb-1">
+                                                {product.title}
+                                            </h1>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {product.department.name}
+                                            </div>
+                                        </div>
 
-                    <h1 className="text-4xl font-light mb-4 tracking-tight">{product.title}</h1>
+                                        <div className="flex items-baseline justify-between">
+                                            <div className="text-2xl font-medium text-gray-900 dark:text-white">
 
-                    <div>
-                      <p className="mb-2"> Descritpion : </p>
-                      <div
-                        className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm"
-                        dangerouslySetInnerHTML={{ __html: product.description }}
-                      />
-                    </div>
-                  </div>
+                                                <CurrencyFormatter amount={computedProduct.price} />
+                                            </div>
+                                            <div className={`flex items-center gap-2 text-sm ${isInStock ? 'text-green-600' : 'text-red-600'
+                                                }`}>
+                                                {isInStock ? (
+                                                    <>
+                                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                        {computedProduct.quantity} in stock
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                                        Out of stock
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
 
-                  {/* Price and Availability */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl font-light">${computedProduct.price}</span>
-                      {computedProduct.price < product.price && (
-                        <span className="text-gray-500 line-through">${product.price}</span>
-                      )}
-                    </div>
+                                    {/* Variations */}
+                                    <div className="space-y-6">
+                                        {renderProductVariationTypes()}
+                                    </div>
 
-                    {/* Selected variation details */}
-                    {Object.keys(selectedOptions).length > 0 && (
-                      <div className="text-sm bg-gray-50 dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700">
-                        <div className="flex flex-wrap gap-x-4 gap-y-1">
-                          {Object.entries(selectedOptions).map(([typeId, option]) => (
-                            <div key={typeId} className="flex items-center gap-1">
-                              <span className="font-medium">
-                                {product.variationTypes.find((t) => t.id === Number(typeId))?.name}:
-                              </span>
-                              <span>{option.name}</span>
+                                    {/* Quantity & Cart */}
+                                    <div className="space-y-6">
+                                        {isInStock ? (
+                                            <div className="space-y-6">
+                                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                                              {/* Selected Options */}
+                                              {Object.keys(selectedOptions).length > 0 && (
+                                                <div className="flex-1">
+                                                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 lg:mb-0">
+                                                    Selected options
+                                                  </div>
+                                                  <div className="flex flex-wrap gap-2">
+                                                    {Object.entries(selectedOptions).map(([typeId, option]) => (
+                                                      <div
+                                                        key={typeId}
+                                                        className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 rounded-full"
+                                                      >
+                                                        {option.name}
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              )}
+
+                                              {/* Quantity Controls */}
+                                              <div className="w-full lg:w-auto flex items-center justify-between gap-4">
+                                                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full p-1">
+                                                  <button
+                                                    onClick={decrementQuantity}
+                                                    className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                                                    disabled={form.data.quantity <= 1}
+                                                  >
+                                                    <Minus className="w-5 h-5" />
+                                                  </button>
+                                                  <span className="w-8 text-center">
+                                                    {form.data.quantity}
+                                                  </span>
+                                                  <button
+                                                    onClick={incrementQuantity}
+                                                    className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                                                    disabled={form.data.quantity >= computedProduct.quantity}
+                                                  >
+                                                    <Plus className="w-5 h-5" />
+                                                  </button>
+                                                </div>
+
+                                                <button
+                                                  onClick={addToCart}
+                                                  className="py-3.5 px-6 text-sm font-medium bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full transition-colors"
+                                                >
+                                                  Add to Cart —
+                                                  <CurrencyFormatter amount={(computedProduct.price * form.data.quantity).toFixed(2)} />
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-center">
+                                                <div className="text-gray-500 dark:text-gray-400">
+                                                    Get notified when back in stock
+                                                </div>
+                                                <div className="mt-3 flex gap-2">
+                                                    <input
+                                                        type="email"
+                                                        placeholder="Enter your email"
+                                                        className="flex-1 px-4 py-2 text-sm bg-white dark:bg-gray-900 rounded-full border"
+                                                    />
+                                                    <button className="px-4 py-2 text-sm bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-full">
+                                                        Notify Me
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="pt-4 border-t dark:border-gray-800">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Truck className="w-4 h-4" />
+                                                        <span>Free shipping</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <ShieldCheck className="w-4 h-4" />
+                                                        <span>Secure checkout</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Product Description */}
+                                    <div className="pt-6">
+                                        <div className="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+                                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                                                Product Details
+                                            </h3>
+                                            <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                          ))}
                         </div>
-                        <div className="mt-2 flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${isInStock ? "bg-green-500" : "bg-red-500"}`}></div>
-                          <span>{isInStock ? `In stock: ${computedProduct.quantity} available` : "Out of stock"}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Variation Types */}
-                  {renderProductVariationTypes()}
-
-                  {/* Quantity */}
-                  {isInStock && (
-                    <div>
-                      <h3 className="text-xs uppercase tracking-widest mb-4">Quantity</h3>
-                      <div className="flex border border-black/20 dark:border-white/20 w-32">
-                        <button
-                          onClick={decrementQuantity}
-                          disabled={form.data.quantity <= 1}
-                          className="w-10 h-10 flex items-center justify-center disabled:opacity-50"
-                        >
-                          <Minus className="h-4 w-4" />
-                        </button>
-                        <div className="flex-1 h-10 flex items-center justify-center">{form.data.quantity}</div>
-                        <button
-                          onClick={incrementQuantity}
-                          disabled={form.data.quantity >= computedProduct.quantity}
-                          className="w-10 h-10 flex items-center justify-center disabled:opacity-50"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                      </div>
                     </div>
-                  )}
-
-                  {/* Add to Cart */}
-                  <div className="flex gap-4 pt-4">
-                    <Button
-                      className="flex-1 bg-black hover:bg-black/80 text-white dark:bg-white dark:hover:bg-white/80 dark:text-black py-7 rounded-none"
-                      onClick={addToCart}
-                      disabled={
-                        !isInStock || Object.keys(selectedOptions).length < (product.variationTypes?.length || 0)
-                      }
-                    >
-                      {isInStock ? "Add to Cart" : "Out of Stock"}
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      className="w-14 h-14 border-black/20 text-black hover:bg-transparent hover:border-black dark:border-white/20 dark:text-white dark:hover:border-white rounded-none p-0"
-                      onClick={() => setLiked(!liked)}
-                    >
-                      <Heart className={`h-5 w-5 ${liked ? "fill-black dark:fill-white" : ""}`} />
-                    </Button>
-                  </div>
-
-                  {/* Shipping info */}
-                  <div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 pt-4">
-                    Free shipping on orders over $50
-                  </div>
-                </div>
-              </div>
+                </AuthLayout>
             </div>
-          </div>
-        </AuthLayout>
-      </div>
-    </>
-  )
+        </>
+    )
 }
 
 export default ProductDetail

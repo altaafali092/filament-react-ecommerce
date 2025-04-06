@@ -19,6 +19,10 @@ class Product extends Model implements HasMedia
 
 
 
+    public $casts =
+    [
+        'variations' => 'array',
+    ];
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')

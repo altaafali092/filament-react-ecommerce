@@ -12,17 +12,19 @@ class FrontendController extends Controller
 {
     public function index()
     {
-        $products=Product::where('status','published')->paginate(10);
-        return Inertia::render('welcome',[
-            'products'=>ProductResource::collection($products),
+        $products = Product::where('status', 'published')->paginate(10);
+        return Inertia::render('welcome', [
+            'products' => ProductResource::collection($products),
         ]);
     }
     public function productDetail(Product $product)
-{
-    return Inertia::render('Frontend/Product/ProductDetail', [
-        'product' => new ProductDetailResource($product),
-        'variationOptions' => request('options',[]),
-    ]);
-}
+    {
+        // Eager load the variations relationship
+        $product = $product->load('variations');
 
+        return Inertia::render('Frontend/Product/ProductDetail', [
+            'product' => new ProductDetailResource($product),
+            'variationOptions' => request('options', []),
+        ]);
+    }
 }

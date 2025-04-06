@@ -16,17 +16,18 @@ const ProductDetail = () => {
   const { product, variationOptions } = usePage<Props>().props
 
   const form = useForm<{
-    option_ids: Record<string, number>
-    quantity: number
-    price: number | null
+    option_ids: Record<string, number>;
+    quantity: number;
+    price: number | null;
   }>({
     option_ids: {},
     quantity: 1,
     price: null,
   })
 
-  const url = usePage().url
-  const route = window.route
+  const {url} = usePage();
+
+
 
   const [selectedOptions, setSelectedOptions] = useState<Record<number, VariationTypeOption>>({})
   const [activeImage, setActiveImage] = useState(0)
@@ -37,25 +38,30 @@ const ProductDetail = () => {
   }
 
   const computedProduct = useMemo(() => {
+
     const selectedOptionIds = Object.values(selectedOptions)
       .map((op) => op.id)
-      .sort()
+      .sort();
+
 
     for (const variation of product.variations) {
-      const optionIds = (variation.variation_type_ids ?? []).sort()
+      const optionIds = (variation.variation_type_option_ids ?? []).sort();
+
       if (arraysAreEqual(selectedOptionIds, optionIds)) {
         return {
           price: variation.price,
           quantity: variation.quantity ?? 0,
-        }
+        };
       }
     }
 
+    // Fallback to the default product price and quantity if no matching variation is found
     return {
       price: product.price,
       quantity: product.quantity,
-    }
-  }, [product, selectedOptions])
+    };
+  }, [product, selectedOptions]);
+
 
   const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
@@ -93,22 +99,9 @@ const ProductDetail = () => {
         )
       }
 
-      // Reset quantity to 1 if it exceeds the new variation's quantity
-      const newSelectedOptionIds = Object.values(newOptions)
-        .map((op) => op.id)
-        .sort()
-
-      for (const variation of product.variations) {
-        const optionIds = (variation.variation_type_ids ?? []).sort()
-        if (arraysAreEqual(newSelectedOptionIds, optionIds)) {
-          const maxQuantity = variation.quantity || 0
-          if (form.data.quantity > maxQuantity) {
-            form.setData("quantity", maxQuantity > 0 ? 1 : 0)
-          }
-          form.setData("price", variation.price)
-          break
-        }
-      }
+      // Update form data with option IDs
+      const optionIdsMap = getOptionIdsMap(newOptions)
+      form.setData("option_ids", optionIdsMap)
 
       return newOptions
     })
@@ -232,6 +225,9 @@ const ProductDetail = () => {
       const foundOption = type.options.find((op) => op.id === selectedOptionId) || type.options[0]
       chooseOption(type.id, foundOption, false)
     }
+
+    // Initialize price with the default computed price
+    form.setData("price", product.price)
   }, [])
 
   useEffect(() => {
@@ -239,14 +235,26 @@ const ProductDetail = () => {
     form.setData("option_ids", idsMap)
   }, [selectedOptions])
 
+  useEffect(() => {
+    // Update price and quantity when selected options change
+    form.setData("price", computedProduct.price)
+
+    // Reset quantity to 1 if it exceeds the new variation's quantity
+    if (form.data.quantity > computedProduct.quantity) {
+      form.setData("quantity", computedProduct.quantity > 0 ? 1 : 0)
+    } else if (form.data.quantity === 0 && computedProduct.quantity > 0) {
+      form.setData("quantity", 1)
+    }
+  }, [computedProduct, selectedOptions])
+
   return (
     <>
       <Head title={product.title} />
       <div className="relative">
         <AuthLayout>
-          <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
+          <div className="min-h-screen bg-gradient-to-b from-indigo-300 to-grenn-100 dark:from-black dark:to-white text-black dark:text-white">
             <div className="container mx-auto px-4 py-16 max-w-6xl">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mt-20">
                 {/* Product Gallery - Left Side */}
                 <div>
                   {/* Main image */}
@@ -302,11 +310,11 @@ const ProductDetail = () => {
                     <h1 className="text-4xl font-light mb-4 tracking-tight">{product.title}</h1>
 
                     <div>
-                        <p className="mb-2"> Descritpion : </p>
-                    <div
-                      className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm"
-                      dangerouslySetInnerHTML={{ __html: product.description }}
-                    />
+                      <p className="mb-2"> Descritpion : </p>
+                      <div
+                        className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm"
+                        dangerouslySetInnerHTML={{ __html: product.description }}
+                      />
                     </div>
                   </div>
 

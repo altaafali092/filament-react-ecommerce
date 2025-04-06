@@ -8,6 +8,7 @@ export type Image={
     small:string;
     large: string;
 }
+
 export type VariationType={
     id: number;
     name: string;
@@ -29,6 +30,7 @@ export interface IFrontProduct {
     quantity: number;
     short_description: string;
     description: string;
+    image: string;
     images: Image[];
     user:{
         id: number;
@@ -38,10 +40,12 @@ export interface IFrontProduct {
         id: number;
         name: string;
     };
-    variationTypes: VariationType[]; // safe default: []
+    variationTypes: VariationType[], // safe default: []
     variations: Array<{
       id: number;
       variation_type_option_ids: number[];
+      quantity:number;
+      price: number;
     }>; // safe default: []
 }
 export type paginationProps<T>={

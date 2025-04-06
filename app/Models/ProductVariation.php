@@ -12,8 +12,5 @@ class ProductVariation extends Model
     [
         'variation_types_option_ids' => 'json',
     ];
-    // public function product()
-    // {
-    //     return $this->belongsTo(Product::class);
-    // }
+
 }

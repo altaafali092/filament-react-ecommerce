@@ -11,6 +11,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
+use function Pest\Laravel\json;
+
 class ProductVariations extends EditRecord
 {
     protected static string $resource = ProductResource::class;
@@ -19,14 +21,14 @@ class ProductVariations extends EditRecord
 
     public function form(Form $form): Form
     {
-        $type = $this->record->variationTypes;
+        $types = $this->record->variationTypes;
         $fields = [];
 
-        foreach ($type as $i => $variationType) {
-            $fields[] = TextInput::make("variation_type_{$variationType->id}.id")
+        foreach ($types as $i => $type) {
+            $fields[] = TextInput::make('variation_type_' . ($type->id) . '.id')
                 ->hidden();
-            $fields[] = TextInput::make("variation_type_{$variationType->id}.name")
-                ->label($variationType->name);
+            $fields[] = TextInput::make('variation_type_' . ($type->id) . '.name')
+                ->label($type->name);
         }
 
         return $form->schema([
@@ -57,11 +59,19 @@ class ProductVariations extends EditRecord
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $variations = $this->record->variations->toArray();
-        $data['variations'] = $this->mergeCartesianWithExisting($this->record->variationTypes, $variations);
-        return $data;
-    }
+{
+    // Safely get variations as an array
+    $variations = $this->record->variations
+        ? $this->record->variations->toArray()
+        : [];
+
+    $data['variations'] = $this->mergeCartesianWithExisting(
+        $this->record->variationTypes,
+        $variations
+    );
+
+    return $data;
+}
 
     private function mergeCartesianWithExisting($variationTypes, $existingData): array
     {
@@ -74,15 +84,13 @@ class ProductVariations extends EditRecord
         foreach ($cartesianProduct as $product) {
             $optionIds = collect($product)
                 ->filter(fn($value, $key) => str_starts_with($key, 'variation_type_'))
-                ->map(fn($option) => $option['id'] ?? null) // Prevent "Undefined array key 'id'"
-                ->filter() // Remove null values
+                ->map(fn($option) => $option['id']) // Prevent "Undefined array key 'id'"
+                ->filter()
                 ->values()
                 ->toArray();
 
             $match = array_filter($existingData, function ($existingOption) use ($optionIds) {
-                return isset($existingOption['variation_types_option_ids'])
-                    && is_array($existingOption['variation_types_option_ids'])
-                    && $existingOption['variation_types_option_ids'] === $optionIds;
+                return $existingOption['variation_types_option_ids'] === $optionIds;
             });
 
             if (!empty($match)) {
@@ -111,7 +119,7 @@ class ProductVariations extends EditRecord
             foreach ($variationType->options as $option) {
                 foreach ($result as $combination) {
                     $newCombination = $combination + [
-                        'variation_type_' . $variationType->id => [
+                        'variation_type_' . ($variationType->id) => [
                             'id'    => $option->id ?? null,
                             'name'  => $option->name,
                             'label' => $variationType->name,
@@ -142,21 +150,20 @@ class ProductVariations extends EditRecord
             $variationTypeOptionIds = [];
 
             foreach ($this->record->variationTypes as $variationType) {
-                $value = $option['variation_type_' . $variationType->id] ?? null;
+                $variationTypeOptionIds[]= $option['variation_type_' . ($variationType->id)]['id'];
 
-                if (is_array($value)) {
-                    $value = json_encode($value);
-                }
-
-                $variationTypeOptionIds[] = (string) $value;
             }
 
-            $formattedData[] = [
-                'id' => $option['id'] ?? null,
-                'variation_types_option_ids' => $variationTypeOptionIds,
-                'quantity' => $option['quantity'] ?? 0,
-                'price' => $option['price'] ?? 0.0,
-            ];
+            $quantity =$option ['quantity'];
+                $price = $option['price'];
+
+
+                $formattedData[] = [
+                    'variation_types_option_ids' => $variationTypeOptionIds,
+                    'quantity' => $quantity,
+                    'price' => $price,
+                ];
+
         }
 
         $data['variations'] = $formattedData;
@@ -167,19 +174,15 @@ class ProductVariations extends EditRecord
     {
         $variations = $data['variations'];
         unset($data['variations']);
-
-        $variations = collect($variations)->map(function ($variation) {
+        $variations=collect($variations)->map(function ($variation){
             return [
-                'id' => $variation['id'] ?? null,
-                'variation_types_option_ids' => json_encode($variation['variation_types_option_ids'] ?? []), // Ensure it's JSON encoded
-                'quantity' => $variation['quantity'] ?? 0,
-                'price' => $variation['price'] ?? 0.0,
+                'variation_types_option_ids' => json_encode($variation['variation_types_option_ids']),
+                'quantity' => $variation['quantity'],
+                'price' => $variation['price'],
             ];
-        })->toArray();
-
+        });
         $record->variations()->delete();
-        $record->variations()->upsert($variations, ['id'], ['variation_types_option_ids', 'quantity', 'price']);
-
+        $record->variations()->upsert($variations,['id'],['variation_type_option_ids' ,'quantity','price']);
         return $record;
     }
 }

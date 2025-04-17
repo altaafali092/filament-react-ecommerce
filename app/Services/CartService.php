@@ -68,7 +68,7 @@ class CartService
                     $cartItems = $this->getCartItemsFromCookies();
                 }
                 $productIds = collect($cartItems)->map(fn($item) => $item['product_id']);
-                $products = whereIn('id', $productIds)->with('user.vendor')->get()->keyBy('id');
+                $products = Product::whereIn('id', $productIds)->with('user.vendor')->get()->keyBy('id');
 
                 $cartItemData = [];
                 foreach ($cartItems as $key => $cartItem) {

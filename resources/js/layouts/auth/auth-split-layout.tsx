@@ -41,7 +41,7 @@ export default function AuthSplitLayout({ children, title, description }: PropsW
                     </Link>
 
                     <Link
-                        href={route('home')}
+                        href={route('index')}
                         className="relative z-20 flex items-center text-lg bg-green-300  px-4 py-2 rounded-full font-medium hover:scale-105 transition-transform duration-300 text-white"
                     >
                      <Home className='h-4'/>

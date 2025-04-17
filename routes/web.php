@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 
 
-Route::get('/', [FrontendController::class, 'index'])->name('index');
+Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('product-detail/{product:slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
 
 

@@ -38,7 +38,7 @@ const ProductDetail = () => {
         return a.length === b.length && a.every((v, i) => v === b[i])
     }
 
-    // In computedProduct memo:
+   
     const computedProduct = useMemo(() => {
         console.log("Product Variations:", product.variations);
         const selectedOptionIds = Object.values(selectedOptions)
@@ -242,6 +242,8 @@ const ProductDetail = () => {
     }, [product, selectedOptions])
 
     const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
+
+
 
     return (
         <>

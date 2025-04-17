@@ -1,14 +1,24 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Route::get('/', function () {
-//     return Inertia::render('welcome');
-// })->name('home');
- Route::get('/',[FrontendController::class, 'index'])->name('index');
- Route::get('product-detail/{product:slug}',[FrontendController::class, 'productDetail'])->name('product-detail');
+
+
+
+Route::get('/', [FrontendController::class, 'index'])->name('index');
+Route::get('product-detail/{product:slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
+
+
+Route::controller(CartController::class)->group(function () {
+    Route::get('cart-add/{product}', 'store')->name('cart.store');
+    Route::delete('cart',  'index')->name('cart.index');
+    Route::put('cart/{product}', 'update')->name('cart.update');
+    Route::get('checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::delete('cart/{product}', 'destroy')->name('cart.destroy');
+});
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -17,5 +27,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

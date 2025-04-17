@@ -13,7 +13,7 @@ Route::get('product-detail/{product:slug}', [FrontendController::class, 'product
 
 
 Route::controller(CartController::class)->group(function () {
-    Route::get('cart-add/{product}', 'store')->name('cart.store');
+    Route::post('cart-add/{product}', 'store')->name('cart.store');
     Route::delete('cart',  'index')->name('cart.index');
     Route::put('cart/{product}', 'update')->name('cart.update');
     Route::get('checkout', [CartController::class, 'checkout'])->name('cart.checkout');

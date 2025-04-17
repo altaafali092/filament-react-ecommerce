@@ -14,9 +14,7 @@ interface Props {
 const ProductDetail = () => {
     const { product, variationOptions } = usePage<Props>().props
 
-    // Log the product and variation options
-    console.log("Product Data:", product);
-    console.log("Variation Options:", variationOptions);
+
 
     const form = useForm<{
         option_ids: Record<string, number>
@@ -38,9 +36,9 @@ const ProductDetail = () => {
         return a.length === b.length && a.every((v, i) => v === b[i])
     }
 
-   
+
     const computedProduct = useMemo(() => {
-        console.log("Product Variations:", product.variations);
+
         const selectedOptionIds = Object.values(selectedOptions)
             .map((op) => op.id)
             .sort();
@@ -334,58 +332,58 @@ const ProductDetail = () => {
                                     <div className="space-y-6">
                                         {isInStock ? (
                                             <div className="space-y-6">
-                                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                                              {/* Selected Options */}
-                                              {Object.keys(selectedOptions).length > 0 && (
-                                                <div className="flex-1">
-                                                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 lg:mb-0">
-                                                    Selected options
-                                                  </div>
-                                                  <div className="flex flex-wrap gap-2">
-                                                    {Object.entries(selectedOptions).map(([typeId, option]) => (
-                                                      <div
-                                                        key={typeId}
-                                                        className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 rounded-full"
-                                                      >
-                                                        {option.name}
-                                                      </div>
-                                                    ))}
-                                                  </div>
-                                                </div>
-                                              )}
+                                                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                                                    {/* Selected Options */}
+                                                    {Object.keys(selectedOptions).length > 0 && (
+                                                        <div className="flex-1">
+                                                            <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 lg:mb-0">
+                                                                Selected options
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {Object.entries(selectedOptions).map(([typeId, option]) => (
+                                                                    <div
+                                                                        key={typeId}
+                                                                        className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 rounded-full"
+                                                                    >
+                                                                        {option.name}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
 
-                                              {/* Quantity Controls */}
-                                              <div className="w-full lg:w-auto flex items-center justify-between gap-4">
-                                                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full p-1">
-                                                  <button
-                                                    onClick={decrementQuantity}
-                                                    className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
-                                                    disabled={form.data.quantity <= 1}
-                                                  >
-                                                    <Minus className="w-5 h-5" />
-                                                  </button>
-                                                  <span className="w-8 text-center">
-                                                    {form.data.quantity}
-                                                  </span>
-                                                  <button
-                                                    onClick={incrementQuantity}
-                                                    className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
-                                                    disabled={form.data.quantity >= computedProduct.quantity}
-                                                  >
-                                                    <Plus className="w-5 h-5" />
-                                                  </button>
-                                                </div>
+                                                    {/* Quantity Controls */}
+                                                    <div className="w-full lg:w-auto flex items-center justify-between gap-4">
+                                                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full p-1">
+                                                            <button
+                                                                onClick={decrementQuantity}
+                                                                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                                                                disabled={form.data.quantity <= 1}
+                                                            >
+                                                                <Minus className="w-5 h-5" />
+                                                            </button>
+                                                            <span className="w-8 text-center">
+                                                                {form.data.quantity}
+                                                            </span>
+                                                            <button
+                                                                onClick={incrementQuantity}
+                                                                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                                                                disabled={form.data.quantity >= computedProduct.quantity}
+                                                            >
+                                                                <Plus className="w-5 h-5" />
+                                                            </button>
+                                                        </div>
 
-                                                <button
-                                                  onClick={addToCart}
-                                                  className="py-3.5 px-6 text-sm font-medium bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full transition-colors"
-                                                >
-                                                  Add to Cart —
-                                                  <CurrencyFormatter amount={(computedProduct.price * form.data.quantity).toFixed(2)} />
-                                                </button>
-                                              </div>
+                                                        <button
+                                                            onClick={addToCart}
+                                                            className="py-3.5 px-6 text-sm font-medium bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full transition-colors"
+                                                        >
+                                                            Add to Cart —
+                                                            <CurrencyFormatter amount={(computedProduct.price * form.data.quantity).toFixed(2)} />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                          </div>
                                         ) : (
                                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-center">
                                                 <div className="text-gray-500 dark:text-gray-400">

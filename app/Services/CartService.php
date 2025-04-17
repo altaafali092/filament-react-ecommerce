@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
 
 use function Pest\Laravel\json;
 
@@ -24,7 +26,7 @@ class CartService
     protected const COOKIE_LIFETIME = 60 * 24 * 365;
 
 
-    public function addItemToCart(Product $product, int $quantity = 1,  $optionIds = null)
+    public function addItemToCart(Product $product, int $quantity = 1, $optionIds = null)
     {
         if ($optionIds === null) {
             $optionIds = $product->variationTypes

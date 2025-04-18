@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('price',20,4);
             $table->json('variation_type_option_ids')->nullable();
-            $table->boolean('saved_for_later')->defaultFalse();
+            $table->boolean('saved_for_later')->default(false);
 
             $table->timestamps();
         });

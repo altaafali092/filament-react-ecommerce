@@ -14,7 +14,7 @@ Route::get('product-detail/{product:slug}', [FrontendController::class, 'product
 
 Route::controller(CartController::class)->group(function () {
     Route::post('cart-add/{product}', 'store')->name('cart.store');
-    Route::delete('cart',  'index')->name('cart.index');
+    Route::get('cart-index', 'index')->name('cart.index');
     Route::put('cart/{product}', 'update')->name('cart.update');
     Route::get('checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::delete('cart/{product}', 'destroy')->name('cart.destroy');

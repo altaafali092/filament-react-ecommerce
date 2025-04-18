@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CartController extends Controller
 {
@@ -12,9 +14,13 @@ class CartController extends Controller
      * Display a listing of the resource.
      */
     public function index(CartService $cartService)
-    {
-        //
-    }
+{
+    $cartItems = $cartService->getCartItemsGrouped();
+    // Add this to check
+    return Inertia::render('Frontend/CartIndex', [
+        'cartItems' => $cartItems,
+    ]);
+}
 
 
 
@@ -48,10 +54,10 @@ class CartController extends Controller
         $request->validate([
             'quantity' => ['integer', 'min:1'],
         ]);
-        $optionIds= $request->input('option_ids');
-        $quantity= $request->input('quantity');
+        $optionIds = $request->input('option_ids');
+        $quantity = $request->input('quantity');
 
-        $cartService ->updateItemQuantity($product->id, $optionIds, $quantity);
+        $cartService->updateItemQuantity($product->id, $optionIds, $quantity);
         return back()->with('success', 'product quantity updated successfully');
     }
 

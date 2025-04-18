@@ -18,7 +18,6 @@ use function Pest\Laravel\json;
 class CartService
 {
 
-
     private ?array $cachedCartItems = null;
 
     protected const COOKIE_NAME = 'cartItem';
@@ -44,60 +43,72 @@ class CartService
 
     public function updateItemQuantity(int $productId, int $quantity, $optionIds = null)
     {
-       if(Auth::check()){
-        $this->updateItemQuantityInDatabase($productId,$quantity,$optionIds);
-       }else{
-        $this->updateItemQuantityInCookies($productId,$quantity,$optionIds);
-       }
+        if (Auth::check()) {
+            $this->updateItemQuantityInDatabase($productId, $quantity, $optionIds);
+        } else {
+            $this->updateItemQuantityInCookies($productId, $quantity, $optionIds);
+        }
     }
-    public function removeItemFromCart(int $productId,int $quantity, $optionIds = null)
+    public function removeItemFromCart(int $productId, int $quantity, $optionIds = null)
     {
-        if(Auth::check()){
-            $this->removeCartItemFromDatabase($productId,$quantity,$optionIds);
-        }else{
-            $this->removeCartItemsFromCookies($productId,$quantity,$optionIds);
+        if (Auth::check()) {
+            $this->removeCartItemFromDatabase($productId, $quantity, $optionIds);
+        } else {
+            $this->removeCartItemsFromCookies($productId, $quantity, $optionIds);
         }
     }
     public function getCartItems(): array
-    {
-        try {
-            if ($this->cachedCartItems === null) {
-                if (Auth::check()) {
-                    $cartItems = $this->getCartItemsFromDatabase();
-                } else {
-                    $cartItems = $this->getCartItemsFromCookies();
+{
+    try {
+        if ($this->cachedCartItems === null) {
+            if (Auth::check()) {
+                $cartItems = $this->getCartItemsFromDatabase();
+            } else {
+                $cartItems = $this->getCartItemsFromCookies();
+            }
+
+            $productIds = collect($cartItems)->pluck('product_id')->unique();
+            $products = Product::whereIn('id', $productIds)
+                ->with('user.vendor')
+                ->get()
+                ->keyBy('id');
+
+            $cartItemData = [];
+
+            foreach ($cartItems as $cartItem) {
+                $product = $products->get($cartItem['product_id']);
+                if (!$product) {
+                    continue;
                 }
-                $productIds = collect($cartItems)->map(fn($item) => $item['product_id']);
-                $products = Product::whereIn('id', $productIds)->with('user.vendor')->get()->keyBy('id');
 
-                $cartItemData = [];
-                foreach ($cartItems as $key => $cartItem) {
-                    $product = data_get($products, $cartItem['product_id']);
-                    if (!$product) continue;
+                $optionInfo = [];
+                $options = VariationTypeOption::with('variationType')
+                    ->whereIn('id', $cartItem['option_ids'])
+                    ->get()
+                    ->keyBy('id');
 
-                    $optionInfo = [];
-                    $options = VariationTypeOption::with('variationType')
-                        ->whereIn('id', $cartItem['option_ids'])
-                        ->get()->keyBy('id');
+                $imageUrl = null;
 
-                    $imageUrl = null;
-                    foreach ($cartItem['options_ids'] as $option_id) {
-                        $option = data_get($options, $option_id);
-                        if (!$imageUrl) {
-                            $imageUrl = $options->getFirstMediaUrl('images', 'small');
-                        }
-                        $optionInfo[] = [
-                            'id' => $option_id,
-                            'name' => $option->name,
-                            'type' => [
-                                'id' => $option->variationType->id,
-                                'name' => $option->vaiationType->name,
+                foreach ($cartItem['option_ids'] as $optionId) {
+                    $option = $options->get($optionId);
 
-                            ],
+                    if (!$option) continue;
 
-                        ];
+                    // Only set image once
+                    if (!$imageUrl) {
+                        $imageUrl = $option->getFirstMediaUrl('images', 'small');
                     }
+
+                    $optionInfo[] = [
+                        'id' => $optionId,
+                        'name' => $option->name,
+                        'type' => [
+                            'id' => $option->variationType->id,
+                            'name' => $option->variationType->name,
+                        ],
+                    ];
                 }
+
                 $cartItemData[] = [
                     'id' => $cartItem['id'],
                     'product_id' => $product->id,
@@ -110,16 +121,21 @@ class CartService
                     'image' => $imageUrl ?: $product->getFirstMediaUrl('images', 'size'),
                     'user' => [
                         'id' => $product->created_by,
-                        'name' => $product->user->vendor->store_name,
+                        'name' => optional($product->user->vendor)->store_name,
                     ],
                 ];
             }
-            return $this->cachedCartItems;
-        } catch (\Exception $e) {
-            Log::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+
+            // ✅ Set to cached property
+            $this->cachedCartItems = $cartItemData;
         }
-        return [];
+
+        return $this->cachedCartItems;
+    } catch (\Exception $e) {
+        Log::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+        return []; // Fallback empty array to satisfy the return type
     }
+}
 
 
     public function getTotalQuantity(): int
@@ -168,7 +184,7 @@ class CartService
         ksort($optionIds);
         $cartItem = CartItem::where('user_id', $userId)
             ->where('product_id', $productId)
-            ->where('variation_type_options_ids', json_encode($optionIds))
+            ->where('variation_type_option_ids', json_encode($optionIds))
             ->first();
         if ($cartItem) {
             $cartItem->update([
@@ -180,7 +196,7 @@ class CartService
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'price' => $price,
-                'variation_type_option_ids' => $optionIds,
+                'variation_type_option_ids' => json_encode($optionIds),
             ]);
         }
     }
@@ -188,6 +204,8 @@ class CartService
     protected function saveItemToCookies(int $productId, int $quantity, $price, array $optionIds): void
     {
         $cartItems = $this->getCartItemsFromCookies();
+
+        dd($cartItems, $productId, $quantity, $optionIds, $price);
         ksort($optionIds);
         $itemKey = $productId . '_' . json_encode($optionIds);
         if (isset($cartItems[$itemKey])) {
@@ -232,7 +250,8 @@ class CartService
                     'product_id' => $cartItem->product_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
-                    'option_ids' => $cartItem->variation_type_option_ids,
+                    'option_ids' => json_decode($cartItem->variation_type_option_ids, true),
+
                 ];
             })
             ->toArray();
@@ -240,7 +259,20 @@ class CartService
     }
     protected function getCartItemsFromCookies()
     {
-        $cartItems = json_encode(Cookie::get(self::COOKIE_NAME, '[]'), true);
+        $cartItems = json_decode(Cookie::get(self::COOKIE_NAME, '[]'), true);
         return $cartItems;
+    }
+
+    public function getCartItemsGrouped():array
+    {
+        $cartItems=$this->getCartItems();
+        return collect($cartItems)
+        ->groupBy(fn($item)=> $item['user']['id'])
+        ->map(fn($items,$userId)=>[
+            'user'=>$items->first()['user'],
+            'items'=>$items->toArray(),
+            'totalQuantity' => $items->sum('quantity'),
+            'totalPrice'=> $items ->sum(fn($item)=>$item['price']*$item['quantity'],)
+        ])->toArray();
     }
 }

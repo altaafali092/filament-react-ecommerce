@@ -28,7 +28,7 @@ interface NavbarProps {
   auth: Auth;
   totalQuantity: number;
   totalPrice: number;
-  cartItems: CartItems[];
+  miniCartItems: CartItems[];
 }
 
 const messages = [
@@ -53,7 +53,7 @@ const categories: Category[] = [
 
 const Navbar = () => {
   const { props } = usePage<NavbarProps>();
-  const { auth, totalQuantity = 0, totalPrice = 0, cartItems = [] } = props;
+  const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
 
   const [currentMessage, setCurrentMessage] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -292,7 +292,7 @@ const Navbar = () => {
               {isCartOpen && (
                 <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown">
                   <h3 className="font-medium text-lg mb-3">Cart</h3>
-                  {cartItems.length > 0 ? (
+                  {miniCartItems.length > 0 ? (
                     <div>
 
                       <div className="flex justify-between font-semibold mt-2">

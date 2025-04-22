@@ -56,7 +56,7 @@ export type CartItems = {
     product_id: number;
     title: string;
     slug: string;
-    price: string;
+    price: number;
     quantity: number;
     image: string;
     option_ids: Record<string, number>;
@@ -69,7 +69,7 @@ export type NavbarProp = {
     cartItems: CartItems[];
 };
 
-export type GroupedCartItem = {
+export type GroupedCartItems = {
     user: User;
     items: CartItems[];
     totalPrice: number;
@@ -84,5 +84,5 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     ziggy: Config & { location: string };
     totalQuantity: number;
     totalPrice: number;
-    cartItems: CartItems[];
+    minCartItems: CartItems[];
 };

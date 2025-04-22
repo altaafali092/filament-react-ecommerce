@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use PhpParser\Node\Expr\FuncCall;
 
 class CartController extends Controller
 {
@@ -14,13 +15,13 @@ class CartController extends Controller
      * Display a listing of the resource.
      */
     public function index(CartService $cartService)
-{
-    $cartItems = $cartService->getCartItemsGrouped();
-    // Add this to check
-    return Inertia::render('Frontend/CartIndex', [
-        'cartItems' => $cartItems,
-    ]);
-}
+    {
+        $cartItems = $cartService->getCartItemsGrouped();
+        // Add this to check
+        return Inertia::render('Frontend/CartIndex', [
+            'cartItems' => $cartItems,
+        ]);
+    }
 
 
 
@@ -39,7 +40,7 @@ class CartController extends Controller
         $cartService->addItemToCart(
             $product,
             $data['quantity'],
-            $data['option_ids'] ?? null,
+            $data['option_ids'] ?: [],
 
         );
         return back()->with('success', 'product added successfully');
@@ -54,10 +55,10 @@ class CartController extends Controller
         $request->validate([
             'quantity' => ['integer', 'min:1'],
         ]);
-        $optionIds = $request->input('option_ids');
+        $optionIds = $request->input('option_ids') ?: [];
         $quantity = $request->input('quantity');
 
-        $cartService->updateItemQuantity($product->id, $optionIds, $quantity);
+        $cartService->updateItemQuantity($product->id, $quantity, $optionIds);
         return back()->with('success', 'product quantity updated successfully');
     }
 
@@ -66,8 +67,17 @@ class CartController extends Controller
      */
     public function destroy(Request $request, CartService $cartService, Product $product)
     {
-        $optionIds = $request->input('option_ids');
-        $cartService->removeItemFromCart($product->id, $optionIds);
-        return back()->with('success', 'product removed successfully');
+        // dd('Hit controller', $request->all());
+
+
+        $cartService->removeItemFromCart($product->id, $request->input('option_ids'));
+
+
+        return back()->with('success', 'Product removed successfully');
     }
+
+
+
+
+    public function checkout() {}
 }

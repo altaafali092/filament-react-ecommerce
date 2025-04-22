@@ -16,7 +16,6 @@ Route::controller(CartController::class)->group(function () {
     Route::post('cart-add/{product}', 'store')->name('cart.store');
     Route::get('cart-index', 'index')->name('cart.index');
     Route::put('cart/{product}', 'update')->name('cart.update');
-    Route::get('checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::delete('cart/{product}', 'destroy')->name('cart.destroy');
 });
 
@@ -25,6 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+});
+Route::middleware(['verified'])->group(function(){
+Route::post('cart-checkout',[CartController::class,'checkout'])->name('cart.checkout');
 });
 
 require __DIR__ . '/settings.php';

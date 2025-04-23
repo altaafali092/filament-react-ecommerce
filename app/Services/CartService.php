@@ -59,84 +59,94 @@ class CartService
         }
     }
     public function getCartItems(): array
-{
-    try {
-        if ($this->cachedCartItems === null) {
-            if (Auth::check()) {
-                $cartItems = $this->getCartItemsFromDatabase();
-            } else {
-                $cartItems = $this->getCartItemsFromCookies();
-            }
-
-            $productIds = collect($cartItems)->pluck('product_id')->unique();
-            $products = Product::whereIn('id', $productIds)
-                ->with('user.vendor')
-                ->get()
-                ->keyBy('id');
-
-            $cartItemData = [];
-
-            foreach ($cartItems as $cartItem) {
-                $product = $products->get($cartItem['product_id']);
-                if (!$product) {
-                    continue;
+    {
+        try {
+            if ($this->cachedCartItems === null) {
+                if (Auth::check()) {
+                    $cartItems = $this->getCartItemsFromDatabase();
+                } else {
+                    $cartItems = $this->getCartItemsFromCookies();
                 }
 
-                $optionInfo = [];
-                $options = VariationTypeOption::with('variationType')
-                    ->whereIn('id', $cartItem['option_ids'])
+                $productIds = collect($cartItems)->pluck('product_id')->unique();
+                $products = Product::whereIn('id', $productIds)
+                    ->with('user.vendor')
                     ->get()
                     ->keyBy('id');
 
-                $imageUrl = null;
+                $cartItemData = [];
 
-                foreach ($cartItem['option_ids'] as $optionId) {
-                    $option = $options->get($optionId);
-
-                    if (!$option) continue;
-
-                    // Only set image once
-                    if (!$imageUrl) {
-                        $imageUrl = $option->getFirstMediaUrl('images', 'small');
+                foreach ($cartItems as $cartItem) {
+                    $product = $products->get($cartItem['product_id']);
+                    if (!$product) {
+                        continue;
                     }
 
-                    $optionInfo[] = [
-                        'id' => $optionId,
-                        'name' => $option->name,
-                        'type' => [
-                            'id' => $option->variationType->id,
-                            'name' => $option->variationType->name,
+                    // ✅ Safely decode option_ids
+                    $optionIds = $cartItem['option_ids'];
+                    if (is_string($optionIds)) {
+                        $optionIds = json_decode($optionIds, true);
+                    }
+                    if (!is_array($optionIds)) {
+                        $optionIds = [];
+                    }
+
+                    $optionInfo = [];
+                    $options = VariationTypeOption::with('variationType')
+                        ->whereIn('id', $optionIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    $imageUrl = null;
+
+                    foreach ($optionIds as $optionId) {
+                        $option = $options->get($optionId);
+
+                        if (!$option) continue;
+
+                        // Only set image once
+                        if (!$imageUrl) {
+                            $imageUrl = $option->getFirstMediaUrl('images', 'small');
+                        }
+
+                        $optionInfo[] = [
+                            'id' => $optionId,
+                            'name' => $option->name,
+                            'type' => [
+                                'id' => $option->variationType->id,
+                                'name' => $option->variationType->name,
+                            ],
+                        ];
+                    }
+
+                    $cartItemData[] = [
+                        'id' => $cartItem['id'],
+                        'product_id' => $product->id,
+                        'title' => $product->title,
+                        'slug' => $product->slug,
+                        'price' => $cartItem['price'],
+                        'quantity' => $cartItem['quantity'],
+                        'option_ids' => $optionIds,
+                        'options' => $optionInfo,
+                        'image' => $imageUrl ?: $product->getFirstMediaUrl('images', 'size'),
+                        'user' => [
+                            'id' => $product->created_by,
+                            'name' => optional($product->user->vendor)->store_name,
                         ],
                     ];
                 }
 
-                $cartItemData[] = [
-                    'id' => $cartItem['id'],
-                    'product_id' => $product->id,
-                    'title' => $product->title,
-                    'slug' => $product->slug,
-                    'price' => $cartItem['price'],
-                    'quantity' => $cartItem['quantity'],
-                    'option_ids' => $cartItem['option_ids'],
-                    'options' => $optionInfo,
-                    'image' => $imageUrl ?: $product->getFirstMediaUrl('images', 'size'),
-                    'user' => [
-                        'id' => $product->created_by,
-                        'name' => optional($product->user->vendor)->store_name,
-                    ],
-                ];
+                // ✅ Set to cached property
+                $this->cachedCartItems = $cartItemData;
             }
 
-            // ✅ Set to cached property
-            $this->cachedCartItems = $cartItemData;
+            return $this->cachedCartItems;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+            return []; // Fallback empty array to satisfy the return type
         }
-
-        return $this->cachedCartItems;
-    } catch (\Exception $e) {
-        Log::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
-        return []; // Fallback empty array to satisfy the return type
     }
-}
+
 
 
     public function getTotalQuantity(): int
@@ -231,7 +241,7 @@ class CartService
 
         CartItem::where('user_id', Auth::id())
             ->where('product_id', $productId)
-            ->when($optionIds, fn ($q) => $q->whereJsonContains('variation_type_option_ids', $optionIds))
+            ->when($optionIds, fn($q) => $q->whereJsonContains('variation_type_option_ids', $optionIds))
             ->delete();
     }
     protected function removeCartItemsFromCookies(int $productId,  array $optionIds): void
@@ -266,16 +276,16 @@ class CartService
         return $cartItems;
     }
 
-    public function getCartItemsGrouped():array
+    public function getCartItemsGrouped(): array
     {
-        $cartItems=$this->getCartItems();
+        $cartItems = $this->getCartItems();
         return collect($cartItems)
-        ->groupBy(fn($item)=> $item['user']['id'])
-        ->map(fn($items,$userId)=>[
-            'user'=>$items->first()['user'],
-            'items'=>$items->toArray(),
-            'totalQuantity' => $items->sum('quantity'),
-            'totalPrice'=> $items ->sum(fn($item)=>$item['price']*$item['quantity'],)
-        ])->toArray();
+            ->groupBy(fn($item) => $item['user']['id'])
+            ->map(fn($items, $userId) => [
+                'user' => $items->first()['user'],
+                'items' => $items->toArray(),
+                'totalQuantity' => $items->sum('quantity'),
+                'totalPrice' => $items->sum(fn($item) => $item['price'] * $item['quantity'],)
+            ])->toArray();
     }
 }

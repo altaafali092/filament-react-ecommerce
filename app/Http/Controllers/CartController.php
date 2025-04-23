@@ -69,10 +69,7 @@ class CartController extends Controller
     {
         // dd('Hit controller', $request->all());
 
-
         $cartService->removeItemFromCart($product->id, $request->input('option_ids'));
-
-
         return back()->with('success', 'Product removed successfully');
     }
 

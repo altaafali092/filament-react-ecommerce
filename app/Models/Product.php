@@ -71,14 +71,27 @@ class Product extends Model implements HasMedia
     {
         $optionIds = array_values($optionIds);
         sort($optionIds);
-        foreach($this->variations as $variation)
-        {
+
+        foreach ($this->variations as $variation) {
             $a = $variation->variation_type_options_ids;
+
+            // If it's stored as JSON in the database, decode it
+            if (is_string($a)) {
+                $a = json_decode($a, true);
+            }
+
+            if (!is_array($a)) {
+                continue; // Skip this variation if it's still not an array
+            }
+
             sort($a);
-            if($optionIds == $a){
-                return $variation->price !==null ? $variation->price : $this->price;
+
+            if ($optionIds == $a) {
+                return $variation->price !== null ? $variation->price : $this->price;
             }
         }
+
         return $this->price;
     }
+
 }

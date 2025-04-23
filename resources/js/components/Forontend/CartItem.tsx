@@ -20,11 +20,18 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
     const [error, setError] = useState('');
 
     const onDeleteClick = () => {
-
+    
         DeleteFrom.delete(route('cart.destroy', item.product_id), {
             preserveScroll: true,
+            onSuccess: () => {
+                console.log('✅ Item successfully deleted');
+            },
+            onError: (errors) => {
+                console.log('❌ Delete error:', errors);
+            }
         });
     };
+
 
 
     const handleQuantityChange = (ev: React.ChangeEvent<HTMLInputElement>) => {

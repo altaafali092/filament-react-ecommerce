@@ -19,11 +19,10 @@ const ProductDetail = () => {
     const form = useForm<{
         option_ids: Record<string, number>
         quantity: number
-        price: number | null
+
     }>({
         option_ids: {},
         quantity: 1,
-        price: null,
     })
 
     const { url } = usePage()

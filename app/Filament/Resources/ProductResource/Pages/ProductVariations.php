@@ -174,15 +174,25 @@ class ProductVariations extends EditRecord
     {
         $variations = $data['variations'];
         unset($data['variations']);
-        $variations=collect($variations)->map(function ($variation){
+
+        $variations = collect($variations)->map(function ($variation) {
             return [
                 'variation_types_option_ids' => json_encode($variation['variation_types_option_ids']),
                 'quantity' => $variation['quantity'],
                 'price' => $variation['price'],
             ];
-        });
+        })->all(); // Convert to array
+
         $record->variations()->delete();
-        $record->variations()->upsert($variations,['id'],['variation_type_option_ids' ,'quantity','price']);
+
+        $record->variations()->upsert(
+            $variations,
+            ['variation_types_option_ids'], // Or use 'id' if you're confident each item has it
+            ['quantity', 'price']
+        );
+
         return $record;
     }
+
+
 }

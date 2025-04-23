@@ -238,12 +238,22 @@ class CartService
 
     private function removeCartItemFromDatabase(int $productId, $optionIds = null)
     {
+        $userId = Auth::id();
+        sort($optionIds); // Sort for consistent comparison
 
-        CartItem::where('user_id', Auth::id())
+        CartItem::where('user_id', $userId)
             ->where('product_id', $productId)
-            ->when($optionIds, fn($q) => $q->whereJsonContains('variation_type_option_ids', $optionIds))
-            ->delete();
+            ->get()
+            ->each(function ($item) use ($optionIds) {
+                $stored = json_decode($item->variation_type_option_ids, true);
+                sort($stored);
+
+                if ($stored === $optionIds) {
+                    $item->delete();
+                }
+            });
     }
+
     protected function removeCartItemsFromCookies(int $productId,  array $optionIds): void
     {
         $cartItems = $this->getCartItemsFromCookies();

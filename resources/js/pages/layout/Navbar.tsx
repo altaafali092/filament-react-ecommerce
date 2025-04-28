@@ -23,7 +23,7 @@ interface Auth {
   } | null;
 }
 
-// Define Navbar props (optional for clarity, since we're using usePage)
+// Define Navbar props
 interface NavbarProps {
   auth: Auth;
   totalQuantity: number;
@@ -88,7 +88,6 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     document.addEventListener('mousedown', handleClickOutside);
 
-    // Auto-hide popup after 3 seconds
     let popupTimeout: NodeJS.Timeout;
     if (isPopupOpen) {
       popupTimeout = setTimeout(() => {
@@ -106,8 +105,13 @@ const Navbar = () => {
 
   // Handler for cart button click
   const handleCartClick = () => {
-    setIsCartOpen(!isCartOpen);
-    setIsPopupOpen(true);
+    if (!auth.user && totalQuantity === 0) {
+      // Redirect to login if guest cart is empty (or handle guest cart logic)
+      window.location.href = '/login';
+    } else {
+      setIsCartOpen(!isCartOpen);
+      setIsPopupOpen(true);
+    }
   };
 
   // Handler for dropdown toggle
@@ -156,26 +160,27 @@ const Navbar = () => {
               <button>
                 <Heart className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
               </button>
-              <div className="relative">
-                <button onClick={handleCartClick} className="relative overflow-hidden group">
-                  <ShoppingBag
-                    className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
-                  />
-                  {totalQuantity > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-pink-600 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
-                      {totalQuantity}
-                    </span>
-                  )}
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                </button>
-
-              </div>
             </>
           ) : (
             <Link href="/login" className="text-sm text-white hover:text-pink-500">
               Log in
             </Link>
           )}
+
+          {/* Cart Button for Mobile (Always Visible) */}
+          <div className="relative">
+            <button onClick={handleCartClick} className="relative overflow-hidden group">
+              <ShoppingBag
+                className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
+              />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 bg-pink-600 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
+                  {totalQuantity}
+                </span>
+              )}
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+            </button>
+          </div>
 
           <button
             className="focus:outline-none relative overflow-hidden group"
@@ -275,48 +280,6 @@ const Navbar = () => {
                 />
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
               </button>
-              <div className="relative">
-                <button onClick={handleCartClick} className="relative overflow-hidden group">
-                  <ShoppingBag
-                    className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
-                  />
-                  {totalQuantity > 0 && (
-                    <span className="absolute -top-0 -right-1 bg-pink-600 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
-                      {totalQuantity}
-                    </span>
-                  )}
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                </button>
-
-              </div>
-              {isCartOpen && (
-                <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown">
-                  <h3 className="font-medium text-lg mb-3">Cart</h3>
-                  {miniCartItems.length > 0 ? (
-                    <div>
-
-                      <div className="flex justify-between font-semibold mt-2">
-                        <span>Total Items:</span>
-                        <span>{totalQuantity}</span>
-                      </div>
-                      <div className="flex justify-between font-semibold mt-2">
-                        <span>Total:</span>
-                        <span><CurrencyFormatter amount={totalPrice} /></span>
-
-
-                      </div>
-                      <Link
-                        href={route('cart.index')}
-                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                      >
-                        View More
-                      </Link>
-                    </div>
-                  ) : (
-                    <p>Your cart is empty!</p>
-                  )}
-                </div>
-              )}
             </>
           ) : (
             <>
@@ -327,6 +290,50 @@ const Navbar = () => {
                 Register
               </Link>
             </>
+          )}
+
+          {/* Cart Button for Desktop (Always Visible) */}
+          <div className="relative">
+            <button onClick={handleCartClick} className="relative overflow-hidden group">
+              <ShoppingBag
+                className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
+              />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-0 -right-1 bg-pink-600 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
+                  {totalQuantity}
+                </span>
+              )}
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+            </button>
+          </div>
+
+          {/* Cart Dropdown */}
+          {isCartOpen && (
+            <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown">
+              <h3 className="font-medium text-lg mb-3">Cart</h3>
+              {miniCartItems.length > 0 ? (
+                <div>
+                  <div className="flex justify-between font-semibold mt-2">
+                    <span>Total Items:</span>
+                    <span>{totalQuantity}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold mt-2">
+                    <span>Total:</span>
+                    <span>
+                      <CurrencyFormatter amount={totalPrice} />
+                    </span>
+                  </div>
+                  <Link
+                    href={route('cart.index')}
+                    className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                  >
+                    View More
+                  </Link>
+                </div>
+              ) : (
+                <p>Your cart is empty!</p>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -16,14 +16,15 @@ export default function NewArrivals({ products }: IndexProps) {
     const [hoveredId, setHoveredId] = useState<number | null>(null)
     const [likedProducts, setLikedProducts] = useState<number[]>([])
 
-    const handleLike = (id: number, e: React.MouseEvent) => {
-        e.stopPropagation()
-        if (likedProducts.includes(id)) {
-            setLikedProducts(likedProducts.filter((productId) => productId !== id))
-        } else {
-            setLikedProducts([...likedProducts, id])
-        }
-    }
+
+
+    // const addToCart = () => {
+    //     form.post(route("cart.store", product.id), {
+    //         preserveScroll: true,
+    //         preserveState: true,
+    //         onError: (err) => console.log(err),
+    //     })
+    // }
 
     return (
         <section className="py-12 px-4 md:px-6 bg-gradient-to-b from-gray-50 to-gray-100 text-gray-800">
@@ -82,23 +83,23 @@ export default function NewArrivals({ products }: IndexProps) {
 
                                 {/* Buttons - Simplified */}
                                 <div className="flex gap-1">
-                                    <button className="flex-1 inline-flex items-center justify-center text-xs font-bold bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white py-1.5 px-2 rounded-lg hover:opacity-90 transition-all">
+                                    {/* <button onClick={addToCa} className="flex-1 inline-flex items-center justify-center text-xs font-bold bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white py-1.5 px-2 rounded-lg hover:opacity-90 transition-all">
                                         <ShoppingCart className="mr-1 h-3 w-3" />
                                         Add to Cart
-                                    </button>
+                                    </button> */}
 
                                     <Link
                                         href={route('product-detail', { product: product.slug })}
-                                        className="flex-1 inline-flex items-center justify-center text-xs font-bold border border-gray-200 bg-gray-50 text-gray-700 py-1.5 px-2 rounded-lg hover:bg-gray-100 transition-all"
+                                        className=" inline-flex items-center justify-center text-xs font-bold border border-green-300 bg-gray-50 text-gray-700 hover:text-pink-700 py-1.5 px-2 rounded-lg hover:bg-green-500 transition-all"
                                     >
                                         <Sparkles className="mr-1 h-3 w-3" />
                                         Buy Now
                                     </Link>
 
 
-                                </div>
 
-                                {/* Social proof - Compact */}
+
+                                </div>
 
                             </div>
                         </div>

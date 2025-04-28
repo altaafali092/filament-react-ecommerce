@@ -18,4 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
+
+    Route::get('settings/shippingAddress',[ProfileController::class, 'ShippingAddressPage'])->name('profile.shippingAddress');
+    Route::patch('settings/shippingAddress',[ProfileController::class, 'shippingAddressUpdate'])->name('shippingAddress.update');
 });

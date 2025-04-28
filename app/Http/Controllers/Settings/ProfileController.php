@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Http\Requests\Settings\ShippingAddressUpdateRequest;
+use App\Models\ShippingAddress;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -60,4 +62,27 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+
+    public function ShippingAddressPage()
+    {
+        $address = Auth::user()->shippingAddress;
+
+        return Inertia::render('settings/ShippingAddress', [
+            'shippingAddress' => $address,
+        ]);
+    }
+
+
+    public function shippingAddressUpdate(ShippingAddressUpdateRequest $request)
+    {
+        $user = Auth::user();
+
+        $shippingAddress = ShippingAddress::firstOrNew(['user_id' => $user->id]);
+
+        $shippingAddress->fill($request->validated() + ['user_id' => $user->id]);
+        $shippingAddress->save();
+
+        return back()->with('success', 'Shipping address saved successfully.');
+    }
+
 }

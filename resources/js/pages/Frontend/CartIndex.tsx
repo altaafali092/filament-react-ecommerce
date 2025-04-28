@@ -132,7 +132,7 @@ function CartIndex({
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <form
+                                    {/* <form
                                         action={route('cart.checkout')}
                                         method="POST"
                                         className="w-full"
@@ -148,7 +148,11 @@ function CartIndex({
                                         >
                                             Checkout Now! 🚀
                                         </Button>
-                                    </form>
+                                    </form> */}
+                                    <Link href={route('cartInfo')} className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={isEmpty}>
+                                        Checkout Now! 🚀
+                                    </Link>
                                 </CardFooter>
                             </Card>
                         </div>

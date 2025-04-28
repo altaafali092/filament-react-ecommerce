@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\PaymentControlller;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -9,6 +10,7 @@ use Inertia\Inertia;
 
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
+Route::get('cartInfo', [FrontendController::class, 'cartInfo'])->name('cartInfo');
 Route::get('product-detail/{product:slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
 
 
@@ -18,6 +20,7 @@ Route::controller(CartController::class)->group(function () {
     Route::put('cart/{product}', 'update')->name('cart.update');
     Route::delete('cart/{product}', 'destroy')->name('cart.destroy');
 });
+Route::post('payment/webhook',[PaymentControlller::class, 'webhook'])->name('webhook');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -27,6 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::middleware(['verified'])->group(function(){
 Route::post('cart-checkout',[CartController::class,'checkout'])->name('cart.checkout');
+Route::get('/checkout', [FrontendController::class, 'showCheckout'])->name('checkout.detail');
+Route::get('/payment/success',[PaymentControlller::class, 'success'])->name('payment.success');
+Route::get('/payment/fail',[PaymentControlller::class, 'failure'])->name('payment.fail');
 });
 
 require __DIR__ . '/settings.php';

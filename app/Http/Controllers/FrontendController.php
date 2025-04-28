@@ -6,6 +6,9 @@ use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\ShippingAddress;
+use App\Services\CartService;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class FrontendController extends Controller
@@ -32,4 +35,17 @@ class FrontendController extends Controller
         ]);
     }
 
+
+
+    public function cartInfo()
+    {
+        $user = Auth::user();
+        $cartItems = app(CartService::class)->getCartItems();
+        $shipping = ShippingAddress::with('user')->where('user_id', Auth::id())->first();
+        return Inertia::render('Frontend/Checkout/CheckoutDetail', [
+            'user' => $user,
+            'cartItems' => $cartItems,
+            'shipping'=>$shipping,
+        ]);
+    }
 }

@@ -216,7 +216,8 @@ class CartService
     protected function saveItemToCookies(int $productId, int $quantity, $price, array $optionIds): void
     {
         $cartItems = $this->getCartItemsFromCookies();
-        ksort($optionIds);
+
+        ksort($optionIds); // ensure consistent ordering
         $itemKey = $productId . '_' . json_encode($optionIds);
 
         if (isset($cartItems[$itemKey])) {
@@ -236,6 +237,7 @@ class CartService
     }
 
 
+
     private function removeCartItemFromDatabase(int $productId, $optionIds = null)
     {
         $userId = Auth::id();
@@ -245,7 +247,10 @@ class CartService
             ->where('product_id', $productId)
             ->get()
             ->each(function ($item) use ($optionIds) {
-                $stored = json_decode($item->variation_type_option_ids, true);
+                $stored = is_array($item->variation_type_option_ids)
+                    ? $item->variation_type_option_ids
+                    : json_decode($item->variation_type_option_ids, true);
+
                 sort($stored);
 
                 if ($stored === $optionIds) {
@@ -253,6 +258,7 @@ class CartService
                 }
             });
     }
+
 
     protected function removeCartItemsFromCookies(int $productId,  array $optionIds): void
     {
@@ -268,23 +274,32 @@ class CartService
         $cartItems = CartItem::where('user_id', $userId)
             ->get()
             ->map(function ($cartItem) {
+                $optionIds = is_array($cartItem->variation_type_option_ids)
+                    ? $cartItem->variation_type_option_ids
+                    : json_decode($cartItem->variation_type_option_ids, true);
+
                 return [
                     'id' => $cartItem->id,
                     'product_id' => $cartItem->product_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
-                    'option_ids' => json_decode($cartItem->variation_type_option_ids, true),
-
+                    'option_ids' => $optionIds,
                 ];
             })
             ->toArray();
+
         return $cartItems;
     }
-    protected function getCartItemsFromCookies()
+
+    protected function getCartItemsFromCookies(): array
     {
-        $cartItems = json_decode(Cookie::get(self::COOKIE_NAME, '[]'), true);
-        return $cartItems;
+        $cookie = Cookie::get(self::COOKIE_NAME);
+
+        $decoded = json_decode($cookie, true); // decode as associative array
+
+        return is_array($decoded) ? $decoded : []; // fallback if cookie is null or malformed
     }
+
 
     public function getCartItemsGrouped(): array
     {
@@ -297,5 +312,40 @@ class CartService
                 'totalQuantity' => $items->sum('quantity'),
                 'totalPrice' => $items->sum(fn($item) => $item['price'] * $item['quantity'],)
             ])->toArray();
+    }
+
+    public function moveCartItemsToDatabase($userId): void
+    {
+        $cartItems = $this->getCartItemsFromCookies();
+
+        foreach ($cartItems as $itemKey => $cartItem) {
+            // Make sure option_ids is sorted before using in key comparison
+            ksort($cartItem['option_ids']);
+            $optionIdsJson = json_encode(array_values($cartItem['option_ids']));
+
+            // Check if the item already exists in the user's cart
+            $existingItem = CartItem::where('user_id', $userId)
+                ->where('product_id', $cartItem['product_id'])
+                ->where('variation_type_option_ids', $optionIdsJson)
+                ->first();
+
+            if ($existingItem) {
+                $existingItem->update([
+                    'quantity' => $existingItem->quantity + $cartItem['quantity'],
+                    'price' => $cartItem['price'],
+                ]);
+            } else {
+                CartItem::create([
+                    'user_id' => $userId,
+                    'product_id' => $cartItem['product_id'], // ✅ fixed typo from 'produxt_id'
+                    'quantity' => $cartItem['quantity'],
+                    'variation_type_option_ids' => $cartItem['option_ids'], // ✅ fixed typo from 'cariation_type_option_ids'
+                    'price' => $cartItem['price'], // ✅ you missed this if it's required
+                ]);
+            }
+        }
+
+        // ✅ Clear the cookie after merging
+        Cookie::queue(Cookie::forget(self::COOKIE_NAME));
     }
 }

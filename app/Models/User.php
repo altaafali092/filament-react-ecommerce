@@ -49,6 +49,11 @@ class User extends Authenticatable
     }
     public function vendor(): HasOne
     {
-        return $this->hasOne(Vendor::class,'user_id');
+        return $this->hasOne(Vendor::class, 'user_id');
+    }
+
+    public function shippingAddress(): HasOne
+    {
+        return $this->hasOne(ShippingAddress::class);
     }
 }

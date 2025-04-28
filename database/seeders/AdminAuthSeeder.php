@@ -25,6 +25,7 @@ class AdminAuthSeeder extends Seeder
             ],
             [
                 'name' => 'Super Admin',
+
                 'password' => bcrypt('password'), // Always use a secure password
             ]
         );

@@ -36,14 +36,39 @@ const ProductDetail = () => {
     }
 
 
-    const computedProduct = useMemo(() => {
+    // const computedProduct = useMemo(() => {
 
+    //     const selectedOptionIds = Object.values(selectedOptions)
+    //         .map((op) => op.id)
+    //         .sort();
+
+    //     // Find matching variation
+    //     const matchedVariation = product.variations.find(v =>
+    //         arraysAreEqual(
+    //             (v.variation_type_option_ids || []).sort(),
+    //             selectedOptionIds
+    //         )
+    //     );
+
+    //     return matchedVariation ? {
+    //         price: matchedVariation.price,
+    //         quantity: matchedVariation.quantity ?? 0,
+    //     } : {
+    //         price: product.price,
+    //         quantity: product.quantity,
+    //     };
+    // }, [product, selectedOptions]);
+
+
+
+
+    const computedProduct = useMemo(() => {
         const selectedOptionIds = Object.values(selectedOptions)
             .map((op) => op.id)
             .sort();
 
-        // Find matching variation
-        const matchedVariation = product.variations.find(v =>
+        // Ensure product.variations exists before calling find
+        const matchedVariation = product.variations?.find(v =>
             arraysAreEqual(
                 (v.variation_type_option_ids || []).sort(),
                 selectedOptionIds
@@ -254,7 +279,7 @@ const ProductDetail = () => {
                                 <div className="space-y-6">
                                     <div className="aspect-square bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden border">
                                         <img
-                                            src={images[activeImage]?.large}
+                                           src={images[activeImage]?.large || "/placeholder.svg"}
                                             alt={product.title}
                                             className="w-full h-full object-cover transition-opacity duration-300"
                                         />
@@ -437,4 +462,3 @@ const ProductDetail = () => {
 }
 
 export default ProductDetail
-

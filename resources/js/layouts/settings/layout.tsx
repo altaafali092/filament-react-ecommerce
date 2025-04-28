@@ -18,10 +18,16 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Shipping Address',
+        href: '/settings/shippingAddress',
+        icon: null,
+    },
+    {
         title: 'Appearance',
         href: '/settings/appearance',
         icon: null,
     },
+
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

@@ -60,7 +60,6 @@ class ProductDetailResource extends JsonResource
                                     'large' => $image->getUrl('large'),
                                 ];
                             }),
-
                         ];
                     }),
                 ];

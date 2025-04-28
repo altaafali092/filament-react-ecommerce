@@ -3,10 +3,9 @@
 import SliderMain from "@/components/slider-main"
 
 export default function Slider() {
-    // Responsive carousel items with consistent height and enhanced styling
     const carouselItems = [
         <div key="1" className="relative h-[300px] sm:h-[400px] lg:h-[700px] w-full group overflow-hidden">
-            {/* Add gradient overlay at the top for navbar text visibility */}
+
             <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/50 to-transparent z-10"></div>
 
             <img

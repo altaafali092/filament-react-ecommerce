@@ -42,7 +42,7 @@ const ProductDetail = () => {
 
     const [selectedOptions, setSelectedOptions] = useState<Record<number, VariationTypeOption>>({})
     const [activeImage, setActiveImage] = useState(0)
-    const [liked, setLiked] = useState(false)
+
 
     const arraysAreEqual = (a: any[], b: any[]) => {
         return a.length === b.length && a.every((v, i) => v === b[i])

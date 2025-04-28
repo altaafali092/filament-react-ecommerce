@@ -11,9 +11,7 @@ import toast from 'react-hot-toast';
 
 function Success({ orders }: PageProps<{ orders: { data: Order[] } }>) {
 
-
-
-    const { flash } = usePage().props;
+    const { flash } = usePage<PageProps>().props;
 
     useEffect(() => {
         if (flash.success) {
@@ -23,7 +21,7 @@ function Success({ orders }: PageProps<{ orders: { data: Order[] } }>) {
             toast.error(flash.error);
         }
     }, [flash]);
-    
+
   return (
     <AuthLayout>
       <Head title="Order Vibes 🔥" />

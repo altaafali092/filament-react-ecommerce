@@ -126,6 +126,7 @@ export type OrderItem ={
 
     };
     orderItems:OrderItem[];
+    flash: FlashProps;
  }
 
  export type Shipping= {

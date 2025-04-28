@@ -3,13 +3,27 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import AuthLayout from '@/pages/layout/AuthLayout';
 import { Order, PageProps } from '@/types/frontend';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { CheckCircle2 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
+import toast from 'react-hot-toast';
 
 function Success({ orders }: PageProps<{ orders: { data: Order[] } }>) {
-    console.log(orders);
+
+
+
+    const { flash } = usePage().props;
+
+    useEffect(() => {
+        if (flash.success) {
+            toast.success(flash.success);
+        }
+        if (flash.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
+    
   return (
     <AuthLayout>
       <Head title="Order Vibes 🔥" />

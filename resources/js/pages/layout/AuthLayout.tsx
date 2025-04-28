@@ -11,6 +11,8 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="relative">
       <Navbar auth={auth} /> {/* Pass auth as a prop */}
       {children}
+
+      
       <Footer />
     </div>
   )

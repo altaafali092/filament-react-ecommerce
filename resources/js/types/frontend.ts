@@ -1,6 +1,13 @@
 import { Config, TypeConfig } from 'vendor/tightenco/ziggy/src/js';
 import { User } from '.';
 
+
+
+export interface FlashProps {
+    success?: string; // Optional success message
+    error?: string;   // Optional error message
+}
+
 export type Image = {
     id: number;
     thumb: string;
@@ -85,6 +92,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     totalQuantity: number;
     totalPrice: number;
     minCartItems: CartItems[];
+    flash: FlashProps;
 };
 
 
@@ -116,3 +124,17 @@ export type OrderItem ={
     };
     orderItems:OrderItem[];
  }
+
+ export type Shipping= {
+    user?: {
+        name: string;
+        email: string;
+    };
+    phone?: string;
+    alternative_phone?: string;
+    city?: string;
+    district?: string;
+    province?: string;
+    postal_code?: string;
+    nearest_landmarks?: string;
+}

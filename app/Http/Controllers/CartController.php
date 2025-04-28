@@ -51,7 +51,7 @@ class CartController extends Controller
             $data['option_ids'] ?: [],
 
         );
-        return back()->with('success', 'product added successfully');
+        return back()->with('success', 'Item added to Cart Sucessfully');
     }
 
 
@@ -143,7 +143,7 @@ class CartController extends Controller
                 ->delete();
 
             DB::commit();
-            
+
 
             return redirect()->route('payment.success')->with('success', 'Thank you for your order!');
         } catch (\Throwable $e) {

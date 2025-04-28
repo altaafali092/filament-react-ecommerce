@@ -3,20 +3,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import AuthLayout from "@/pages/layout/AuthLayout";
 import { Head, router } from "@inertiajs/react";
+import { CartItems, Shipping } from "@/types/frontend";
 
-export default function CheckoutDetail({ shipping, cartItems }) {
+
+
+interface CheckoutDetailProps {
+    shipping: Shipping;
+    cartItems: CartItems[];
+}
+
+export default function CheckoutDetail({ shipping, cartItems }: CheckoutDetailProps) {
     const total = cartItems.reduce(
         (sum, item) => sum + item.quantity * item.price,
         0
     );
 
-
     const handleCheckout = () => {
         router.post(route('cart.checkout'), {
-            onError: (errors) => {
-                console.error('Checkout failed:', errors);
-                alert('Checkout failed. Please try again.');
-            },
+
             preserveState: true,
             preserveScroll: true,
         });
@@ -53,11 +57,9 @@ export default function CheckoutDetail({ shipping, cartItems }) {
                                 <button
                                     type="button"
                                     onClick={handleCheckout}
-                                    className="w-full bg-blue-900 text-white py-3 rounded font-medium mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    disabled={router.processing}
-                                    aria-disabled={router.processing}
+                                    className="w-full bg-blue-900 text-white py-3 rounded font-medium mt-6"
                                 >
-                                    {router.processing ? 'Processing...' : 'Check Out'}
+                                    Check Out
                                 </button>
                             </CardContent>
                         </Card>

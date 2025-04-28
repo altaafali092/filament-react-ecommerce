@@ -1,5 +1,5 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useEffect } from 'react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { CreditCard } from 'lucide-react';
 import AuthLayout from '../layout/AuthLayout';
 import { GroupedCartItems, PageProps } from '@/types/frontend';
@@ -9,14 +9,29 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import CartItem from '@/components/Forontend/CartItem';
+import toast from 'react-hot-toast';
+
+
 
 function CartIndex({
     csrf_token,
     totalPrice,
     totalQuantity,
     cartItems,
+    flash
 }: PageProps<{ cartItems: Record<number, GroupedCartItems> }>) {
     const isEmpty = Object.keys(cartItems).length === 0;
+
+
+
+    useEffect(() => {
+        if (flash.success) {
+            toast.success(flash.success);
+        }
+        if (flash.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     return (
         <AuthLayout>
@@ -132,26 +147,12 @@ function CartIndex({
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    {/* <form
-                                        action={route('cart.checkout')}
-                                        method="POST"
-                                        className="w-full"
+                                    <Link
+                                        href={route('cartInfo')}
+                                        className="w-full text-center py-3 px-6 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-md transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={isEmpty}
                                     >
-                                        <input
-                                            type="hidden"
-                                            name="_token"
-                                            value={csrf_token}
-                                        />
-                                        <Button
-                                            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled={isEmpty}
-                                        >
-                                            Checkout Now! 🚀
-                                        </Button>
-                                    </form> */}
-                                    <Link href={route('cartInfo')} className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-                                        disabled={isEmpty}>
-                                        Checkout Now! 🚀
+                                        Checkout Now
                                     </Link>
                                 </CardFooter>
                             </Card>

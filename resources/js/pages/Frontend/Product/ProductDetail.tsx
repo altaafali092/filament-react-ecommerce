@@ -5,6 +5,7 @@ import type { IFrontProduct, VariationTypeOption } from "@/types/frontend"
 import { Head, router, useForm, usePage } from "@inertiajs/react"
 import { Heart, Minus, Plus, ShieldCheck, Truck } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
+import toast from "react-hot-toast"
 
 interface Props {
     product: IFrontProduct
@@ -14,6 +15,17 @@ interface Props {
 const ProductDetail = () => {
     const { product, variationOptions } = usePage<Props>().props
 
+
+    const { flash } = usePage().props;
+
+    useEffect(() => {
+        if (flash.success) {
+            toast.success(flash.success);
+        }
+        if (flash.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
 
     const form = useForm<{
@@ -34,32 +46,6 @@ const ProductDetail = () => {
     const arraysAreEqual = (a: any[], b: any[]) => {
         return a.length === b.length && a.every((v, i) => v === b[i])
     }
-
-
-    // const computedProduct = useMemo(() => {
-
-    //     const selectedOptionIds = Object.values(selectedOptions)
-    //         .map((op) => op.id)
-    //         .sort();
-
-    //     // Find matching variation
-    //     const matchedVariation = product.variations.find(v =>
-    //         arraysAreEqual(
-    //             (v.variation_type_option_ids || []).sort(),
-    //             selectedOptionIds
-    //         )
-    //     );
-
-    //     return matchedVariation ? {
-    //         price: matchedVariation.price,
-    //         quantity: matchedVariation.quantity ?? 0,
-    //     } : {
-    //         price: product.price,
-    //         quantity: product.quantity,
-    //     };
-    // }, [product, selectedOptions]);
-
-
 
 
     const computedProduct = useMemo(() => {
@@ -239,7 +225,6 @@ const ProductDetail = () => {
         form.post(route("cart.store", product.id), {
             preserveScroll: true,
             preserveState: true,
-            onError: (err) => console.log(err),
         })
     }
 
@@ -264,6 +249,8 @@ const ProductDetail = () => {
     }, [product, selectedOptions])
 
     const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
+
+
 
 
 

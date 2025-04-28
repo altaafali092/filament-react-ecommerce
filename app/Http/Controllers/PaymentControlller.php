@@ -33,8 +33,8 @@ class PaymentControlller extends Controller
         }
 
         return Inertia::render('Frontend/Payment/Success', [
-            'orders' => OrderViewResource::collection($orders), // Simply return the collection without toArray()
-        ]);
+            'orders' => OrderViewResource::collection($orders),
+        ])->with('success','Your order has been placed');
     }
 
     public function failure()

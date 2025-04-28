@@ -1,22 +1,22 @@
 import CurrencyFormatter from "@/components/CurrencyFormatter"
 import { Button } from "@/components/ui/button"
 import AuthLayout from "@/pages/layout/AuthLayout"
-import type { IFrontProduct, VariationTypeOption } from "@/types/frontend"
+import type { IFrontProduct, PageProps, VariationTypeOption } from "@/types/frontend"
 import { Head, router, useForm, usePage } from "@inertiajs/react"
 import { Heart, Minus, Plus, ShieldCheck, Truck } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
 
-interface Props {
+interface DetailProps {
     product: IFrontProduct
     variationOptions: Record<number, number>
 }
 
 const ProductDetail = () => {
-    const { product, variationOptions } = usePage<Props>().props
+    const { product, variationOptions } = usePage<DetailProps>().props
 
 
-    const { flash } = usePage().props;
+    const { flash } = usePage<PageProps>().props;
 
     useEffect(() => {
         if (flash.success) {
@@ -29,13 +29,14 @@ const ProductDetail = () => {
 
 
     const form = useForm<{
-        option_ids: Record<string, number>
-        quantity: number
-
+        option_ids: Record<string, number>;
+        quantity: number;
+        price: number; // Add the price field here
     }>({
         option_ids: {},
         quantity: 1,
-    })
+        price: product.price, // Initialize price with the product's default price
+    });
 
     const { url } = usePage()
 
@@ -390,7 +391,7 @@ const ProductDetail = () => {
                                                             className="py-3.5 px-6 text-sm font-medium bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full transition-colors"
                                                         >
                                                             Add to Cart —
-                                                            <CurrencyFormatter amount={(computedProduct.price * form.data.quantity).toFixed(2)} />
+                                                            <CurrencyFormatter amount={Number((computedProduct.price * form.data.quantity).toFixed(2))} />
                                                         </button>
                                                     </div>
                                                 </div>

@@ -18,7 +18,7 @@ export type Image = {
 export type VariationType = {
     id: number;
     name: string;
-    type: 'Select' | 'Radio' | 'Image';
+    type: 'select' | 'radio' | 'image';
     options: VariationTypeOption[];
 };
 export type VariationTypeOption = {
@@ -38,6 +38,7 @@ export interface IFrontProduct {
     description: string;
     image: string;
     images: Image[];
+    flash: FlashProps;
     user: {
         id: number;
         name: string;
@@ -50,9 +51,11 @@ export interface IFrontProduct {
     variations: Array<{
         id: number;
         variation_type_option_ids: string[];
+        variation_type_ids?: number[];
         quantity: number;
         price: number;
-    }>; // safe default: []
+    }>;
+
 }
 export type paginationProps<T> = {
     data: Array<T>;

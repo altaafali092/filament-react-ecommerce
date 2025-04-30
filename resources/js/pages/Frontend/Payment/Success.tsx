@@ -84,7 +84,7 @@ function Success({ orders }: PageProps<{ orders: { data: Order[] } }>) {
 
           {/* Back to Shop CTA */}
           <div className="text-center">
-            <Link href="/shop">
+            <Link href={route('home')}>
               <Button
                 className="bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 transition-colors"
               >

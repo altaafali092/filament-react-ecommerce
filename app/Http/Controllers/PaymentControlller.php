@@ -21,7 +21,9 @@ class PaymentControlller extends Controller
     {
         $user = Auth::user();
         $session_id = $request->get('session_id');
-        $orders = Order::where('payemt_session_id', $session_id)->get();
+        $orders = Order::where('payment_session_id', $session_id)
+        ->where('user_id', $user->id)
+        ->get();
 
         if ($orders->count() === 0) {
             abort(400);
@@ -35,6 +37,7 @@ class PaymentControlller extends Controller
         return Inertia::render('Frontend/Payment/Success', [
             'orders' => OrderViewResource::collection($orders),
         ])->with('success','Your order has been placed');
+
     }
 
     public function failure()

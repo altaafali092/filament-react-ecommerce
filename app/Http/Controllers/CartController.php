@@ -3,19 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatusEnum;
+use App\Mail\CheckoutCompleted;
+use App\Mail\NewOrderMail;
+use App\Mail\UserOrderConfirmationMail;
+use App\Mail\VendorOrderNotificationMail;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ShippingAddress;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
-use PhpParser\Node\Expr\FuncCall;
+use Illuminate\Support\Str;
 
-use function Pest\Laravel\delete;
 
 class CartController extends Controller
 {
@@ -120,6 +125,7 @@ class CartController extends Controller
                     'website_commision' => $totalPrice,
                     'vendor_commision' => $totalPrice,
                     'payment_intent' => null,
+                    'payment_session_id' => Str::uuid(),
                 ]);
 
                 foreach ($cartItems as $cartItem) {
@@ -130,6 +136,17 @@ class CartController extends Controller
                         'price' => $cartItem['price'],
                         'variation_type_options_ids' => json_encode($cartItem['option_ids'] ?? []),
                     ]);
+                }
+
+
+                $shippingAddress = ShippingAddress::where('user_id', $order->user_id)->first();
+                // 🚀 Send email to user
+                Mail::to($request->user()->email)->send(new UserOrderConfirmationMail($order,$shippingAddress));
+
+                // 🚀 Send email to vendor
+                $vendorEmail = $user['email'] ?? null;
+                if ($vendorEmail) {
+                    Mail::to($vendorEmail)->send(new VendorOrderNotificationMail($order));
                 }
 
                 $orders[] = $order;
@@ -146,6 +163,7 @@ class CartController extends Controller
 
 
             return redirect()->route('payment.success')->with('success', 'Thank you for your order!');
+            // return redirect(route('payment.success'));
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Checkout Error: ' . $e->getMessage(), [

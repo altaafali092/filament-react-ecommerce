@@ -140,10 +140,10 @@ class CartController extends Controller
 
 
                 $shippingAddress = ShippingAddress::where('user_id', $order->user_id)->first();
-                // 🚀 Send email to user
+                 //Send email to user
                 Mail::to($request->user()->email)->send(new UserOrderConfirmationMail($order,$shippingAddress));
 
-                // 🚀 Send email to vendor
+                //  Send email to vendor
                 $vendorEmail = $user['email'] ?? null;
                 if ($vendorEmail) {
                     Mail::to($vendorEmail)->send(new VendorOrderNotificationMail($order));

@@ -156,10 +156,10 @@ const Navbar = () => {
             <>
               <button>
                 <User className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
-              </button>
+          </button>
               <button>
                 <Heart className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
-              </button>
+          </button>
             </>
           ) : (
             <Link href="/login" className="text-sm text-white hover:text-pink-500">
@@ -168,7 +168,7 @@ const Navbar = () => {
           )}
 
           {/* Cart Button for Mobile (Always Visible) */}
-          <div className="relative">
+            <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
                 className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
@@ -178,8 +178,8 @@ const Navbar = () => {
                   {totalQuantity}
                 </span>
               )}
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-            </button>
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+          </button>
           </div>
 
           <button
@@ -254,7 +254,7 @@ const Navbar = () => {
                     {auth.user?.name === 'Super Admin' ? 'SA' : auth.user?.name}
                   </span>
                   <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                </button>
+          </button>
                 {isOpen && (
                   <div className="absolute left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-md shadow-lg rounded-xl p-2 mt-2 min-w-[150px] opacity-100 transition-all duration-300 border border-pink-100 user-dropdown">
                     <Link
@@ -278,8 +278,8 @@ const Navbar = () => {
                 <Heart
                   className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
                 />
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-              </button>
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+          </button>
             </>
           ) : (
             <>
@@ -293,7 +293,7 @@ const Navbar = () => {
           )}
 
           {/* Cart Button for Desktop (Always Visible) */}
-          <div className="relative">
+            <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
                 className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
@@ -329,7 +329,7 @@ const Navbar = () => {
                   >
                     View More
                   </Link>
-                </div>
+              </div>
               ) : (
                 <p>Your cart is empty!</p>
               )}
@@ -409,19 +409,19 @@ const Navbar = () => {
 
       {/* Styles */}
       <style>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slideDown {
-          animation: slideDown 0.3s ease forwards;
-        }
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                .animate-slideDown {
+                    animation: slideDown 0.3s ease forwards;
+                }
         @keyframes popup {
           0% {
             opacity: 0;
@@ -438,8 +438,8 @@ const Navbar = () => {
         }
         .animate-popup {
           animation: popup 0.3s ease forwards;
-        }
-      `}</style>
+                }
+            `}</style>
     </nav>
   );
 };

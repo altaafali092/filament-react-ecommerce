@@ -4,9 +4,9 @@ namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
 use Filament\Actions;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Contracts\Auth\Authenticatable;
+
+use Illuminate\Database\Eloquent\Model;
 
 class EditRole extends EditRecord
 {
@@ -24,16 +24,21 @@ class EditRole extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function authorizeAccess(): void
-    {
-        if (! auth()->user()->can('edit role')) {
-            Notification::make()
-                ->title('Unauthorized')
-                ->body('You are not allowed to access this page.')
-                ->danger()
-                ->send();
 
-            $this->redirect('/admin'); // Or wherever appropriate
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        // Remove permissions from the update data
+        $permissions = $data['permissions'] ?? [];
+        unset($data['permissions']);
+
+        // Update the role (excluding permissions)
+        $record = parent::handleRecordUpdate($record, $data);
+
+        // Sync the permissions via the relationship
+        if (!empty($permissions)) {
+            $record->permissions()->sync($permissions);
         }
+
+        return $record;
     }
 }

@@ -18,6 +18,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
@@ -29,6 +30,15 @@ class UserResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::check() && Auth::user()->hasRole('superadmin');
+    }
+    public static function canViewAny(): bool
+    {
+        return Auth::check() && Auth::user()->hasRole('superadmin');
     }
 
     public static function form(Form $form): Form
@@ -59,7 +69,7 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),
-                TextColumn::make('roles.name')->badge(),
+                TextColumn::make('role')->badge(),
                 ToggleColumn::make('status')
                 ->label('Active')
                 ->beforeStateUpdated(function ($record, $state) {
@@ -72,7 +82,9 @@ class UserResource extends Resource
                         return false;
                     }
                 })
-                ->updateStateUsing(fn (User $user, bool $state) => $user->update(['status' => $state])),
+
+                ->updateStateUsing(fn (User $user, bool $state) => $user->update(['status' => $state]))
+                ->visible(fn () => Auth::user()->can('edit users')),
                 TextColumn::make('created_at')->date(),
                 TextColumn::make('updated_at')->date(),
             ])
@@ -80,7 +92,8 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->visible(fn () => Auth::user()->can('edit users')),
                 // Custom Delete action to prevent Super Admin deletion
                 Tables\Actions\DeleteAction::make()
                     ->hidden(function ($record) {
@@ -99,7 +112,8 @@ class UserResource extends Resource
 
                             return false; // Return false to prevent deletion
                         }
-                    }),
+                    })
+                    ->visible(fn () => Auth::user()->can('delete users')),
             ])
 
             ->bulkActions([
@@ -124,4 +138,6 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+
 }

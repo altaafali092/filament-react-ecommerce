@@ -142,3 +142,14 @@ export type OrderItem ={
     postal_code?: string;
     nearest_landmarks?: string;
 }
+
+
+export type IFrontBlogs={
+    id:number;
+    title:string;
+    slug:string;
+    description:string;
+    image:string
+    published_by:string
+    created_at: string;
+}

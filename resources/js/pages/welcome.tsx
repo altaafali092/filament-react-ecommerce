@@ -9,13 +9,14 @@ import Trending from './index/Trending';
 import NewsAndBlogs from './index/NewsAndBlog';
 import CustomerReviews from './index/Review';
 import NewArrivial from './index/NewArrivial';
-import { IFrontProduct } from '@/types/frontend';
+import { IFrontBlogs, IFrontProduct } from '@/types/frontend';
 import Slider from './index/Slider';
 
 
 export default function Welcome() {
     const { auth  } = usePage<SharedData>().props;
     const{products}=usePage<{products:IFrontProduct[]}>().props;
+    const{blogs}=usePage<{blogs:IFrontBlogs[]}>().props;
 
     return (
         <>
@@ -39,7 +40,7 @@ export default function Welcome() {
                     <Trending />
                 </div>
                 <div className="relative z-10">
-                    <NewsAndBlogs />
+                    <NewsAndBlogs  blogs={blogs}/>
                 </div>
                 <div className="relative z-10">
                     <CustomerReviews />

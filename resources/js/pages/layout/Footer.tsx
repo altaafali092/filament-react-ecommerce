@@ -184,8 +184,12 @@ export function Footer() {
             </div>
 
             <div className="pt-2">
-              <p className="text-white/70 text-sm">DM us for support:</p>
-              <p className="font-medium">@yourbrand</p>
+
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-500">
+                <Link href={route('vendor.registerPage')}>
+                Become a vendor
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

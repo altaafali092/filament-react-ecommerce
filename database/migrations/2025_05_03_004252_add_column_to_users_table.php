@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('status')->default(true);
+            $table->string('phone')->nullable();
+            $table->string('vendor_status')->default('pending');
+
         });
     }
 
@@ -23,6 +26,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('status');
+            $table->dropColumn('phone');
+            $table->dropColumn('vendor_status');
         });
     }
 };

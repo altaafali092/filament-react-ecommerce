@@ -13,6 +13,9 @@ Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('cartInfo', [FrontendController::class, 'cartInfo'])->name('cartInfo');
 Route::get('product-detail/{product:slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
 
+Route::get('blogs',[FrontendController::class, 'blogs'])->name('blogs.index');
+Route::get('blogs/{blog:slug}',[FrontendController::class, 'blogDetails'])->name('blogs.show');
+
 
 Route::controller(CartController::class)->group(function () {
     Route::post('cart-add/{product}', 'store')->name('cart.store');
@@ -34,6 +37,9 @@ Route::get('/checkout', [FrontendController::class, 'showCheckout'])->name('chec
 Route::get('/payment/success',[PaymentControlller::class, 'success'])->name('payment.success');
 Route::get('/payment/fail',[PaymentControlller::class, 'failure'])->name('payment.fail');
 });
+
+Route::get('vendor-register',[FrontendController::class, 'vendorRegisterPage'])->name('vendor.registerPage');
+Route::post('vendor-register', [FrontendController::class, 'vendorRegister'])->name('vendor.register');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

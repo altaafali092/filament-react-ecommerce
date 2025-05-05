@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('store_address')->nullable();
             $table->string('cover_image')->nullable();
             $table->timestamps();
+            
         });
     }
 

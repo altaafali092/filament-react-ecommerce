@@ -15,24 +15,18 @@ class AdminAuthSeeder extends Seeder
      */
     public function run(): void
     {
-
         $superAdminRole = Role::firstOrCreate(['name' => 'superadmin']);
 
-        // 2. Create or update the Super Admin user
-        $user = User::updateOrCreate(
-            [
-                'email' => 'admin@admin.com', // Unique email ensures only one Super Admin
-            ],
-            [
-                'name' => 'Super Admin',
+       $user=User::firstOrCreate([
+            'name' => 'Super Admin',
+            'email' => 'admin@admin.com',
+            'role' => 'superadmin',
+            'password' => bcrypt('password'),
+        ]);
 
-                'password' => bcrypt('password'), // Always use a secure password
-            ]
-        );
-
-        // 3. Assign the Super Admin role to the Super Admin user
-          $user->assignRole($superAdminRole);
-          $permissions = Permission::all();
-          $superAdminRole->syncPermissions($permissions);
+        $user->assignRole($superAdminRole);
+        $permissions = Permission::all();
+        // Assign all permissions to the superadmin role
+        $superAdminRole->syncPermissions($permissions);
     }
 }

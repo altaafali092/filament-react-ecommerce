@@ -14,10 +14,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role as SpatieRole;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Spatie\Permission\Models\Permission;
+
 
 class RoleResource extends Resource
 {
@@ -27,6 +26,15 @@ class RoleResource extends Resource
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge';
     protected static ?string $navigationGroup = 'Settings';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::check() && Auth::user()->hasRole('superadmin');
+    }
+    public static function canViewAny(): bool
+    {
+        return Auth::check() && Auth::user()->hasRole('superadmin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -34,13 +42,13 @@ class RoleResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Select::make('permissions')
+                    Select::make('permissions')
                     ->label('Permissions')
                     ->multiple()
                     ->relationship('permissions', 'name')
-                    ->options(Permission::pluck('name', 'id'))
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->disabled(fn ($record) => $record && $record->name === 'superadmin'),
             ]);
     }
 

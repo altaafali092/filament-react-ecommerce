@@ -21,4 +21,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/shippingAddress',[ProfileController::class, 'ShippingAddressPage'])->name('profile.shippingAddress');
     Route::patch('settings/shippingAddress',[ProfileController::class, 'shippingAddressUpdate'])->name('shippingAddress.update');
+    Route::get('settings/becomeVendor',[ProfileController::class, 'becomeVendor'])->name('profile.becomeVendor');
+    Route::post('settings/becomeVendor',[ProfileController::class, 'vedorDetailupdate'])->name('vedorDetail.update');
 });

@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendors', function (Blueprint $table) {
-            $table->bigInteger('user_id')->unsigned()->primary();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('users')->cascadeOnDelete();
-            $table->string('status');
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('store_name');
-            $table->string('store_address')->nullable();
+            $table->string('store_address');
             $table->string('cover_image')->nullable();
+            $table->text('store_description')->nullable();
+            $table->string('store_registration_no');
+            $table->string('citizenship_no');
+            $table->string('store_registration_doc')->nullable();
+            $table->string('citizenship_image')->nullable();
+            $table->string('other_document')->nullable();
             $table->timestamps();
-            
         });
     }
 

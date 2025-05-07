@@ -18,6 +18,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Become a Vendor',
+        href: '/settings/becomeVendor',
+        icon: null,
+    },
+    {
         title: 'Shipping Address',
         href: '/settings/shippingAddress',
         icon: null,

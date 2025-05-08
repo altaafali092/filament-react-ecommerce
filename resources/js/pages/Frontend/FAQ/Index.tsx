@@ -1,6 +1,6 @@
 import AuthLayout from '@/pages/layout/AuthLayout';
 import React from 'react';
-import { usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { IFrontFAQ } from '@/types/frontend';
 
 const Index = () => {
@@ -8,6 +8,7 @@ const Index = () => {
 
   return (
     <AuthLayout>
+      <Head title='FAQ'/>
       <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-200 to-blue-200 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900  py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-center text-gray-800 mb-12 mt-20">

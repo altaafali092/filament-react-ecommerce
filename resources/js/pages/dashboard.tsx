@@ -77,6 +77,11 @@ export default function Dashboard() {
                             Become a Vendor
                         </Button>
                     )}
+                    {isVendor && (
+                        <a target='_blank' href={route('filament.admin.auth.login')} className="w-full bg-black text-white px-3 py-2 rounded-lg">
+                            Login to Vendor Dashboard
+                        </a>
+                    )}
 
                     {/* Confirm Modal */}
                     <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

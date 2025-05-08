@@ -153,3 +153,16 @@ export type IFrontBlogs={
     published_by:string
     created_at: string;
 }
+ export type IFrontSlider={
+    id:number;
+    title:string;
+    description:string;
+    image:string;
+    link:string; 
+ }
+
+ export type IFrontFAQ={
+    id:number;
+    anwer:string;
+    question:string;
+ }

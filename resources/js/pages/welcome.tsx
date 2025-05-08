@@ -1,6 +1,5 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import Navbar from './layout/Navbar';
 
 import AuthLayout from './layout/AuthLayout';
 import ShopByCategory from './index/ShopByCatregory';
@@ -9,7 +8,8 @@ import Trending from './index/Trending';
 import NewsAndBlogs from './index/NewsAndBlog';
 import CustomerReviews from './index/Review';
 import NewArrivial from './index/NewArrivial';
-import { IFrontBlogs, IFrontProduct } from '@/types/frontend';
+import FrquentlyAskQues from './index/FrequentlyAskQues';
+import { IFrontBlogs, IFrontFAQ, IFrontProduct, IFrontSlider } from '@/types/frontend';
 import Slider from './index/Slider';
 
 
@@ -17,6 +17,8 @@ export default function Welcome() {
     const { auth  } = usePage<SharedData>().props;
     const{products}=usePage<{products:IFrontProduct[]}>().props;
     const{blogs}=usePage<{blogs:IFrontBlogs[]}>().props;
+    const {sliders}=usePage<{sliders:IFrontSlider[]}>().props;
+    const {faqs}=usePage<{faqs:IFrontFAQ[]}>().props;
 
     return (
         <>
@@ -28,7 +30,7 @@ export default function Welcome() {
             <div className="relative">
                 <AuthLayout >
                 <div className="relative z-10 mt-5">
-                    <Slider />
+                    <Slider  sliders={sliders}/>
                 </div>
                 <div className="relative z-10">
                     <ShopByCategory />
@@ -41,6 +43,10 @@ export default function Welcome() {
                 </div>
                 <div className="relative z-10">
                     <NewsAndBlogs  blogs={blogs}/>
+                </div>
+                  
+                <div className="relative z-10">
+                    <FrquentlyAskQues  faqs={faqs}/>
                 </div>
                 <div className="relative z-10">
                     <CustomerReviews />

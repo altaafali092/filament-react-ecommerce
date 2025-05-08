@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,20 +29,26 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request, CartService $cartService): RedirectResponse
+    public function store(LoginRequest $request, CartService $cartService): HttpResponse|RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
-
+    
         $user = Auth::user();
-
+    
         if ($user->role === 'superadmin') {
-            return Inertia::location(route('filament.admin.pages.dashboard'));
+            Auth::logout(); // ✅ Log the user out
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+    
+            return Inertia::location(route('filament.admin.auth.login'));
         }
+    
         $cartService->moveCartItemsToDatabase($user->id);
-
+    
         return redirect()->intended(route('home'));
     }
+    
 
     /**
      * Destroy an authenticated session.

@@ -163,6 +163,6 @@ export type IFrontBlogs={
 
  export type IFrontFAQ={
     id:number;
-    anwer:string;
+    answer:string;
     question:string;
  }

@@ -101,4 +101,12 @@ class FrontendController extends Controller
         return Inertia::location(route('filament.admin.auth.login'));
 
     }
+
+    public function faqs()
+    {
+        $faqs = FAQ::where('status', 1)->latest()->get();
+        return Inertia::render('Frontend/FAQ/Index', [
+            'faqs' => FAQResource::collection($faqs)->toArray(request()),
+        ]);
+    }
 }

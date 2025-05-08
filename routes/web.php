@@ -16,6 +16,7 @@ Route::get('product-detail/{product:slug}', [FrontendController::class, 'product
 Route::get('blogs',[FrontendController::class, 'blogs'])->name('blogs.index');
 Route::get('blogs/{blog:slug}',[FrontendController::class, 'blogDetails'])->name('blogs.show');
 
+Route::get('faqs',[FrontendController::class, 'faqs'])->name('faqs.index');
 
 Route::controller(CartController::class)->group(function () {
     Route::post('cart-add/{product}', 'store')->name('cart.store');

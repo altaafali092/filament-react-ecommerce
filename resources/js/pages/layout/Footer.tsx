@@ -127,7 +127,7 @@ export function Footer() {
             <h4 className="text-lg font-bold">Help</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="/faq" className="text-white/70 hover:text-pink-400 transition-colors">
+                <Link href={route('faqs.index')} className="text-white/70 hover:text-pink-400 transition-colors">
                   FAQs
                 </Link>
               </li>

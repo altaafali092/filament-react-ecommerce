@@ -36,7 +36,7 @@ type vendorDetail = {
 export default function BecomeVendor() {
     const { vendorDetail } = usePage<SharedData & { vendorDetail: Partial<vendorDetail> }>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<vendorDetail>({
+    const { data, setData, errors, processing, recentlySuccessful } = useForm<vendorDetail>({
         store_name: vendorDetail?.store_name || '',
         store_address: vendorDetail?.store_address || '',
         store_phone: vendorDetail?.store_phone || '',
@@ -58,15 +58,15 @@ export default function BecomeVendor() {
 
         router.post(route('vedorDetail.update'), data, {
             preserveScroll: true,
-            onSuccess: () => {
-                console.log("Vendor detail updated successfully");
-            },
-            onError: (errors) => {
-                console.error("Validation errors:", errors);
-            },
-            onFinish: () => {
-                console.log("Finished submitting form");
-            },
+            // onSuccess: () => {
+            //     console.log("Vendor detail updated successfully");
+            // },
+            // onError: (errors) => {
+            //     console.error("Validation errors:", errors);
+            // },
+            // onFinish: () => {
+            //     console.log("Finished submitting form");
+            // },
         });
     };
 

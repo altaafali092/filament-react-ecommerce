@@ -73,7 +73,7 @@ export type CartItems = {
     options: VariationTypeOption[];
 };
 export type NavbarProp = {
-    auth: any;
+    auth: Record<string, unknown>;
     totalPrice: number;
     totalQuantity: number;
     cartItems: CartItems[];

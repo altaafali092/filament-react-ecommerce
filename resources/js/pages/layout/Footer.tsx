@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Instagram, Twitter, Youtube, CreditCard, Truck, ShieldCheck, Facebook } from "lucide-react"
+import { Instagram,  Youtube, CreditCard, Truck, ShieldCheck, Facebook } from "lucide-react"
 import { Link } from "@inertiajs/react"
 
 // Custom TikTok icon since it's not in Lucide by default

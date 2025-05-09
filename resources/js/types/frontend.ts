@@ -1,4 +1,4 @@
-import { Config, TypeConfig } from 'vendor/tightenco/ziggy/src/js';
+import { Config  } from 'vendor/tightenco/ziggy/src/js';
 import { User } from '.';
 
 

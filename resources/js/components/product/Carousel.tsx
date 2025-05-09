@@ -1,5 +1,5 @@
 import { Image } from '@/types/frontend';
-import { useForm, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import React from 'react'
 
 const Carousel = () => {

@@ -19,7 +19,7 @@ const NewsAndBlogs = () => {
 
     const { blogs } = usePage<BlogProps>().props
 
-    const [hoveredId, setHoveredId] = useState<number | null>(null)
+    const [ setHoveredId] = useState<number | null>(null)
 
     return (
 

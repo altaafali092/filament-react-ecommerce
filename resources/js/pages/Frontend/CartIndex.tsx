@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { CreditCard } from 'lucide-react';
 import AuthLayout from '../layout/AuthLayout';
 import { GroupedCartItems, PageProps } from '@/types/frontend';

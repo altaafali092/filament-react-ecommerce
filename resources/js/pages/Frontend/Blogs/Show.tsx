@@ -1,7 +1,7 @@
 import AuthLayout from '@/pages/layout/AuthLayout'
 import { IFrontBlogs } from '@/types/frontend'
 import { Head, Link, usePage } from '@inertiajs/react'
-import { ArrowLeft, ArrowRight, ArrowUpLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 

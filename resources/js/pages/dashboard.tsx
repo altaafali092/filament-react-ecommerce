@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
@@ -18,16 +18,16 @@ export default function Dashboard() {
     const { auth } = usePage<SharedData>().props;
     const isVendor = auth.user.role?.toLowerCase() === 'vendor';
     const isActive = auth.user.status === 1;
-    const [showForm, setShowForm] = useState(false);
+    const [ setShowForm] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
 
 
-    const submit = (e: any) => {
-        e.preventDefault();
-        (route('profile.becomeVendor'), {
-            preserveScroll: true,
-        });
-    };
+    // const submit = (e: any) => {
+    //     e.preventDefault();
+    //     (route('profile.becomeVendor'), {
+    //         preserveScroll: true,
+    //     });
+    // };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

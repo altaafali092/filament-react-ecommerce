@@ -1,9 +1,9 @@
 import CurrencyFormatter from "@/components/CurrencyFormatter"
-import { Button } from "@/components/ui/button"
+
 import AuthLayout from "@/pages/layout/AuthLayout"
 import type { IFrontProduct, PageProps, VariationTypeOption } from "@/types/frontend"
 import { Head, router, useForm, usePage } from "@inertiajs/react"
-import { Heart, Minus, Plus, ShieldCheck, Truck } from "lucide-react"
+import {  Minus, Plus, ShieldCheck, Truck } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
 
@@ -17,6 +17,7 @@ const ProductDetail = () => {
 
 
     const { flash } = usePage<PageProps>().props;
+
 
     useEffect(() => {
         if (flash.success) {
@@ -44,7 +45,7 @@ const ProductDetail = () => {
     const [activeImage, setActiveImage] = useState(0)
 
 
-    const arraysAreEqual = (a: any[], b: any[]) => {
+    const arraysAreEqual = <T extends number | string>(a: T[], b: T[]): boolean => {
         return a.length === b.length && a.every((v, i) => v === b[i])
     }
 
@@ -58,7 +59,7 @@ const ProductDetail = () => {
         const matchedVariation = product.variations?.find(v =>
             arraysAreEqual(
                 (v.variation_type_option_ids || []).sort(),
-                selectedOptionIds
+                selectedOptionIds,
             )
         );
 

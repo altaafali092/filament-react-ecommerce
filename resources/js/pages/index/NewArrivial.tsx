@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { ShoppingCart, Heart, Flame, TrendingUp, Sparkles, FlameIcon } from "lucide-react"
+import {  Flame, TrendingUp, Sparkles } from "lucide-react"
 import type { IFrontProduct } from "@/types/frontend"
 import CurrencyFormatter from "@/components/CurrencyFormatter"
 import { Link } from "@inertiajs/react"
@@ -14,7 +14,7 @@ interface IndexProps {
 
 export default function NewArrivals({ products }: IndexProps) {
     const [hoveredId, setHoveredId] = useState<number | null>(null)
-    const [likedProducts, setLikedProducts] = useState<number[]>([])
+    // const [likedProducts, setLikedProducts] = useState<number[]>([])
 
 
 

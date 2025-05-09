@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { CartItems as CartItemType } from "@/types/frontend";
-import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { Link, router, useForm,  } from '@inertiajs/react';
 import { ProductRoute } from '@/helpers';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 import CurrencyFormatter from '../CurrencyFormatter';
-import toast from 'react-hot-toast';
+
 
 type CartItemProps = {
     item: CartItemType;

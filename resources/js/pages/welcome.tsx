@@ -1,5 +1,5 @@
-import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+
+import { Head, usePage } from '@inertiajs/react';
 
 import AuthLayout from './layout/AuthLayout';
 import ShopByCategory from './index/ShopByCatregory';
@@ -14,7 +14,7 @@ import Slider from './index/Slider';
 
 
 export default function Welcome() {
-    const { auth  } = usePage<SharedData>().props;
+    // const { auth  } = usePage<SharedData>().props;
     const{products}=usePage<{products:IFrontProduct[]}>().props;
     const{blogs}=usePage<{blogs:IFrontBlogs[]}>().props;
     const {sliders}=usePage<{sliders:IFrontSlider[]}>().props;

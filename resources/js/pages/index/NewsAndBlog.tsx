@@ -13,7 +13,7 @@ import { IFrontBlogs } from "@/types/frontend"
 
 
 interface BlogProps {
-    blogs: IFrontBlogs | undefined
+    blogs: IFrontBlogs[];
 }
 const NewsAndBlogs = () => {
 
@@ -99,7 +99,7 @@ const NewsAndBlogs = () => {
                                         asChild
                                         className="text-[#ff00ff] border border-[#ff00ff] font-bold text-xs uppercase rounded-none px-3 py-1 hover:bg-[#ff00ff] hover:text-black transition-all duration-300"
                                     >
-                                        <Link href={blog.link}>
+                                        <Link href={route('blogs.show',blog.slug)}>
                                             Hit It
                                             <MoveRight className="ml-1 h-3 w-3" />
                                         </Link>

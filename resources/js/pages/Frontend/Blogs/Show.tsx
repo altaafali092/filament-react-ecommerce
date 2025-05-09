@@ -6,9 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export default function BlogsDetail() {
-    const {
-        props: { blog, previous, next },
-    } = usePage<{ blog: IFrontBlogs; previous?: IFrontBlogs; next?: IFrontBlogs }>()
+    const {props: { blog },} = usePage<{ blog: IFrontBlogs }>()
 
     const formattedDate = new Date(blog.created_at).toLocaleDateString('en-US', {
         year: 'numeric',

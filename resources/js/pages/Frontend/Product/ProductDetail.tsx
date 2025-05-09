@@ -29,7 +29,7 @@ const ProductDetail = () => {
 
 
     const form = useForm<{
-        option_ids: Record<string, number>;
+        option_ids: Record<string, number>
         quantity: number;
         price: number; // Add the price field here
     }>({

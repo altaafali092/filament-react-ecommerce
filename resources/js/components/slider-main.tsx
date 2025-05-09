@@ -52,7 +52,7 @@ export default function SliderMain({
     setIsDragging(true)
   }
 
-  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+  const handleTouchMove = (_: React.TouchEvent | React.MouseEvent) => {
     if (!isDragging) return
     // Implementation would go here for drag effect
   }

@@ -21,7 +21,8 @@ class HandleFrontendRequest
     public function handle(Request $request, Closure $next): Response
     {
         $officeSettings = new OfficeSettingResource(OfficeSetting::first());
-        $banners = new BannerResource(Banner::where('is_active',1)->latest()->get());
+        $banners = BannerResource::collection(Banner::where('is_active',1)->latest()->get());
+
 
         Inertia::share([   
            

@@ -17,27 +17,45 @@ use UnexpectedValueException;
 
 class PaymentControlller extends Controller
 {
+    // public function success(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $session_id = $request->get('session_id');
+    //     $orders = Order::where('payment_session_id', $session_id)
+    //     ->where('user_id', $user->id)
+    //     ->get();
+
+    //     if ($orders->count() === 0) {
+    //         abort(400);
+    //     }
+    //     foreach ($orders as $order) {
+    //         if ($order->user_id !== $user->id) {
+    //             abort(403);
+    //         }
+    //     }
+
+    //     return Inertia::render('Frontend/Payment/Success', [
+    //         'orders' => OrderViewResource::collection($orders),
+    //     ])->with('success','Your order has been placed');
+
+    // }
     public function success(Request $request)
     {
         $user = Auth::user();
-        $session_id = $request->get('session_id');
-        $orders = Order::where('payment_session_id', $session_id)
-        ->where('user_id', $user->id)
-        ->get();
 
-        if ($orders->count() === 0) {
-            abort(400);
-        }
-        foreach ($orders as $order) {
-            if ($order->user_id !== $user->id) {
-                abort(403);
-            }
+        // Get most recent orders for this user
+        $orders = Order::where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->limit(10) // or however many you want to show
+            ->get();
+
+        if ($orders->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'You have no orders yet.');
         }
 
         return Inertia::render('Frontend/Payment/Success', [
             'orders' => OrderViewResource::collection($orders),
-        ])->with('success','Your order has been placed');
-
+        ])->with('success', 'Your order has been placed');
     }
 
     public function failure()

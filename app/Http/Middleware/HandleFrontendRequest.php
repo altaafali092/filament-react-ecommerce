@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\BannerResource;
 use App\Http\Resources\OfficeSettingResource;
 use App\Models\Banner;
 use App\Models\OfficeSetting;
@@ -20,10 +21,12 @@ class HandleFrontendRequest
     public function handle(Request $request, Closure $next): Response
     {
         $officeSettings = new OfficeSettingResource(OfficeSetting::first());
+        $banners = new BannerResource(Banner::where('is_active',1)->latest()->get());
 
         Inertia::share([   
            
             'officeSettings'=> $officeSettings,
+            'banners'=> $banners,
         ]);
         return $next($request);
     }

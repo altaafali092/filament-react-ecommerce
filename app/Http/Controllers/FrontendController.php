@@ -33,13 +33,13 @@ class FrontendController extends Controller
         $blogs = Blog::where('status', 1)->limit(3)->latest()->get();
         $sliders=Slider::where('status',1)->latest()->get();
         $faqs =FAQ::where('status', 1)->limit(5)->latest()->get();
-        $banners=Banner::where('is_active',1)->latest()->get();
+        // $banners=Banner::where('is_active',1)->latest()->get();
         return Inertia::render('welcome', [
             'products' => ProductResource::collection($products),
             'blogs' => BlogResource::collection($blogs)->toArray(request()),
             'sliders' => SliderResource::collection($sliders)->toArray(request()),
             'faqs'=>FAQResource::collection($faqs)->toArray(request()),
-            'banners'=>BannerResource::collection($banners)->toArray(request()),
+            // 'banners'=>BannerResource::collection($banners)->toArray(request()),
 
         ]);
     }

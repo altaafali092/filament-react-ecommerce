@@ -8,9 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { Link, usePage } from "@inertiajs/react"
 import { IFrontBlogs } from "@/types/frontend"
 
-// Blog Data - Short and Snappy
-
-
 
 interface BlogProps {
     blogs: IFrontBlogs[];

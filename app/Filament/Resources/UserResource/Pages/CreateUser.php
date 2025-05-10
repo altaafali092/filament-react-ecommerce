@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
-
-    public static function canCreate(): bool
+    protected function getRedirectUrl(): string
     {
-        return Auth::user()?->can('create users');
+        return $this->getResource()::getUrl('index');
     }
 }

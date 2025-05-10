@@ -69,15 +69,12 @@ class BlogResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                ->visible(fn () => Auth::user()->can('edit blogs')),
-                Tables\Actions\DeleteAction::make()
-                ->visible(fn () => Auth::user()->can('delete blogs')),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                    ->visible(fn () => Auth::user()->can('delete blogs')),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -98,8 +95,5 @@ class BlogResource extends Resource
         ];
     }
 
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->can('create blogs');
-    }
+    
 }

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\PermissionResource\Pages;
+namespace App\Filament\Resources\BannerResource\Pages;
 
-use App\Filament\Resources\PermissionResource;
+use App\Filament\Resources\BannerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPermission extends EditRecord
+class EditBanner extends EditRecord
 {
-    protected static string $resource = PermissionResource::class;
+    protected static string $resource = BannerResource::class;
 
     protected function getHeaderActions(): array
     {

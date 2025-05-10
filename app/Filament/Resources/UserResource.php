@@ -19,6 +19,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
@@ -31,91 +32,64 @@ class UserResource extends Resource
     {
         return static::getModel()::count();
     }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return Auth::check() && Auth::user()->hasRole('superadmin');
-    }
-    public static function canViewAny(): bool
-    {
-        return Auth::check() && Auth::user()->hasRole('superadmin');
-    }
-
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('name')->required(),
-                TextInput::make('email')->email()->required(),
-                Select::make('roles')
-                    ->multiple()
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
+                Forms\Components\TextInput::make('password')
+                    ->password()
+                    ->required()
+                    ->maxLength(255)
+                    ->hiddenOn('edit')
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state)),
+                Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->nullable(),
+                Forms\Components\Select::make('roles')
                     ->relationship('roles', 'name')
-                    ->options(Role::pluck('name', 'id'))
-                    ->searchable()
-                    ->preload(),
-                    Select::make('status')
-                    ->options([
-                        1 => 'Active',
-                        0 => 'Inactive',
-                    ])
-                    ->default(1)
-                    ->required(),
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
-                TextColumn::make('role')->badge(),
-                ToggleColumn::make('status')
-                ->label('Active')
-                ->beforeStateUpdated(function ($record, $state) {
-                    if ($record->hasRole('superadmin')) {
-                        Notification::make()
-                            ->title('Error')
-                            ->body('Cannot change Super Admin status.')
-                            ->danger()
-                            ->send();
-                        return false;
-                    }
-                })
-
-                ->updateStateUsing(fn (User $user, bool $state) => $user->update(['status' => $state]))
-                ->visible(fn () => Auth::user()->can('edit users')),
-                TextColumn::make('created_at')->date(),
-                TextColumn::make('updated_at')->date(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('email_verified_at')
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                // Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                ->visible(fn () => Auth::user()->can('edit users')),
-                // Custom Delete action to prevent Super Admin deletion
-                Tables\Actions\DeleteAction::make()
-                    ->hidden(function ($record) {
-                        // If the user has the 'superadmin' role, hide the delete action
-                        return $record->hasRole('superadmin');
-                    })
-                    ->before(function ($record) {
-                        // Check if the user has the 'superadmin' role
-                        if ($record->hasRole('superadmin')) {
-                            // Prevent deletion and show a notification
-                            Notification::make()
-                                ->title('Error')
-                                ->body('Cannot delete Super Admin user.')
-                                ->danger()
-                                ->send();
-
-                            return false; // Return false to prevent deletion
-                        }
-                    })
-                    ->visible(fn () => Auth::user()->can('delete users')),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
-
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

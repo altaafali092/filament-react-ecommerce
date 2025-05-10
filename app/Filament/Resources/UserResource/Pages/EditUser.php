@@ -10,12 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
-
-    protected function getHeaderActions(): array
+    protected function getRedirectUrl(): string
     {
-        return [
-            Actions\DeleteAction::make()
-            ->visible(fn () => Auth::user()->can('delete users')),
-        ];
+        return $this->getResource()::getUrl('index');
     }
 }

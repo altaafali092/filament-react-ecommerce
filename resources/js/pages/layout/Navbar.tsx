@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Search, User, Heart, ShoppingBag, Menu, X, ChevronDown, Sparkles } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
+import Banner from '@/components/Forontend/Banner';
+import { IfrontBanner } from '@/types/frontend';
 
 // Define CartItems type
 interface CartItems {
@@ -11,6 +13,8 @@ interface CartItems {
   price: number;
   // Add other fields as needed
 }
+
+
 
 // Define Category type for the categories array
 type Category = string | { name: string; dropdown: string[] };
@@ -31,11 +35,6 @@ interface NavbarProps {
   miniCartItems: CartItems[];
 }
 
-const messages = [
-  '✨ Worldwide Shipping Available! ✨',
-  '🔥 Limited Time: 10% Off on Silk Sarees! 🔥',
-  '💯 Exclusive Collection Now Available! 💯',
-];
 
 const categories: Category[] = [
   'NEW DROPS',
@@ -53,9 +52,9 @@ const categories: Category[] = [
 
 const Navbar = () => {
   const { props } = usePage<NavbarProps>();
-  const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
+  const {banners}=usePage<{banners:IfrontBanner[]}>().props;
 
-  const [currentMessage, setCurrentMessage] = useState(0);
+  const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -65,9 +64,6 @@ const Navbar = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMessage((prev) => (prev + 1) % messages.length);
-    }, 3000);
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -103,7 +99,7 @@ const Navbar = () => {
     };
   }, [isCartOpen, isOpen, isPopupOpen]);
 
-  // Handler for cart button click
+
   const handleCartClick = () => {
     if (!auth.user && totalQuantity === 0) {
       // Redirect to login if guest cart is empty (or handle guest cart logic)
@@ -121,18 +117,11 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
-      }`}
+      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
+        }`}
     >
       {/* Announcement Banner with Gradient */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-center py-2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')] opacity-20"></div>
-        <span className="text-white font-medium text-sm md:text-base transition-opacity duration-500 inline-flex items-center">
-          <Sparkles className="w-4 h-4 mr-1" />
-          {messages[currentMessage]}
-        </span>
-      </div>
+      <Banner banners={banners} />
 
       {/* Main Navbar Container */}
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
@@ -156,10 +145,10 @@ const Navbar = () => {
             <>
               <button>
                 <User className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
-          </button>
+              </button>
               <button>
                 <Heart className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
-          </button>
+              </button>
             </>
           ) : (
             <Link href="/login" className="text-sm text-white hover:text-pink-500">
@@ -168,7 +157,7 @@ const Navbar = () => {
           )}
 
           {/* Cart Button for Mobile (Always Visible) */}
-            <div className="relative">
+          <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
                 className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
@@ -178,8 +167,8 @@ const Navbar = () => {
                   {totalQuantity}
                 </span>
               )}
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-          </button>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+            </button>
           </div>
 
           <button
@@ -254,7 +243,7 @@ const Navbar = () => {
                     {auth.user?.name === 'Super Admin' ? 'SA' : auth.user?.name}
                   </span>
                   <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          </button>
+                </button>
                 {isOpen && (
                   <div className="absolute left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-md shadow-lg rounded-xl p-2 mt-2 min-w-[150px] opacity-100 transition-all duration-300 border border-pink-100 user-dropdown">
                     <Link
@@ -278,8 +267,8 @@ const Navbar = () => {
                 <Heart
                   className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
                 />
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-          </button>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+              </button>
             </>
           ) : (
             <>
@@ -293,7 +282,7 @@ const Navbar = () => {
           )}
 
           {/* Cart Button for Desktop (Always Visible) */}
-            <div className="relative">
+          <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
                 className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
@@ -329,7 +318,7 @@ const Navbar = () => {
                   >
                     View More
                   </Link>
-              </div>
+                </div>
               ) : (
                 <p>Your cart is empty!</p>
               )}
@@ -379,15 +368,13 @@ const Navbar = () => {
                   >
                     <span className="hover:text-pink-500 transition-colors text-gray-900">{item.name}</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        activeDropdown === item.name ? 'rotate-180 text-pink-500' : ''
-                      }`}
+                      className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === item.name ? 'rotate-180 text-pink-500' : ''
+                        }`}
                     />
                   </div>
                   <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      activeDropdown === item.name ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
-                    }`}
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeDropdown === item.name ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                      }`}
                   >
                     <ul className="space-y-2 pl-4 bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
                       {item.dropdown.map((subItem, subIndex) => (

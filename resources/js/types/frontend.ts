@@ -166,3 +166,8 @@ export type IFrontBlogs={
     answer:string;
     question:string;
  }
+
+ export type IfrontBanner={
+    id:number;
+    title:string;   
+ }

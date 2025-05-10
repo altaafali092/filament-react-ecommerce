@@ -2,7 +2,8 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Instagram,  Youtube, CreditCard, Truck, ShieldCheck, Facebook } from "lucide-react"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
+import { IFrontOfficeSetting } from "@/types/frontend"
 
 // Custom TikTok icon since it's not in Lucide by default
 function TikTok() {
@@ -23,7 +24,12 @@ function TikTok() {
   )
 }
 
+
+
 export function Footer() {
+
+const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
+// console.log(officeSettings)
   return (
     <footer className="bg-black text-white">
       {/* Newsletter Section with Gradient */}
@@ -70,7 +76,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
           {/* Shop */}
           <div className="space-y-5">
-            <h4 className="text-lg font-bold">Shop</h4>
+          <h4 className="text-lg font-bold">{officeSettings?.office_name}</h4>
             <ul className="space-y-3">
               <li>
                 <Link href="/trending" className="text-white/70 hover:text-pink-400 transition-colors">
@@ -154,28 +160,28 @@ export function Footer() {
             <h4 className="text-lg font-bold">Connect</h4>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="https://instagram.com"
+                href={officeSettings?.office_instagram ??''}
                 className="bg-white/10 p-3 rounded-full hover:bg-pink-500 transition-colors"
               >
                 <Instagram className="w-5 h-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link
-                href="https://tiktok.com"
+                href={officeSettings?.office_tiktok??''}
                 className="bg-white/10 p-3 rounded-full hover:bg-pink-500 transition-colors"
               >
                 <TikTok />
                 <span className="sr-only">TikTok</span>
               </Link>
               <Link
-                href="https://twitter.com"
+                href={officeSettings?.office_facebook??''}
                 className="bg-white/10 p-3 rounded-full hover:bg-pink-500 transition-colors"
               >
                 <Facebook className="w-5 h-5" />
-                <span className="sr-only">Twitter</span>
+                <span className="sr-only">Facebook</span>
               </Link>
               <Link
-                href="https://youtube.com"
+                href={officeSettings?.office_youtube??''}
                 className="bg-white/10 p-3 rounded-full hover:bg-pink-500 transition-colors"
               >
                 <Youtube className="w-5 h-5" />

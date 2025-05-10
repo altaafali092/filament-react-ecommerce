@@ -7,6 +7,7 @@ use App\Filament\Resources\BannerResource\RelationManagers;
 use App\Models\Banner;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,6 +19,9 @@ class BannerResource extends Resource
     protected static ?string $model = Banner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+    protected static ?string $navigationGroup = 'Index Page';
+    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge';
 
     public static function form(Form $form): Form
     {

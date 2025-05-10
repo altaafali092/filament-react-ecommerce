@@ -4,7 +4,7 @@ import { Search, User, Heart, ShoppingBag, Menu, X, ChevronDown, Sparkles } from
 import { Link } from '@inertiajs/react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
 import Banner from '@/components/Forontend/Banner';
-import { IfrontBanner } from '@/types/frontend';
+import { IfrontBanner, IFrontOfficeSetting } from '@/types/frontend';
 
 // Define CartItems type
 interface CartItems {
@@ -53,6 +53,7 @@ const categories: Category[] = [
 const Navbar = () => {
   const { props } = usePage<NavbarProps>();
   const {banners}=usePage<{banners:IfrontBanner[]}>().props;
+  const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
 
   const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -126,7 +127,7 @@ const Navbar = () => {
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
         {/* Logo */}
         <img
-          src="https://rmkv.com/cdn/shop/files/rmkv-logo_600x.webp?v=1725338242"
+          src={officeSettings?.office_logo ??''}
           alt="RMKV Wedding Silks"
           className="h-10 md:h-12 w-[100px]"
         />

@@ -11,6 +11,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -25,6 +26,10 @@ class BlogResource extends Resource
     protected static ?string $model = Blog::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center';
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+    protected static ?string $navigationGroup = 'Pages';
+    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge';
 
     public static function form(Form $form): Form
     {

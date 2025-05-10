@@ -171,3 +171,18 @@ export type IFrontBlogs={
     id:number;
     title:string;   
  }
+
+ export type IFrontOfficeSetting={
+    id:number;
+    office_logo:string;
+    office_name:string;
+    office_address:string;
+    office_phone:string;
+    office_email:string;
+    office_facebook:string;
+    office_youtube:string;
+    office_instagram:string;
+    office_tiktok:string;
+    office_whatsapp:string;
+   
+ }

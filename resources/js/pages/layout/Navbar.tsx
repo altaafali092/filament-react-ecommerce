@@ -92,7 +92,6 @@ const Navbar = () => {
     }
 
     return () => {
-      clearInterval(interval);
       clearTimeout(popupTimeout);
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);

@@ -74,7 +74,7 @@ export default function Dashboard() {
 
                     {!isVendor && (
                         <Button className="w-full" onClick={() => setConfirmOpen(true)}>
-                            Become a Vendor
+                            Become a Seller
                         </Button>
                     )}
                     {isVendor && (
@@ -87,9 +87,9 @@ export default function Dashboard() {
                     <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Become a Vendor</DialogTitle>
+                                <DialogTitle>Become a Seller</DialogTitle>
                                 <DialogDescription>
-                                    Are you sure you want to become a vendor?
+                                    Are you sure you want to become a Seller?
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter className="gap-2">
@@ -99,8 +99,7 @@ export default function Dashboard() {
                                 <Button
                                     onClick={() => {
                                         setConfirmOpen(false);
-                                        setShowForm(true);
-                                        router.visit(route('profile.becomeVendor'));
+                                        router.visit(route('profile.becomeVendor')); // ✅ works if @routes is defined and route exists
                                     }}
                                 >
                                     Yes

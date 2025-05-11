@@ -126,11 +126,13 @@ const Navbar = () => {
       {/* Main Navbar Container */}
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
         {/* Logo */}
-        <img
+       <Link href={route('home')}>
+       <img
           src={officeSettings?.office_logo ??''}
           alt="RMKV Wedding Silks"
           className="h-10 md:h-12 w-[100px]"
         />
+       </Link>
 
         {/* Mobile Icons and Menu Toggle */}
         <div className="md:hidden flex items-center space-x-4">

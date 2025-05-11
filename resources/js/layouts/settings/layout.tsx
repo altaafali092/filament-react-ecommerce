@@ -2,44 +2,52 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: '/settings/profile',
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: '/settings/password',
-        icon: null,
-    },
-    {
-        title: 'Become a Vendor',
-        href: '/settings/becomeVendor',
-        icon: null,
-    },
-    {
-        title: 'Shipping Address',
-        href: '/settings/shippingAddress',
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: '/settings/appearance',
-        icon: null,
-    },
-
-];
-
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    // When server-side rendering, we only render the layout on the client...
-    if (typeof window === 'undefined') {
-        return null;
-    }
+    const { auth } = usePage<SharedData>().props;
+    const userRole = auth.user.role?.toLowerCase();
+    const isVendor = auth.user.role?.toLowerCase() === 'vendor';
+
+    const sidebarNavItems: NavItem[] = [
+        {
+            title: 'Profile',
+            href: '/settings/profile',
+            icon: null,
+        },
+        {
+            title: 'Password',
+            href: '/settings/password',
+            icon: null,
+        },
+        // ✅ Conditionally include this item only if role is not 'user'
+        ...(userRole !== 'user'
+            ? [{
+                title: 'Become a Vendor',
+                href: '/settings/becomeVendor',
+                icon: null,
+            }]
+            : []),
+
+        // ✅ Conditionally include this item only if role is not 'vendor'
+        ...(!isVendor
+            ? [{
+                title: 'Shipping Address',
+                href: '/settings/shippingAddress',
+                icon: null,
+            }]
+            : []),
+       
+        {
+            title: 'Appearance',
+            href: '/settings/appearance',
+            icon: null,
+        },
+    ];
+
+    if (typeof window === 'undefined') return null;
 
     const currentPath = window.location.pathname;
 

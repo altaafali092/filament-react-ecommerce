@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Http\Requests\Settings\ShippingAddressUpdateRequest;
 use App\Http\Requests\Settings\VendorDetailUpdateRequest;
+use App\Models\Role;
 use App\Models\ShippingAddress;
 use App\Models\Vendor;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -87,119 +88,68 @@ class ProfileController extends Controller
         return back()->with('success', 'Shipping address saved successfully.');
     }
 
-    public function becomeVendor(){
+    public function becomeVendor()
+    {
         $vendor = Auth::user()->vendorDetail;
-        return Inertia::render('settings/BecomeVendor',[
+        return Inertia::render('settings/BecomeVendor', [
             'vendorDetail' => $vendor,
         ]);
     }
 
-    // public function vedorDetailupdate(VendorDetailUpdateRequest $request)
-    // {
 
-    //     $user = Auth::user();    
-    //     // Save or update vendor details
-    //     $vendorDetail = Vendor::firstOrNew(['user_id' => $user->id]);
-    //     $vendorDetail->fill($request->validated() + ['user_id' => $user->id]);
-
-    //     if($request->hasFile('cover_image')){
-    //         $path = Storage::disk('public')->put('vendor_cover_images', $request->file('cover_image'));
-    //         $vendorDetail['cover_image'] = Storage::url($path); 
-    //         // $vendorDetail->cover_image = $request->file('cover_image')->store('vendor_cover_images');
-    //     }
-    //     if($request->hasFile('citizenship_image')){
-    //         $path = Storage::disk('public')->put('citizenship_image', $request->file('citizenship_image'));
-    //         $vendorDetail['citizenship_image'] = Storage::url($path); 
-    //     }
-    //     if($request->hasFile('store_registration_doc')){
-    //         $path = Storage::disk('public')->put('store_registration_doc', $request->file('store_registration_doc'));
-    //         $vendorDetail['store_registration_doc'] = Storage::url($path); 
-    //     }
-    //     if($request->hasFile('other_document')){
-    //         $path = Storage::disk('public')->put('other_document', $request->file('other_document'));
-    //         $vendorDetail['other_document'] = Storage::url($path);
-           
-    //     }
-
-    //     $vendorDetail->save();
     
-    //     // Update user role if not already a vendor
-    //     if ($user->role !== 'vendor') {
-    //         $user->update([
-    //             'role' => 'vendor',
-    //         ]);
-    //     }
-        
-    
-    //     return back()->with('success', 'You are now registered as a vendor.');
-    // }
-
     public function vedorDetailupdate(VendorDetailUpdateRequest $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
     
-    // Save or update vendor details
-    $vendorDetail = Vendor::firstOrNew(['user_id' => $user->id]);
-    $vendorDetail->fill($request->validated() + ['user_id' => $user->id]);
-
-    // Handle the cover image
-    if ($request->hasFile('cover_image')) {
-        // Delete old cover image if it exists
-        if ($vendorDetail->cover_image) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->cover_image));
-        }
-
-        // Store new cover image and get URL
-        $path = Storage::disk('public')->put('cover_images', $request->file('cover_image'));
-        $vendorDetail['cover_image'] = Storage::url($path);
-    }
-
-    // Handle the citizenship image
-    if ($request->hasFile('citizenship_image')) {
-        // Delete old citizenship image if it exists
-        if ($vendorDetail->citizenship_image) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->citizenship_image));
-        }
-
-        // Store new citizenship image and get URL
-        $path = Storage::disk('public')->put('citizenship_image', $request->file('citizenship_image'));
-        $vendorDetail['citizenship_image'] = Storage::url($path);
-    }
-
-    // Handle the store registration document
-    if ($request->hasFile('store_registration_doc')) {
-        // Delete old store registration document if it exists
-        if ($vendorDetail->store_registration_doc) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->store_registration_doc));
-        }
-
-        // Store new store registration document and get URL
-        $path = Storage::disk('public')->put('store_registration_doc', $request->file('store_registration_doc'));
-        $vendorDetail['store_registration_doc'] = Storage::url($path);
-    }
-
-    // Handle the other document
-    if ($request->hasFile('other_document')) {
-        // Delete old other document if it exists
-        if ($vendorDetail->other_document) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->other_document));
-        }
-        
-        $path = Storage::disk('public')->put('other_document', $request->file('other_document'));
-        $vendorDetail['other_document'] = Storage::url($path);
-    }
-
-    $vendorDetail->save();
-
-    if ($user->role !== 'vendor') {
-        $user->update([
-            'role' => 'vendor',
-        ]);
-    }
-
-    return back()->with('success', 'You are now registered as a vendor.');
-}
-
+        // Save or update vendor details
+        $vendorDetail = Vendor::firstOrNew(['user_id' => $user->id]);
+        $vendorDetail->fill($request->validated() + ['user_id' => $user->id]);
     
-
+        // Handle the cover image
+        if ($request->hasFile('cover_image')) {
+            if ($vendorDetail->cover_image) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->cover_image));
+            }
+            $path = Storage::disk('public')->put('cover_images', $request->file('cover_image'));
+            $vendorDetail->cover_image = Storage::url($path);
+        }
+    
+        // Citizenship Image
+        if ($request->hasFile('citizenship_image')) {
+            if ($vendorDetail->citizenship_image) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->citizenship_image));
+            }
+            $path = Storage::disk('public')->put('citizenship_image', $request->file('citizenship_image'));
+            $vendorDetail->citizenship_image = Storage::url($path);
+        }
+    
+        // Store Registration Doc
+        if ($request->hasFile('store_registration_doc')) {
+            if ($vendorDetail->store_registration_doc) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->store_registration_doc));
+            }
+            $path = Storage::disk('public')->put('store_registration_doc', $request->file('store_registration_doc'));
+            $vendorDetail->store_registration_doc = Storage::url($path);
+        }
+    
+        // Other Document
+        if ($request->hasFile('other_document')) {
+            if ($vendorDetail->other_document) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $vendorDetail->other_document));
+            }
+            $path = Storage::disk('public')->put('other_document', $request->file('other_document'));
+            $vendorDetail->other_document = Storage::url($path);
+        }
+    
+        $vendorDetail->save();
+    
+        // Assign vendor role using Filament Shield (Spatie)
+        if (!$user->hasRole('vendor')) {
+            $user->assignRole('vendor');
+        }
+    
+        return back()->with('success', 'You are now registered as a vendor.');
+    }
+    
 }

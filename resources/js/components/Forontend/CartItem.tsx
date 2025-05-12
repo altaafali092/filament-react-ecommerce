@@ -51,7 +51,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
     };
 
     return (
-        <div className="flex flex-col md:flex-row gap-6 p-6 bg-white/90 backdrop-blur-sm rounded-xl border border-green-500">
+        <div className="flex flex-col md:flex-row gap-6 p-6 bg-white/90 dark:bg-gray-700 backdrop-blur-sm rounded-xl border border-green-500">
             <Link
                 href={ProductRoute(item)}
                 className="w-40 min-w-40 min-h-40 flex justify-center items-center group"

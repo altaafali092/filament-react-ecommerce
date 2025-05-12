@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Models\Order;
-
+use Filament\Facades\Filament;
 use Filament\Tables;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -27,10 +27,36 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+  
+
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        $user = Filament::auth()->user();
+    
+        if ($user->hasRole('vendor')) {
+            return static::getModel()::whereHas('orderItems.product', function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })->count();
+        }
+    
+        return static::getModel()::count(); // Admin sees all
     }
+    
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Filament::auth()->user();
+    
+        if ($user->hasRole('vendor')) {
+            return parent::getEloquentQuery()
+                ->whereHas('orderItems.product', function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                });
+        }
+    
+        return parent::getEloquentQuery();
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -41,6 +67,7 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        
             ->columns([
                 TextColumn::make('id')->label('Order ID')->sortable(),
 

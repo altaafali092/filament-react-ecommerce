@@ -52,7 +52,7 @@ const categories: Category[] = [
 
 const Navbar = () => {
   const { props } = usePage<NavbarProps>();
-  const {banners}=usePage<{banners:IfrontBanner[]}>().props;
+  const { banners } = usePage<{ banners: IfrontBanner[] }>().props;
   const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
 
   const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
@@ -126,13 +126,13 @@ const Navbar = () => {
       {/* Main Navbar Container */}
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
         {/* Logo */}
-       <Link href={route('home')}>
-       <img
-          src={officeSettings?.office_logo ??''}
-          alt="RMKV Wedding Silks"
-          className="h-10 md:h-12 w-[100px]"
-        />
-       </Link>
+        <Link href={route('home')}>
+          <img
+            src={officeSettings?.office_logo ?? ''}
+            alt="RMKV Wedding Silks"
+            className="h-10 md:h-12 w-[100px]"
+          />
+        </Link>
 
         {/* Mobile Icons and Menu Toggle */}
         <div className="md:hidden flex items-center space-x-4">
@@ -300,7 +300,7 @@ const Navbar = () => {
 
           {/* Cart Dropdown */}
           {isCartOpen && (
-            <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown">
+            <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown dark:bg-gray-700">
               <h3 className="font-medium text-lg mb-3">Cart</h3>
               {miniCartItems.length > 0 ? (
                 <div>
@@ -314,12 +314,21 @@ const Navbar = () => {
                       <CurrencyFormatter amount={totalPrice} />
                     </span>
                   </div>
-                  <Link
-                    href={route('cart.index')}
-                    className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                  >
-                    View More
-                  </Link>
+                  {auth.user ? (
+                    <Link
+                      href={route('cart.index')}
+                      className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                    >
+                      View Cart
+                    </Link>
+                  ) : (
+                    <Link
+                      href={route('login')}
+                      className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                    >
+                      Login to View Cart
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <p>Your cart is empty!</p>

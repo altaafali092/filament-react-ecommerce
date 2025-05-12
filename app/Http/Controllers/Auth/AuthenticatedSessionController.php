@@ -33,22 +33,18 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-    
+
         $user = Auth::user();
-    
         if ($user->role === 'superadmin') {
             Auth::logout(); // ✅ Log the user out
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-    
             return Inertia::location(route('filament.admin.auth.login'));
         }
-    
         $cartService->moveCartItemsToDatabase($user->id);
-    
         return redirect()->intended(route('home'));
     }
-    
+
 
     /**
      * Destroy an authenticated session.

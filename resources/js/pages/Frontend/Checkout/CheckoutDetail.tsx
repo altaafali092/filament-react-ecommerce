@@ -2,8 +2,9 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import AuthLayout from "@/pages/layout/AuthLayout";
-import { Head, router } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { CartItems, Shipping } from "@/types/frontend";
+import { Button } from "@/components/ui/button";
 
 
 
@@ -48,19 +49,37 @@ export default function CheckoutDetail({ shipping, cartItems }: CheckoutDetailPr
                                 <p><strong>Phone:</strong> {shipping?.phone || "-"}</p>
                                 <p><strong>Alternate Phone:</strong> {shipping?.alternative_phone || "-"}</p>
                                 <Separator />
+                                <p><strong>Full Address:</strong> {shipping?.full_address || "-"}</p>
                                 <p><strong>City:</strong> {shipping?.city || "-"}</p>
                                 <p><strong>District:</strong> {shipping?.district || "-"}</p>
                                 <p><strong>Province:</strong> {shipping?.province || "-"}</p>
                                 <p><strong>Postal Code:</strong> {shipping?.postal_code || "-"}</p>
                                 <p><strong>Nearest Landmark:</strong> {shipping?.nearest_landmarks || "-"}</p>
 
-                                <button
-                                    type="button"
-                                    onClick={handleCheckout}
-                                    className="w-full bg-blue-900 text-white py-3 rounded font-medium mt-6"
-                                >
-                                    Check Out
-                                </button>
+                                {shipping?.full_address ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleCheckout}
+                                        className="w-full bg-blue-900 text-white py-3 rounded font-medium mt-6"
+                                    >
+                                        Check Out
+                                    </button>
+                                ) : (
+                                    <>
+                                    <p className="text-sm text-red-600 mt-6">
+                                        Please complete your shipping address to proceed with checkout.
+                                    </p>
+                                    <Link href={route('profile.shippingAddress')}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex items-center gap-2 border-purple-300  dark:text-white text-purple-600 hover:bg-purple-100 hover:scale-105 transition-transform"
+                                       
+                                    >Update Shipping Address</Button>
+                                    </Link>
+                                    </>
+                                )}
+
                             </CardContent>
                         </Card>
                     </div>

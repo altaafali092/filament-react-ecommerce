@@ -259,7 +259,7 @@ const ProductDetail = () => {
     return (
         <>
             <Head title={product.title} />
-            <div className="relative bg-gradient-to-r from-gray-300 to-purple-300 dark:from-blue-700 dark:to-purple-700">
+            <div className="relative bg-gradient-to-r from-gray-300 to-purple-300 dark:from-gray-900 dark:to-black">
                 <AuthLayout>
                     <div className="min-h-screen">
                         <div className="container mx-auto px-4 py-12 max-w-6xl">

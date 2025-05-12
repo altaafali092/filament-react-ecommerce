@@ -36,16 +36,16 @@ function CartIndex({
     return (
         <AuthLayout>
             <Head title="Your Cart" />
-            <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8   bg-gradient-to-r from-gray-300 to-purple-300 dark:from-blue-700 dark:to-purple-700">
+            <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8   bg-gradient-to-r from-gray-300 to-purple-300 dark:from-gray-900 dark:to-black">
                 <div className="max-w-7xl mx-auto mt-20">
                     <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-md">
+                        <h1 className="text-4xl font-extrabold dark:text-white text-gray-900 tracking-tight drop-shadow-md">
                             Your Cart 🛒
                         </h1>
                         <Link href={route('home')}>
                             <Button
                                 variant="outline"
-                                className="flex items-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-100 hover:scale-105 transition-transform"
+                                className="flex items-center  gap-2 border-purple-300 dark:bg-border-purple-300 text-purple-600  dark:text-white hover:bg-purple-100 hover:scale-105 transition-transform"
                             >
                                 Back to Shop 🛍️
                             </Button>
@@ -77,13 +77,13 @@ function CartIndex({
                                 Object.values(cartItems).map((cartItem) => (
                                     <Card
                                         key={cartItem.user.id}
-                                        className="border-0 bg-white/90 backdrop-blur-sm shadow-lg"
+                                        className="border-0 bg-white/90 dark:bg-gray-500 backdrop-blur-sm shadow-lg"
                                     >
                                         <CardHeader>
                                             <div className="flex justify-between items-center">
                                                 <Link
                                                     href=''
-                                                    className="text-xl font-bold text-purple-600 hover:text-purple-700 transition-colors"
+                                                    className="text-xl font-bold text-purple-600 hover:text-purple-700 dark:text-white transition-colors"
                                                 >
                                                     {cartItem.user.name} ✨
                                                 </Link>
@@ -107,7 +107,7 @@ function CartIndex({
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    className="flex items-center gap-2 border-purple-300 text-purple-600 hover:bg-purple-100 hover:scale-105 transition-transform"
+                                                                    className="flex items-center gap-2 border-purple-300  dark:text-white text-purple-600 hover:bg-purple-100 hover:scale-105 transition-transform"
                                                                 >
                                                                     <CreditCard className="w-4 h-4 text-pink-500" />
                                                                     Pay this vendor 💸
@@ -134,14 +134,14 @@ function CartIndex({
 
                         {/* Right: Summary */}
                         <div className="h-fit lg:sticky lg:top-35">
-                            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-lg">
+                            <Card className="border-0 bg-white/90  dark:bg-gray-900 backdrop-blur-sm shadow-lg">
                                 <CardHeader>
-                                    <CardTitle className="text-xl font-bold text-gray-900">
+                                    <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
                                         Order Summary 💰
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="flex justify-between text-base text-gray-700 mb-4">
+                                    <div className="flex justify-between text-base text-gray-700 mb-4 dark:text-white">
                                         <span>Subtotal ({totalQuantity} items):</span>
                                         <CurrencyFormatter amount={totalPrice} />
                                     </div>

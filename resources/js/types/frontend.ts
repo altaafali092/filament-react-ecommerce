@@ -136,6 +136,7 @@ export type OrderItem ={
     };
     phone?: string;
     alternative_phone?: string;
+    full_address?: string;
     city?: string;
     district?: string;
     province?: string;

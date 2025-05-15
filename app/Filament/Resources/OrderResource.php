@@ -21,39 +21,41 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\ImageEntry;
+use Filament\Tables\Columns\SelectColumn;
+use Illuminate\Support\Facades\Auth;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
-  
+
 
     public static function getNavigationBadge(): ?string
     {
         $user = Filament::auth()->user();
-    
+
         if ($user->hasRole('vendor')) {
             return static::getModel()::whereHas('orderItems.product', function ($query) use ($user) {
                 $query->where('created_by', $user->id);
             })->count();
         }
-    
+
         return static::getModel()::count(); // Admin sees all
     }
-    
+
 
     public static function getEloquentQuery(): Builder
     {
         $user = Filament::auth()->user();
-    
+
         if ($user->hasRole('vendor')) {
             return parent::getEloquentQuery()
                 ->whereHas('orderItems.product', function ($query) use ($user) {
                     $query->where('created_by', $user->id);
                 });
         }
-    
+
         return parent::getEloquentQuery();
     }
 
@@ -67,7 +69,7 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        
+
             ->columns([
                 TextColumn::make('id')->label('Order ID')->sortable(),
 
@@ -86,13 +88,57 @@ class OrderResource extends Resource
                     ->label('Total')
                     ->sortable(),
 
-                BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'completed',
-                        'warning' => 'processing',
-                        'danger' => 'cancelled',
-                        'gray' => 'pending',
-                    ]),
+                SelectColumn::make('status')
+                    ->options(function () {
+                        $user = Auth::user();
+
+                        if ($user->hasRole('vendor')) {
+                            return [
+                                'draft' => 'Draft',
+                                'pending' => 'Pending',
+                                'processing' => 'Processing',
+                                'vendor delivered at store' => 'Vendor Delivered at Store',
+                            ];
+                        }
+
+                        // For super_admin or other roles
+                        return [
+                            'draft' => 'Draft',
+                            'pending' => 'Pending',
+                            'processing' => 'Processing',
+                            'vendor droped at store' => 'Vendor Delivered at Store',
+                            'picked up' => 'Picked Up',
+                            'out for delivery' => 'Out for Delivery',
+                            'reached at store' => 'Reached at Store',
+                            'ready to deliver' => 'Ready to Deliver',
+                            'delivered' => 'Delivered',
+                            'completed' => 'Completed',
+                            'cancelled' => 'Cancelled',
+                        ];
+                    })
+                    ->searchable()
+                    ->sortable()
+                    ->disabled(function ($record): bool {
+                        $user = Auth::user();
+
+                        if ($user->hasRole('super_admin')) {
+                            return false;
+                        }
+
+                        if ($user->hasRole('vendor')) {
+                            // These are statuses vendor is allowed to change **from**
+                            $editableStatuses = ['draft', 'pending', 'processing'];
+
+                            // If current status is not in allowed ones, disable dropdown
+                            return !in_array($record->status, $editableStatuses);
+                        }
+
+                        return true;
+                    }),
+
+
+
+
 
                 TextColumn::make('payment_method')
                     ->label('Payment Method')
@@ -113,6 +159,7 @@ class OrderResource extends Resource
                     )
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
@@ -132,6 +179,7 @@ class OrderResource extends Resource
                             ->when($data['from'], fn(Builder $q) => $q->whereDate('created_at', '>=', $data['from']))
                             ->when($data['to'], fn(Builder $q) => $q->whereDate('created_at', '<=', $data['to']));
                     }),
+
             ])
             ->actions([
                 ViewAction::make(),
@@ -182,12 +230,15 @@ class OrderResource extends Resource
                                 TextEntry::make('status')
                                     ->badge()
                                     ->color(fn(string $state): string => match ($state) {
-                                        'pending' => 'gray',
-                                        'processing' => 'warning',
-                                        'completed' => 'success',
+                                        'draft', 'pending', 'processing', 'reached at store', 'ready to deliver' => 'gray',
+                                        'vendor delivered at store' => 'warning',
+                                        'picked up' => 'info',
+                                        'out for delivery' => 'success',
+                                        'delivered', 'completed' => 'success',
                                         'cancelled' => 'danger',
                                         default => 'gray',
                                     }),
+
                                 TextEntry::make('payment_method')
                                     ->formatStateUsing(fn($state) => ucwords(str_replace('_', ' ', $state))),
                                 TextEntry::make('total_price')->money('NPR')->label('Total Price'),
@@ -195,7 +246,7 @@ class OrderResource extends Resource
                     ]),
 
 
-                    Section::make('Ordered Products')
+                Section::make('Ordered Products')
                     ->schema(function (Order $record) {
                         return $record->orderItems->map(function ($item) {
                             return Grid::make()
@@ -204,39 +255,39 @@ class OrderResource extends Resource
                                         ->label('')
                                         ->getStateUsing(fn() => $item->product->getFirstMediaUrl('images', 'large'))
                                         ->extraAttributes(['class' => 'w-20 h-20 object-cover rounded']),
-    
+
                                     TextEntry::make('title')
                                         ->getStateUsing(fn() => $item->product->title)
                                         ->weight(\Filament\Support\Enums\FontWeight::Bold),
-    
+
                                     TextEntry::make('quantity')
                                         ->getStateUsing(fn() => "Qty: {$item->quantity}")
                                         ->color('gray'),
-    
+
                                     TextEntry::make('unit_price')
                                         ->getStateUsing(fn() => "Unit Price: NPR " . number_format($item->price, 2))
                                         ->color('success'),
-    
+
                                     TextEntry::make('total_price')
                                         ->getStateUsing(fn() => "Total: NPR " . number_format($item->price * $item->quantity, 2))
                                         ->weight(\Filament\Support\Enums\FontWeight::Bold),
-    
+
                                     TextEntry::make('variations')
                                         ->getStateUsing(function () use ($item) {
                                             if (empty($item->variation_type_options_ids)) {
                                                 return null;
                                             }
-    
+
                                             $optionIds = is_string($item->variation_type_options_ids)
                                                 ? json_decode($item->variation_type_options_ids, true)
                                                 : $item->variation_type_options_ids;
-    
+
                                             $options = \App\Models\VariationTypeOption::whereIn('id', $optionIds)->get();
-    
+
                                             if ($options->isEmpty()) {
                                                 return null;
                                             }
-    
+
                                             return "Variations: " . $options->pluck('name')->join(', ');
                                         })
                                         ->hiddenLabel()

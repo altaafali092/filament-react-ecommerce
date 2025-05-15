@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    public $timestamps = false;
+    // public $timestamps = false;
 
     protected $fillable = [
         'payment_session_id',
@@ -39,5 +40,18 @@ class Order extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class,'vendor_user_id','user_id');
+    }
+
+
+    
+    
+
+
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => strtolower($value),
+            set: fn(string $value) => strtolower($value),
+        );
     }
 }

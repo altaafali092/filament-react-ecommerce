@@ -9,6 +9,7 @@
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^3.3",
         "filament/filament": "3.3",
+        "filament/notifications": "3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",

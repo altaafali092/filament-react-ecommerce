@@ -61,7 +61,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
-            ]);
+            ])
+            ->databaseNotifications();
     }
     public function boot()
     {

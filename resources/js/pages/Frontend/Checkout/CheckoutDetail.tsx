@@ -33,15 +33,15 @@ export default function CheckoutDetail({ shipping, cartItems }: CheckoutDetailPr
     return (
         <AuthLayout>
             <Head title="Billing" />
-            <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-gray-300 to-purple-300 dark:from-blue-700 dark:to-purple-700">
+            <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-gray-300 to-purple-300 dark:from-gray-900 dark:to-black">
                 <div className="max-w-7xl mx-auto mt-20 flex flex-col md:flex-row gap-8 p-6">
 
                     {/* Shipping Details */}
                     <div className="w-full md:w-1/2 space-y-6">
                         <h1 className="text-2xl font-bold">Checkout</h1>
                         <Card>
-                            <CardContent className="p-6 space-y-4 text-sm text-gray-800">
-                                <h2 className="text-xl font-semibold mb-2">Shipping Details</h2>
+                            <CardContent className="p-6 dark:text-white space-y-4 text-sm text-gray-800">
+                                <h2 className="text-xl  font-semibold mb-2">Shipping Details</h2>
 
                                 {/* Use shipping prop to display details */}
                                 <p><strong>User Name:</strong> {shipping?.user?.name || "-"}</p>
@@ -100,7 +100,7 @@ export default function CheckoutDetail({ shipping, cartItems }: CheckoutDetailPr
                                             <div className="flex-1 text-sm">
                                                 <p className="font-medium">{item.title}</p>
                                                 {item.options && Array.isArray(item.options) && item.options.length > 0 && (
-                                                    <div className="text-gray-500 space-x-2 text-xs mb-1">
+                                                    <div className="text-gray-500  dark:text-white space-x-2 text-xs mb-1">
                                                         {item.options.map((opt) => (
                                                             <span key={opt.id}>
                                                                 <strong>{opt.type?.name || 'Option'}:</strong> {opt.name}
@@ -108,7 +108,7 @@ export default function CheckoutDetail({ shipping, cartItems }: CheckoutDetailPr
                                                         ))}
                                                     </div>
                                                 )}
-                                                <p className="text-gray-500">Qty: {item.quantity}</p>
+                                                <p className="text-gray-500 dark:text-white">Qty: {item.quantity}</p>
                                                 <p className="font-semibold">Price: ₹{(item.price * item.quantity).toFixed(2)}</p>
                                             </div>
                                         </div>

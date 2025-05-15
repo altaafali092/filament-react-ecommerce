@@ -117,6 +117,7 @@ class OrderResource extends Resource
                         ];
                     })
                     ->searchable()
+                   
                     ->sortable()
                     ->disabled(function ($record): bool {
                         $user = Auth::user();

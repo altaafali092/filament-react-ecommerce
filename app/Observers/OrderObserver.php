@@ -42,7 +42,26 @@ class OrderObserver
      */
     public function updated(Order $order): void
     {
-        //
+        $admins = User::where('role', 'superadmin')->get();
+
+        foreach ($admins as $admin) {
+            Notification::make()
+                ->title('🔔 Order ststus has been Updated ')
+                ->body("A  order #{$order->id} has been updated by {$order->customer_name}.")
+                ->sendToDatabase($admin, false);
+        }
+
+        // 2. Notify Related Vendor (if exists)
+        if ($order->vendor_id) {
+            $vendor = User::find($order->vendor_id);
+
+            if ($vendor) {
+                Notification::make()
+                    ->title('📦 Oder Status updated')
+                    ->body("An order #{$order->id} has been placed for your item(s).")
+                    ->sendToDatabase($vendor, false);
+            }
+        }
     }
 
     /**

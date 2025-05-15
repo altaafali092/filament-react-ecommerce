@@ -19,6 +19,19 @@ class OfficeSettings extends Page implements HasForms
 {
     use InteractsWithForms;
 
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+         
+            'create',
+            'update',
+            'delete',
+          
+        ];
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
     protected static string $view = 'filament.pages.office-settings';
     protected static ?string $title = 'Office Settings';

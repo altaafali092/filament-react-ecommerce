@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DepartmentResource\RelationManagers;
 use App\Models\Category;
 use BladeUI\Icons\Components\Icon;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -22,9 +23,21 @@ class CategoriesRelationManager extends RelationManager
         $department = $this->getOwnerRecord();
         return $form
             ->schema([
+
+                FileUpload::make('image')
+                ->label('Image')
+                ->disk('public') // or 's3' if you are using S3
+                ->directory('category') // folder inside storage/app/public
+                ->visibility('public')
+                ->image()
+                ->required()
+                ->maxSize(1024) // 5MB
+                ->helperText('Upload a JPG/PNG image (max: 5MB).'),
+
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+              
                 Forms\Components\Select::make('parent_id')
                     ->options(function () use ($department) {
                         return Category::query()
@@ -35,7 +48,9 @@ class CategoriesRelationManager extends RelationManager
                     ->label('Parent Category')
                     ->preload()
                     ->searchable(),
-                Forms\Components\Checkbox::make('active')
+                Forms\Components\Checkbox::make('active'),
+                Forms\Components\Checkbox::make('is_featured')
+
 
             ]);
     }
@@ -45,13 +60,17 @@ class CategoriesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->rounded()
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
-                ->searchable()
-                ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('parent.name')
-                ->sortable()
-                ->searchable(),
+                    ->sortable()
+                    ->searchable(),
                 IconColumn::make('active')->boolean(),
+                IconColumn::make('is_featured')->boolean(),
 
             ])
             ->filters([

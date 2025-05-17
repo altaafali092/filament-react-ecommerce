@@ -9,7 +9,7 @@ import NewsAndBlogs from './index/NewsAndBlog';
 import CustomerReviews from './index/Review';
 import NewArrivial from './index/NewArrivial';
 import FrquentlyAskQues from './index/FrequentlyAskQues';
-import { IFrontBlogs, IFrontFAQ, IFrontProduct, IFrontSlider } from '@/types/frontend';
+import { IFrontBlogs, IfrontCategory, IFrontFAQ, IFrontProduct, IFrontSlider } from '@/types/frontend';
 import Slider from './index/Slider';
 
 
@@ -19,6 +19,7 @@ export default function Welcome() {
     const{blogs}=usePage<{blogs:IFrontBlogs[]}>().props;
     const {sliders}=usePage<{sliders:IFrontSlider[]}>().props;
     const {faqs}=usePage<{faqs:IFrontFAQ[]}>().props;
+    const {categories}=usePage<{categories:IfrontCategory[]}>().props;
 
     return (
         <>
@@ -33,7 +34,7 @@ export default function Welcome() {
                     <Slider  sliders={sliders}/>
                 </div>
                 <div className="relative z-10">
-                    <ShopByCategory />
+                    <ShopByCategory  categories={categories} />
                 </div>
                 <div className="relative z-10">
                 <NewArrivial products={products?.data ?? []} />

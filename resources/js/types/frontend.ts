@@ -1,4 +1,4 @@
-import { Config  } from 'vendor/tightenco/ziggy/src/js';
+import { Config } from 'vendor/tightenco/ziggy/src/js';
 import { User } from '.';
 
 
@@ -99,37 +99,37 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
 };
 
 
-export type OrderItem ={
-    id:number;
+export type OrderItem = {
+    id: number;
     quantity: number;
     price: number;
     variation_type_option_ids: number[];
-    product:{
+    product: {
         id: number;
-        title:string;
+        title: string;
         slug: string;
         description: string;
         image: string;
     }
 
 }
- export type Order={
+export type Order = {
     id: number;
-    total_price:number;
+    total_price: number;
     status: string;
     created_at: string;
-    vendorUser:{
-        id:string;
-        name:string;
-        email:string;
-        store_name:string;
+    vendorUser: {
+        id: string;
+        name: string;
+        email: string;
+        store_name: string;
 
     };
-    orderItems:OrderItem[];
+    orderItems: OrderItem[];
     flash: FlashProps;
- }
+}
 
- export type Shipping= {
+export type Shipping = {
     user?: {
         name: string;
         email: string;
@@ -145,45 +145,51 @@ export type OrderItem ={
 }
 
 
-export type IFrontBlogs={
-    id:number;
-    title:string;
-    slug:string;
-    description:string;
-    image:string
-    published_by:string
+export type IFrontBlogs = {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    image: string
+    published_by: string
     created_at: string;
 }
- export type IFrontSlider={
-    id:number;
-    title:string;
-    description:string;
-    image:string;
-    link:string; 
- }
+export type IFrontSlider = {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    link: string;
+}
 
- export type IFrontFAQ={
-    id:number;
-    answer:string;
-    question:string;
- }
+export type IFrontFAQ = {
+    id: number;
+    answer: string;
+    question: string;
+}
 
- export type IfrontBanner={
-    id:number;
-    title:string;   
- }
+export type IfrontBanner = {
+    id: number;
+    title: string;
+}
+export type IfrontCategory = {
+    id: number;
+    name: string;
+    image: string;
+    is_featured: boolean;
+}
 
- export type IFrontOfficeSetting={
-    id:number;
-    office_logo:string;
-    office_name:string;
-    office_address:string;
-    office_phone:string;
-    office_email:string;
-    office_facebook:string;
-    office_youtube:string;
-    office_instagram:string;
-    office_tiktok:string;
-    office_whatsapp:string;
-   
- }
+export type IFrontOfficeSetting = {
+    id: number;
+    office_logo: string;
+    office_name: string;
+    office_address: string;
+    office_phone: string;
+    office_email: string;
+    office_facebook: string;
+    office_youtube: string;
+    office_instagram: string;
+    office_tiktok: string;
+    office_whatsapp: string;
+
+}

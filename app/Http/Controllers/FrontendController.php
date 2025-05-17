@@ -9,6 +9,7 @@ use App\Http\Resources\FAQResource;
 use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\SliderResource;
+use App\Http\Resources\CategoryResource;
 use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\FAQ;
@@ -16,6 +17,8 @@ use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\ShippingAddress;
 use App\Models\Slider;
+use App\Models\Category;
+
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorUser;
@@ -33,13 +36,13 @@ class FrontendController extends Controller
         $blogs = Blog::where('status', 1)->limit(3)->latest()->get();
         $sliders=Slider::where('status',1)->latest()->get();
         $faqs =FAQ::where('status', 1)->limit(5)->latest()->get();
-        // $banners=Banner::where('is_active',1)->latest()->get();
+        $categories = Category::where('active', 1)->get();
         return Inertia::render('welcome', [
             'products' => ProductResource::collection($products),
             'blogs' => BlogResource::collection($blogs)->toArray(request()),
             'sliders' => SliderResource::collection($sliders)->toArray(request()),
             'faqs'=>FAQResource::collection($faqs)->toArray(request()),
-            // 'banners'=>BannerResource::collection($banners)->toArray(request()),
+            'categories'=>CategoryResource::collection($categories)->toArray(request()),
 
         ]);
     }

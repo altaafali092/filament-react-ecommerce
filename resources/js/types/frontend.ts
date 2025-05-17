@@ -177,6 +177,8 @@ export type IfrontCategory = {
     name: string;
     image: string;
     is_featured: boolean;
+    description: string;
+    product:IFrontProduct[] 
 }
 
 export type IFrontOfficeSetting = {

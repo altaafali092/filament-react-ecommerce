@@ -20,10 +20,9 @@ use App\Models\Slider;
 use App\Models\Category;
 
 use App\Models\User;
-use App\Models\Vendor;
-use App\Models\VendorUser;
+
 use App\Services\CartService;
-use Doctrine\DBAL\Query\Limit;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -116,4 +115,15 @@ class FrontendController extends Controller
             'faqs' => FAQResource::collection($faqs)->toArray(request()),
         ]);
     }
+
+    public function shopByCategory(Category $category)
+    {
+        $category->load(['products' => function($query) {
+            $query->where('status', 'published')->paginate(10);
+        }]);
+        return Inertia::render('Frontend/Product/CategoryProduct',[
+            'category'=> new CategoryResource($category)
+        ]);
+    }
+
 }

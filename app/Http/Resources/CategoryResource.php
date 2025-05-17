@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,6 +25,8 @@ class CategoryResource extends JsonResource
             'active'=> $this->active,
             'parent_id' => $this->parent_id,
             'is_featured' => $this->is_featured,
+            'description' => $this->description,
+            'products' => ProductResource::collection($this->products),
             // 'children' => CategoryResource::collection($this->children),
         ];
     }

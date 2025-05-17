@@ -31,9 +31,9 @@ export default function BlogsIndex() {
                                     <h2 className="text-lg font-semibold text-gray-900 line-clamp-1 group-hover:text-neon-400 transition-colors">
                                         {blog.title}
                                     </h2>
-                                    <p className="text-gray-500 text-xs mt-1 line-clamp-2">
+                                    {/* <p className="text-gray-500 text-xs mt-1 line-clamp-2">
                                         {blog.excerpt}
-                                    </p>
+                                    </p> */}
                                     <Link
 
                                         href={route('blogs.show',blog.slug)}

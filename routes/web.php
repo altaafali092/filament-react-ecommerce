@@ -11,6 +11,7 @@ use Inertia\Inertia;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('cartInfo', [FrontendController::class, 'cartInfo'])->name('cartInfo');
+Route::get('shopByCategory/{category:name}', [FrontendController::class, 'shopByCategory'])->name('shopByCategory');
 Route::get('product-detail/{product:slug}', [FrontendController::class, 'productDetail'])->name('product-detail');
 
 Route::get('blogs',[FrontendController::class, 'blogs'])->name('blogs.index');

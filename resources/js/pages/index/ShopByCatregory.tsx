@@ -10,13 +10,13 @@ interface CategoryProps {
 }
 
 export default function ShopByCategory() {
-    const { categories } = usePage<CategoryProps>().props;
+    const { props: { categories } } = usePage<{ props: CategoryProps }>();
     const [hoveredId, setHoveredId] = useState<number | null>(null);
 
     // Debugging (optional)
-    // console.log("Categories:", categories);
+    console.log("Categories:", categories);
 
-    if (!categories || categories.length === 0) {
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
         return (
             <div className="text-center py-16 text-gray-500">
                 No categories available.
@@ -71,7 +71,7 @@ export default function ShopByCategory() {
                                     {category.description}
                                 </p>
                                 <Link
-                                    href={`/category/${category.id}`}
+                                    href={route('shopByCategory', category.name)}
                                     className={`inline-flex items-center text-sm font-medium bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-full border border-white/30 hover:bg-white hover:text-pink-600 transition-all duration-300 ${
                                         hoveredId === category.id
                                             ? "opacity-100 translate-y-0"

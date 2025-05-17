@@ -4,6 +4,7 @@ namespace App\Filament\Resources\DepartmentResource\RelationManagers;
 
 use App\Models\Category;
 use BladeUI\Icons\Components\Icon;
+use Doctrine\DBAL\Query\From;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
@@ -37,6 +38,9 @@ class CategoriesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+
+                Forms\Components\TextInput::make('description')
+                ->label('Short Description'),
               
                 Forms\Components\Select::make('parent_id')
                     ->options(function () use ($department) {

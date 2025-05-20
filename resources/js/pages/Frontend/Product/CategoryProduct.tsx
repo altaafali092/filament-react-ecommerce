@@ -55,7 +55,7 @@ export default function CategoryProducts() {
     return (
         <AuthLayout>
             <Head title={category.name} />
-            <div className="bg-white">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
                 {/* Category Hero */}
                 <div className="relative h-[450px] overflow-hidden">
                     <img
@@ -77,7 +77,8 @@ export default function CategoryProducts() {
                         <div className="w-full md:w-auto"></div>
                         <div className="flex items-center gap-4 w-full md:w-auto">
                             <Select value={sortOption} onValueChange={setSortOption}>
-                                <SelectTrigger className="w-full md:w-[180px]">
+                            <SelectTrigger className="w-full md:w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+
                                     <SelectValue placeholder="Sort by" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -125,7 +126,7 @@ export default function CategoryProducts() {
                             {filteredProducts.map((product) => (
                                 <div
                                     key={product.id}
-                                    className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:border border-green-400"
+                                    className="group relative bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden hover:border border-green-400"
                                 >
                                     <Link href={route('product-detail', product.slug)}>
                                         <img

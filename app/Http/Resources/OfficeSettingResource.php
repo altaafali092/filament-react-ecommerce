@@ -16,7 +16,7 @@ class OfficeSettingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this?->id,
             'office_logo' => $this->office_logo ? asset('storage/' . $this->office_logo) : null,
             'office_name' => $this->office_name,
             'office_address' => $this->office_address,

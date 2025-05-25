@@ -427,7 +427,7 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* <style>{`
+      <style>{`
         @keyframes slideDown {
           from {
             opacity: 0;
@@ -458,7 +458,7 @@ const Navbar = () => {
         .animate-popup {
           animation: popup 0.3s ease forwards;
         }
-      `}</style> */}
+      `}</style>
     </nav>
   );
 };

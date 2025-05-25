@@ -13,9 +13,6 @@ export default function ShopByCategory() {
     const { props: { categories } } = usePage<{ props: CategoryProps }>();
     const [hoveredId, setHoveredId] = useState<number | null>(null);
 
-    // Debugging (optional)
-    console.log("Categories:", categories);
-
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
         return (
             <div className="text-center py-16 text-gray-500">

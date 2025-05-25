@@ -21,7 +21,7 @@ interface CategoryWithProducts {
 
 export default function CategoryProducts() {
     const { props: { category } } = usePage<{ category: CategoryWithProducts }>()
-    console.log(category.products)
+ 
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [sortOption, setSortOption] = useState("featured")
     const [filteredProducts, setFilteredProducts] = useState<IFrontProduct[]>([])

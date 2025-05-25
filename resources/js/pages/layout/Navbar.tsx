@@ -14,8 +14,6 @@ interface CartItems {
   // Add other fields as needed
 }
 
-
-
 // Define Category type for the categories array
 type Category = string | { name: string; dropdown: string[] };
 
@@ -34,7 +32,6 @@ interface NavbarProps {
   totalPrice: number;
   miniCartItems: CartItems[];
 }
-
 
 const categories: Category[] = [
   'NEW DROPS',
@@ -65,7 +62,6 @@ const Navbar = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -99,10 +95,8 @@ const Navbar = () => {
     };
   }, [isCartOpen, isOpen, isPopupOpen]);
 
-
   const handleCartClick = () => {
     if (!auth.user && totalQuantity === 0) {
-      // Redirect to login if guest cart is empty (or handle guest cart logic)
       window.location.href = '/login';
     } else {
       setIsCartOpen(!isCartOpen);
@@ -110,22 +104,19 @@ const Navbar = () => {
     }
   };
 
-  // Handler for dropdown toggle
   const handleDropdownToggle = (name: string) => {
     setActiveDropdown(activeDropdown === name ? null : name);
   };
 
   return (
     <nav
-      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
-        }`}
+      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
+      }`}
     >
-      {/* Announcement Banner with Gradient */}
       <Banner banners={banners} />
 
-      {/* Main Navbar Container */}
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
-        {/* Logo */}
         <Link href={route('home')}>
           <img
             src={officeSettings?.office_logo ?? ''}
@@ -134,7 +125,6 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* Mobile Icons and Menu Toggle */}
         <div className="md:hidden flex items-center space-x-4">
           <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="relative overflow-hidden group">
             <Search
@@ -158,7 +148,6 @@ const Navbar = () => {
             </Link>
           )}
 
-          {/* Cart Button for Mobile (Always Visible) */}
           <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
@@ -171,6 +160,43 @@ const Navbar = () => {
               )}
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </button>
+
+            {isCartOpen && (
+              <div className="absolute top-full right-0 w-[280px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown dark:bg-gray-700 md:hidden animate-slideDown">
+                <h3 className="font-medium text-lg mb-3">Cart</h3>
+                {miniCartItems.length > 0 ? (
+                  <div>
+                    <div className="flex justify-between font-semibold mt-2">
+                      <span>Total Items:</span>
+                      <span>{totalQuantity}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold mt-2">
+                      <span>Total:</span>
+                      <span>
+                        <CurrencyFormatter amount={totalPrice} />
+                      </span>
+                    </div>
+                    {auth.user ? (
+                      <Link
+                        href={route('cart.index')}
+                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                      >
+                        View Cart
+                      </Link>
+                    ) : (
+                      <Link
+                        href={route('login')}
+                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                      >
+                        Login to View Cart
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                  <p>Your cart is empty!</p>
+                )}
+              </div>
+            )}
           </div>
 
           <button
@@ -190,7 +216,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Desktop Menu */}
         <ul
           className={`hidden md:flex md:space-x-6 font-medium ${scrolled ? 'text-gray-900' : 'text-white'} transition-colors duration-300`}
         >
@@ -228,7 +253,6 @@ const Navbar = () => {
           )}
         </ul>
 
-        {/* Desktop Icons */}
         <div className="hidden md:flex items-center space-x-5">
           <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="relative overflow-hidden group">
             <Search
@@ -283,7 +307,6 @@ const Navbar = () => {
             </>
           )}
 
-          {/* Cart Button for Desktop (Always Visible) */}
           <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
@@ -296,49 +319,47 @@ const Navbar = () => {
               )}
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </button>
-          </div>
 
-          {/* Cart Dropdown */}
-          {isCartOpen && (
-            <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown dark:bg-gray-700">
-              <h3 className="font-medium text-lg mb-3">Cart</h3>
-              {miniCartItems.length > 0 ? (
-                <div>
-                  <div className="flex justify-between font-semibold mt-2">
-                    <span>Total Items:</span>
-                    <span>{totalQuantity}</span>
+            {isCartOpen && (
+              <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown dark:bg-gray-700 hidden md:block animate-slideDown">
+                <h3 className="font-medium text-lg mb-3">Cart</h3>
+                {miniCartItems.length > 0 ? (
+                  <div>
+                    <div className="flex justify-between font-semibold mt-2">
+                      <span>Total Items:</span>
+                      <span>{totalQuantity}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold mt-2">
+                      <span>Total:</span>
+                      <span>
+                        <CurrencyFormatter amount={totalPrice} />
+                      </span>
+                    </div>
+                    {auth.user ? (
+                      <Link
+                        href={route('cart.index')}
+                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                      >
+                        View Cart
+                      </Link>
+                    ) : (
+                      <Link
+                        href={route('login')}
+                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                      >
+                        Login to View Cart
+                      </Link>
+                    )}
                   </div>
-                  <div className="flex justify-between font-semibold mt-2">
-                    <span>Total:</span>
-                    <span>
-                      <CurrencyFormatter amount={totalPrice} />
-                    </span>
-                  </div>
-                  {auth.user ? (
-                    <Link
-                      href={route('cart.index')}
-                      className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                    >
-                      View Cart
-                    </Link>
-                  ) : (
-                    <Link
-                      href={route('login')}
-                      className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                    >
-                      Login to View Cart
-                    </Link>
-                  )}
-                </div>
-              ) : (
-                <p>Your cart is empty!</p>
-              )}
-            </div>
-          )}
+                ) : (
+                  <p>Your cart is empty!</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Search Bar Overlay */}
       {isSearchOpen && (
         <div className="absolute top-full left-0 w-full bg-white shadow-md p-4 animate-slideDown">
           <div className="relative max-w-3xl mx-auto">
@@ -359,7 +380,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg animate-slideDown">
           <ul className="flex flex-col p-4 font-medium divide-y divide-gray-100">
@@ -379,13 +399,15 @@ const Navbar = () => {
                   >
                     <span className="hover:text-pink-500 transition-colors text-gray-900">{item.name}</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === item.name ? 'rotate-180 text-pink-500' : ''
-                        }`}
+                      className={`w-4 h-4 transition-transform duration-300 ${
+                        activeDropdown === item.name ? 'rotate-180 text-pink-500' : ''
+                      }`}
                     />
                   </div>
                   <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeDropdown === item.name ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
-                      }`}
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      activeDropdown === item.name ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                    }`}
                   >
                     <ul className="space-y-2 pl-4 bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
                       {item.dropdown.map((subItem, subIndex) => (
@@ -405,21 +427,20 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Styles */}
-      <style>{`
-                @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                .animate-slideDown {
-                    animation: slideDown 0.3s ease forwards;
-                }
+      {/* <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slideDown {
+          animation: slideDown 0.3s ease forwards;
+        }
         @keyframes popup {
           0% {
             opacity: 0;
@@ -436,8 +457,8 @@ const Navbar = () => {
         }
         .animate-popup {
           animation: popup 0.3s ease forwards;
-                }
-            `}</style>
+        }
+      `}</style> */}
     </nav>
   );
 };

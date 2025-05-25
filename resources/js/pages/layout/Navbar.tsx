@@ -96,14 +96,14 @@ export default function Navbar() {
       <h3 className="font-medium text-lg mb-3">Cart</h3>
       {miniCartItems.length > 0 ? (
         <div>
-          {/* <ul className="space-y-2 max-h-60 overflow-y-auto">
+          <ul className="space-y-2 max-h-60 overflow-y-auto">
             {miniCartItems.map((item) => (
               <li key={item.id} className="flex justify-between text-sm">
                 <span>{item.title}</span>
                 <CurrencyFormatter amount={item.price} />
               </li>
             ))}
-          </ul> */}
+          </ul>
           <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
             <span>Total Items:</span>
             <span>{totalQuantity}</span>

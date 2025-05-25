@@ -1,31 +1,32 @@
 import { usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Search, User, Heart, ShoppingBag, Menu, X, ChevronDown, Sparkles } from 'lucide-react';
+import {
+  Search,
+  User,
+  Heart,
+  ShoppingBag,
+  Menu,
+  X,
+  ChevronDown,
+} from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
 import Banner from '@/components/Forontend/Banner';
 import { IfrontBanner, IFrontOfficeSetting } from '@/types/frontend';
 
-// Define CartItems type
+// Define Types
 interface CartItems {
   id: number;
   title: string;
   price: number;
-  // Add other fields as needed
 }
 
-// Define Category type for the categories array
 type Category = string | { name: string; dropdown: string[] };
 
-// Define props for auth and user
 interface Auth {
-  user: {
-    name: string;
-    // Add other user fields as needed
-  } | null;
+  user: { name: string } | null;
 }
 
-// Define Navbar props
 interface NavbarProps {
   auth: Auth;
   totalQuantity: number;
@@ -47,60 +48,41 @@ const categories: Category[] = [
   'OUR STORY',
 ];
 
-const Navbar = () => {
+export default function Navbar() {
   const { props } = usePage<NavbarProps>();
   const { banners } = usePage<{ banners: IfrontBanner[] }>().props;
   const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
-
   const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+  // Handle scroll and click outside
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     const handleClickOutside = (event: MouseEvent) => {
-      if (isCartOpen && !(event.target as Element).closest('.cart-dropdown')) {
-        setIsCartOpen(false);
-      }
-      if (isOpen && !(event.target as Element).closest('.user-dropdown')) {
-        setIsOpen(false);
-      }
-      if (isPopupOpen && !(event.target as Element).closest('.cart-popup')) {
-        setIsPopupOpen(false);
-      }
+      if (isCartOpen && !(event.target as Element).closest('.cart-dropdown')) setIsCartOpen(false);
+      if (isOpen && !(event.target as Element).closest('.user-dropdown')) setIsOpen(false);
     };
 
     window.addEventListener('scroll', handleScroll);
     document.addEventListener('mousedown', handleClickOutside);
 
-    let popupTimeout: NodeJS.Timeout;
-    if (isPopupOpen) {
-      popupTimeout = setTimeout(() => {
-        setIsPopupOpen(false);
-      }, 3000);
-    }
-
     return () => {
-      clearTimeout(popupTimeout);
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isCartOpen, isOpen, isPopupOpen]);
+  }, [isCartOpen, isOpen]);
 
   const handleCartClick = () => {
     if (!auth.user && totalQuantity === 0) {
       window.location.href = '/login';
     } else {
       setIsCartOpen(!isCartOpen);
-      setIsPopupOpen(true);
     }
   };
 
@@ -108,15 +90,64 @@ const Navbar = () => {
     setActiveDropdown(activeDropdown === name ? null : name);
   };
 
+  // Reusable Cart Dropdown Component
+  const CartDropdown = () => (
+    <div className="absolute top-full right-0 w-[280px] bg-white shadow-lg rounded-lg p-4 mt-2 z-50 cart-dropdown dark:bg-gray-700 animate-slideDown">
+      <h3 className="font-medium text-lg mb-3">Cart</h3>
+      {miniCartItems.length > 0 ? (
+        <div>
+          {/* <ul className="space-y-2 max-h-60 overflow-y-auto">
+            {miniCartItems.map((item) => (
+              <li key={item.id} className="flex justify-between text-sm">
+                <span>{item.title}</span>
+                <CurrencyFormatter amount={item.price} />
+              </li>
+            ))}
+          </ul> */}
+          <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
+            <span>Total Items:</span>
+            <span>{totalQuantity}</span>
+          </div>
+          <div className="flex justify-between font-semibold mt-1">
+            <span>Total:</span>
+            <span>
+              <CurrencyFormatter amount={totalPrice} />
+            </span>
+          </div>
+          {auth.user ? (
+            <Link
+              href={route('cart.index')}
+              className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+            >
+              View Cart
+            </Link>
+          ) : (
+            <Link
+              href={route('login')}
+              className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+            >
+              Login to View Cart
+            </Link>
+          )}
+        </div>
+      ) : (
+        <p>Your cart is empty!</p>
+      )}
+    </div>
+  );
+
   return (
     <nav
       className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
       }`}
     >
+      {/* Announcement Banner */}
       <Banner banners={banners} />
 
+      {/* Main Navbar */}
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
+        {/* Logo */}
         <Link href={route('home')}>
           <img
             src={officeSettings?.office_logo ?? ''}
@@ -125,14 +156,16 @@ const Navbar = () => {
           />
         </Link>
 
+        {/* Mobile Icons + Menu Toggle */}
         <div className="md:hidden flex items-center space-x-4">
+          {/* Search Button */}
           <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="relative overflow-hidden group">
             <Search
-              className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
+              className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500`}
             />
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
           </button>
 
+          {/* User / Login */}
           {auth.user ? (
             <>
               <button>
@@ -148,278 +181,111 @@ const Navbar = () => {
             </Link>
           )}
 
+          {/* Cart Button */}
           <div className="relative">
             <button onClick={handleCartClick} className="relative overflow-hidden group">
               <ShoppingBag
-                className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
+                className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500`}
               />
               {totalQuantity > 0 && (
                 <span className="absolute -top-2 -right-2 bg-pink-600 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
                   {totalQuantity}
                 </span>
               )}
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </button>
-
-            {isCartOpen && (
-              <div className="absolute top-full right-0 w-[280px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown dark:bg-gray-700 md:hidden animate-slideDown">
-                <h3 className="font-medium text-lg mb-3">Cart</h3>
-                {miniCartItems.length > 0 ? (
-                  <div>
-                    <div className="flex justify-between font-semibold mt-2">
-                      <span>Total Items:</span>
-                      <span>{totalQuantity}</span>
-                    </div>
-                    <div className="flex justify-between font-semibold mt-2">
-                      <span>Total:</span>
-                      <span>
-                        <CurrencyFormatter amount={totalPrice} />
-                      </span>
-                    </div>
-                    {auth.user ? (
-                      <Link
-                        href={route('cart.index')}
-                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                      >
-                        View Cart
-                      </Link>
-                    ) : (
-                      <Link
-                        href={route('login')}
-                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                      >
-                        Login to View Cart
-                      </Link>
-                    )}
-                  </div>
-                ) : (
-                  <p>Your cart is empty!</p>
-                )}
-              </div>
-            )}
+            {isCartOpen && <CartDropdown />}
           </div>
 
-          <button
-            className="focus:outline-none relative overflow-hidden group"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
+          {/* Hamburger Menu */}
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? (
-              <X
-                className={`${scrolled ? 'text-gray-700' : 'text-white'} w-6 h-6 group-hover:text-pink-500 transition-colors`}
-              />
+              <X className={`${scrolled ? 'text-gray-700' : 'text-white'} w-6 h-6`} />
             ) : (
-              <Menu
-                className={`${scrolled ? 'text-gray-700' : 'text-white'} w-6 h-6 group-hover:text-pink-500 transition-colors`}
-              />
+              <Menu className={`${scrolled ? 'text-gray-700' : 'text-white'} w-6 h-6`} />
             )}
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
           </button>
         </div>
 
-        <ul
-          className={`hidden md:flex md:space-x-6 font-medium ${scrolled ? 'text-gray-900' : 'text-white'} transition-colors duration-300`}
-        >
+        {/* Desktop Menu */}
+        <ul className={`hidden md:flex md:space-x-6 font-medium ${scrolled ? 'text-gray-900' : 'text-white'}`}>
           {categories.map((item, index) =>
             typeof item === 'string' ? (
-              <li key={index} className="cursor-pointer relative overflow-hidden group">
-                <span className="group-hover:text-pink-500 transition-colors">{item}</span>
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-              </li>
+              <li key={index}>{item}</li>
             ) : (
-              <li key={index} className="relative group cursor-pointer">
-                <div className="relative overflow-hidden">
-                  <span
-                    className={`flex items-center group-hover:text-pink-500 transition-colors ${scrolled ? '' : 'text-white'}`}
-                    onClick={() => handleDropdownToggle(item.name)}
-                  >
-                    {item.name} <ChevronDown className="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" />
-                  </span>
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                </div>
-                <div className="absolute left-0 hidden group-hover:block bg-white/95 backdrop-blur-md shadow-lg rounded-xl p-3 mt-2 min-w-[250px] opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 border border-pink-100">
-                  {item.dropdown.map((subItem, subIndex) => (
-                    <a
-                      key={subIndex}
-                      href="#"
-                      className="block px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200 relative overflow-hidden group/item"
-                    >
-                      <span>{subItem}</span>
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover/item:w-full transition-all duration-300"></span>
-                    </a>
-                  ))}
-                </div>
+              <li key={index}>
+                <span onClick={() => handleDropdownToggle(item.name)}>{item.name}</span>
+                {activeDropdown === item.name && (
+                  <div className="absolute left-0 bg-white shadow-lg rounded mt-2 min-w-[200px] z-50">
+                    {item.dropdown.map((subItem, i) => (
+                      <a key={i} href="#" className="block px-4 py-2 hover:bg-pink-100">
+                        {subItem}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </li>
             ),
           )}
         </ul>
 
+        {/* Desktop Icons */}
         <div className="hidden md:flex items-center space-x-5">
-          <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="relative overflow-hidden group">
-            <Search
-              className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
-            />
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-          </button>
+          <button onClick={() => setIsSearchOpen(!isSearchOpen)}>Search</button>
 
           {auth.user ? (
             <>
               <div className="relative">
-                <button className="relative overflow-hidden flex items-center" onClick={() => setIsOpen(!isOpen)}>
-                  <span className={`${scrolled ? 'text-gray-700' : 'text-white'} hover:text-pink-500`}>
-                    {auth.user?.name === 'Super Admin' ? 'SA' : auth.user?.name}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                </button>
+                <button onClick={() => setIsOpen(!isOpen)}>{auth.user.name}</button>
                 {isOpen && (
-                  <div className="absolute left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-md shadow-lg rounded-xl p-2 mt-2 min-w-[150px] opacity-100 transition-all duration-300 border border-pink-100 user-dropdown">
-                    <Link
-                      href={route('dashboard')}
-                      className="block px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200"
-                    >
+                  <div className="absolute right-0 bg-white shadow-lg rounded z-50 user-dropdown">
+                    <Link href={route('dashboard')} className="block px-4 py-2 hover:bg-pink-100">
                       Profile
                     </Link>
                     <Link
                       href={route('logout')}
                       method="post"
                       as="button"
-                      className="block w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200"
+                      className="block w-full text-left px-4 py-2 hover:bg-pink-100"
                     >
                       Logout
                     </Link>
                   </div>
                 )}
               </div>
-              <button className="relative overflow-hidden group">
-                <Heart
-                  className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
-                />
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-              </button>
+              <button>Heart</button>
             </>
           ) : (
             <>
-              <Link href="/login" className="text-md text-white hover:text-pink-500">
-                Log in
-              </Link>
-              <Link href="/register" className="text-md text-white hover:text-pink-500">
-                Register
-              </Link>
+              <Link href="/login">Log in</Link>
+              <Link href="/register">Register</Link>
             </>
           )}
 
+          {/* Cart Button (Desktop) */}
           <div className="relative">
-            <button onClick={handleCartClick} className="relative overflow-hidden group">
-              <ShoppingBag
-                className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
-              />
-              {totalQuantity > 0 && (
-                <span className="absolute -top-0 -right-1 bg-pink-600 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
-                  {totalQuantity}
-                </span>
-              )}
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-            </button>
-
-            {isCartOpen && (
-              <div className="absolute top-full right-2 w-[300px] bg-white shadow-lg rounded-lg p-4 mt-2 cart-dropdown dark:bg-gray-700 hidden md:block animate-slideDown">
-                <h3 className="font-medium text-lg mb-3">Cart</h3>
-                {miniCartItems.length > 0 ? (
-                  <div>
-                    <div className="flex justify-between font-semibold mt-2">
-                      <span>Total Items:</span>
-                      <span>{totalQuantity}</span>
-                    </div>
-                    <div className="flex justify-between font-semibold mt-2">
-                      <span>Total:</span>
-                      <span>
-                        <CurrencyFormatter amount={totalPrice} />
-                      </span>
-                    </div>
-                    {auth.user ? (
-                      <Link
-                        href={route('cart.index')}
-                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                      >
-                        View Cart
-                      </Link>
-                    ) : (
-                      <Link
-                        href={route('login')}
-                        className="block mt-3 text-center bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
-                      >
-                        Login to View Cart
-                      </Link>
-                    )}
-                  </div>
-                ) : (
-                  <p>Your cart is empty!</p>
-                )}
-              </div>
-            )}
+            <button onClick={handleCartClick}>Cart ({totalQuantity})</button>
+            {isCartOpen && <CartDropdown />}
           </div>
         </div>
       </div>
 
-      {isSearchOpen && (
-        <div className="absolute top-full left-0 w-full bg-white shadow-md p-4 animate-slideDown">
-          <div className="relative max-w-3xl mx-auto">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="w-full py-3 pl-4 pr-10 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300"
-              autoFocus
-            />
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <button
-              className="absolute -top-1 -right-1 bg-gray-200 rounded-full p-1"
-              onClick={() => setIsSearchOpen(false)}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg animate-slideDown">
-          <ul className="flex flex-col p-4 font-medium divide-y divide-gray-100">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg z-40">
+          <ul className="flex flex-col p-4">
             {categories.map((item, index) =>
               typeof item === 'string' ? (
-                <li
-                  key={index}
-                  className="py-3 cursor-pointer hover:text-pink-500 transition-colors text-gray-900"
-                >
-                  {item}
-                </li>
+                <li key={index}>{item}</li>
               ) : (
-                <li key={index} className="py-3 cursor-pointer">
-                  <div
-                    className="flex justify-between items-center"
-                    onClick={() => handleDropdownToggle(item.name)}
-                  >
-                    <span className="hover:text-pink-500 transition-colors text-gray-900">{item.name}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        activeDropdown === item.name ? 'rotate-180 text-pink-500' : ''
-                      }`}
-                    />
-                  </div>
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      activeDropdown === item.name ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
-                    }`}
-                  >
-                    <ul className="space-y-2 pl-4 bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
-                      {item.dropdown.map((subItem, subIndex) => (
-                        <li
-                          key={subIndex}
-                          className="text-gray-700 hover:text-pink-600 transition-colors py-1.5"
-                        >
-                          {subItem}
-                        </li>
+                <li key={index}>
+                  <div onClick={() => handleDropdownToggle(item.name)}>{item.name}</div>
+                  {activeDropdown === item.name && (
+                    <ul className="pl-4">
+                      {item.dropdown.map((subItem, i) => (
+                        <li key={i}>{subItem}</li>
                       ))}
                     </ul>
-                  </div>
+                  )}
                 </li>
               ),
             )}
@@ -427,6 +293,7 @@ const Navbar = () => {
         </div>
       )}
 
+      {/* Styles */}
       <style>{`
         @keyframes slideDown {
           from {
@@ -441,26 +308,7 @@ const Navbar = () => {
         .animate-slideDown {
           animation: slideDown 0.3s ease forwards;
         }
-        @keyframes popup {
-          0% {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-popup {
-          animation: popup 0.3s ease forwards;
-        }
       `}</style>
     </nav>
   );
-};
-
-export default Navbar;
+}

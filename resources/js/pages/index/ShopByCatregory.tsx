@@ -25,6 +25,7 @@ export default function ShopByCategory() {
         <section className="py-12 px-4 md:px-8 bg-gradient-to-b from-white to-pink-50">
             <div className="container mx-auto max-w-7xl">
                 {/* Section Header */}
+                
                 <div className="text-center mb-10">
                     <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
                         Shop by Category

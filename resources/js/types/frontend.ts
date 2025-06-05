@@ -31,6 +31,8 @@ export type VariationTypeOption = {
 export interface IFrontProduct {
     id: number;
     title: string;
+    sale_price:number| null;
+    is_featured:boolean;
     slug: string;
     price: number;
     quantity: number;
@@ -193,5 +195,24 @@ export type IFrontOfficeSetting = {
     office_instagram: string;
     office_tiktok: string;
     office_whatsapp: string;
-
+}
+export interface PaginationLinks {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+export interface PaginatedProducts {
+    data: IFrontProduct[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: PaginationLinks[];
+}
+export interface CategoryWithProducts {
+    id: number;
+    name: string;
+    description: string;
+    image: string;
+    products: PaginatedProducts;
 }

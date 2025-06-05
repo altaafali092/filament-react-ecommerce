@@ -22,7 +22,7 @@ use App\Models\Category;
 use App\Models\User;
 
 use App\Services\CartService;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -33,15 +33,15 @@ class FrontendController extends Controller
     {
         $products = Product::where('status', 'published')->paginate(10);
         $blogs = Blog::where('status', 1)->limit(3)->latest()->get();
-        $sliders=Slider::where('status',1)->latest()->get();
-        $faqs =FAQ::where('status', 1)->limit(5)->latest()->get();
+        $sliders = Slider::where('status', 1)->latest()->get();
+        $faqs = FAQ::where('status', 1)->limit(5)->latest()->get();
         $categories = Category::where('active', 1)->get();
         return Inertia::render('welcome', [
             'products' => ProductResource::collection($products),
             'blogs' => BlogResource::collection($blogs)->toArray(request()),
             'sliders' => SliderResource::collection($sliders)->toArray(request()),
-            'faqs'=>FAQResource::collection($faqs)->toArray(request()),
-            'categories'=>CategoryResource::collection($categories)->toArray(request()),
+            'faqs' => FAQResource::collection($faqs)->toArray(request()),
+            'categories' => CategoryResource::collection($categories)->toArray(request()),
 
         ]);
     }
@@ -105,7 +105,6 @@ class FrontendController extends Controller
 
         User::create($data + ['role' => 'vendor', 'vendor_status' => 'pending']);
         return Inertia::location(route('filament.admin.auth.login'));
-
     }
 
     public function faqs()
@@ -116,14 +115,30 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function shopByCategory(Category $category)
+
+    public function shopByCategory(Request $request, Category $category)
     {
-        $category->load(['products' => function($query) {
-            $query->where('status', 'published')->paginate(10);
-        }]);
-        return Inertia::render('Frontend/Product/CategoryProduct',[
-            'category'=> new CategoryResource($category)
+        // Load paginated products related to the category
+
+        $products = $category->products()
+            ->where('status', 'published')
+            ->orderBy('id', 'desc')
+            ->paginate(2)
+            ->appends($request->query());
+        $total = $products->count();
+        return Inertia::render('Frontend/Product/CategoryProduct', [
+            'category' => new CategoryResource($category),
+            'products' => ProductResource::collection($products)->additional([
+                'meta' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'next_page_url' => $products->nextPageUrl(),
+                    'prev_page_url' => $products->previousPageUrl(),
+                    'per_page' => $products->perPage(),
+                    'total' => $total,
+
+                ],
+            ]),
         ]);
     }
-
 }

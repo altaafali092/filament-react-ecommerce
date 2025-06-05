@@ -26,7 +26,6 @@ class CategoryResource extends JsonResource
             'parent_id' => $this->parent_id,
             'is_featured' => $this->is_featured,
             'description' => $this->description,
-            'products' => ProductResource::collection($this->products),
             // 'children' => CategoryResource::collection($this->children),
         ];
     }

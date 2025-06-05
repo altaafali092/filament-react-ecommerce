@@ -1,42 +1,60 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Grid3X3, List } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { IfrontCategory, IFrontProduct } from "@/types/frontend"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { Head, Link, usePage } from "@inertiajs/react"
 import AuthLayout from "@/pages/layout/AuthLayout"
 import { Badge } from "@/components/ui/badge"
-import CurrencyFormatter from "@/components/CurrencyFormatter"
+import Pagination from "@/components/ui/pagination"
+import { IFrontProduct } from "@/types/frontend"
 
-interface CategoryWithProducts {
+
+interface IFrontCategory {
     id: number
     name: string
     description: string
     image: string
-    products: IFrontProduct[]
-    
+    slug: string
 }
 
-export default function CategoryProducts() {
-    const { props: { category } } = usePage<{ category: CategoryWithProducts }>()
- 
+interface PaginatedProducts {
+    data: IFrontProduct[]
+    meta: {
+        current_page: number
+        last_page: number
+        next_page_url: string | null
+        prev_page_url: string | null
+        total: number
+    }
+}
+
+export default function CategoryProduct() {
+    const { props } = usePage<{
+        category: IFrontCategory
+        products: PaginatedProducts
+    }>()
+
+    const { category, products } = props
+
+
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [sortOption, setSortOption] = useState("featured")
-    const [filteredProducts, setFilteredProducts] = useState<IFrontProduct[]>([])
+    const [sortedProducts, setSortedProducts] = useState<IFrontProduct[]>([])
 
-    // Initialize filtered products on load
     useEffect(() => {
-        setFilteredProducts(category.products)
-    }, [])
-
-    // Apply sorting
-    useEffect(() => {
-        let result = [...category.products]
+        const result = [...products.data]
         result.sort((a, b) => {
             const priceA = a.sale_price || a.price
             const priceB = b.sale_price || b.price
+
             switch (sortOption) {
                 case "price-low":
                     return priceA - priceB
@@ -49,12 +67,13 @@ export default function CategoryProducts() {
                     return b.is_featured ? 1 : -1
             }
         })
-        setFilteredProducts(result)
-    }, [sortOption])
+        setSortedProducts(result)
+    }, [sortOption, products.data])
 
     return (
         <AuthLayout>
             <Head title={category.name} />
+
             <div className="bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
                 {/* Category Hero */}
                 <div className="relative h-[450px] overflow-hidden">
@@ -65,20 +84,23 @@ export default function CategoryProducts() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-2">{category.name}</h1>
-                        <p className="text-white/80 max-w-2xl">{category.description}</p>
+                        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                            {category.name}
+                        </h1>
+                        <p className="text-white/80 max-w-2xl">
+                            {category.description}
+                        </p>
                     </div>
                 </div>
 
-                {/* Product Listing */}
+                {/* Product Section */}
                 <div className="container mx-auto max-w-7xl px-4 py-8">
-                    {/* Sorting & View Mode */}
+                    {/* Sorting & View Toggle */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div className="w-full md:w-auto"></div>
                         <div className="flex items-center gap-4 w-full md:w-auto">
                             <Select value={sortOption} onValueChange={setSortOption}>
-                            <SelectTrigger className="w-full md:w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-
+                                <SelectTrigger className="w-full md:w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-white">
                                     <SelectValue placeholder="Sort by" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -112,18 +134,18 @@ export default function CategoryProducts() {
                     {/* Results Count */}
                     <div className="mb-6">
                         <p className="text-sm text-gray-500">
-                            Showing {filteredProducts.length} of {category.products.length} products
+                            Showing {Math.min(sortedProducts.length)} of {products.meta.total} products
                         </p>
                     </div>
 
                     {/* Product Grid/List */}
-                    {filteredProducts.length === 0 ? (
+                    {sortedProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-center">
                             <p className="text-xl font-medium text-gray-700 mb-2">No products found</p>
                         </div>
                     ) : viewMode === "grid" ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {filteredProducts.map((product) => (
+                            {sortedProducts.map((product) => (
                                 <div
                                     key={product.id}
                                     className="group relative bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden hover:border border-green-400"
@@ -136,10 +158,16 @@ export default function CategoryProducts() {
                                         />
                                     </Link>
                                     <div className="p-4">
-                                        <h3 className="text-base font-semibold mb-2" dangerouslySetInnerHTML={{ __html: product.title.length>50 ? product.title.substring(0,40) + '...' : product.title}} />
-                                       
+                                        <h3
+                                            className="text-base font-semibold mb-2"
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    product.title.length > 50
+                                                        ? product.title.substring(0, 40) + '...'
+                                                        : product.title,
+                                            }}
+                                        />
                                         <div className="flex items-center justify-between">
-                                          
                                             <span className="text-pink-600 font-bold">
                                                 NPR {product.sale_price || product.price}
                                             </span>
@@ -160,7 +188,7 @@ export default function CategoryProducts() {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {filteredProducts.map((product) => (
+                            {sortedProducts.map((product) => (
                                 <div
                                     key={product.id}
                                     className="flex flex-col md:flex-row gap-6 border rounded-lg p-4 group relative hover:border border-amber-500"
@@ -190,17 +218,19 @@ export default function CategoryProducts() {
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="text-gray-600 text-sm mb-4" 
+                                        <div
+                                            className="text-gray-600 text-sm mb-4"
                                             dangerouslySetInnerHTML={{
-                                                __html: product.description.length > 150
-                                                    ? product.description.substring(0, 150) + '...'
-                                                    : product.description
+                                                __html:
+                                                    product.description.length > 150
+                                                        ? product.description.substring(0, 150) + '...'
+                                                        : product.description,
                                             }}
                                         />
                                         <div className="flex flex-wrap gap-2 mb-4">
                                             {product.is_featured && <Badge variant="outline">Featured</Badge>}
-                                            {product.is_new && <Badge variant="outline">New Arrival</Badge>}
-                                            {product.is_sale && <Badge variant="outline">On Sale</Badge>}
+                                            {/* {product.is_new && <Badge variant="outline">New Arrival</Badge>}
+                                            {product.is_sale && <Badge variant="outline">On Sale</Badge>} */}
                                         </div>
                                         <Button
                                             asChild
@@ -219,25 +249,13 @@ export default function CategoryProducts() {
                     )}
 
                     {/* Pagination */}
-                    <div className="mt-12 flex justify-center">
-                        <div className="flex items-center gap-1">
-                            <Button variant="outline" size="sm" disabled>
-                                Previous
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-pink-50">
-                                1
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                2
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                3
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                Next
-                            </Button>
-                        </div>
-                    </div>
+                    <Pagination
+                        currentPage={products.meta.current_page}
+                        lastPage={products.meta.last_page}
+                        prevPageUrl={products.meta.prev_page_url}
+                        nextPageUrl={products.meta.next_page_url}
+                    />
+
                 </div>
             </div>
         </AuthLayout>

@@ -14,6 +14,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 
@@ -31,6 +32,7 @@ class MenuSettingResource extends Resource
                     ->label('Parent Menu')
                     ->relationship('menu', 'title')
                     ->searchable()
+                    ->preload()
                     ->nullable(),
 
                 TextInput::make('title')
@@ -84,6 +86,7 @@ class MenuSettingResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('menu.title')->label('Parent Title'),
                 Tables\Columns\TextColumn::make('title')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('menu_type')->badge(),
                 Tables\Columns\TextColumn::make('url')->label('Link'),

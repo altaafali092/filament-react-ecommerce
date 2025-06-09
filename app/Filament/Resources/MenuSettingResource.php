@@ -62,9 +62,7 @@ class MenuSettingResource extends Resource
                         'about' => 'About Us',
                         'blogs'=>'Blogs',
                         'faqs'=>'FAQs',
-                        'contact' => 'Contact',
-                        'terms' => 'Terms & Conditions',
-                        'privacy' => 'Privacy Policy',
+                      
                     ])
                     ->visible(fn(Forms\Get $get) => $get('menu_type') === 'static')
                     ->searchable()

@@ -13,8 +13,8 @@ import {
 import { Head, Link, usePage } from "@inertiajs/react"
 import AuthLayout from "@/pages/layout/AuthLayout"
 import { Badge } from "@/components/ui/badge"
-import Pagination from "@/components/ui/pagination"
 import { IFrontProduct } from "@/types/frontend"
+import Pagination from "@/components/ui/Pagination"
 
 
 interface IFrontCategory {

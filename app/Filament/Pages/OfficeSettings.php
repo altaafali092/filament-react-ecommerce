@@ -24,7 +24,6 @@ class OfficeSettings extends Page implements HasForms
     {
         return [
             'view',
-         
             'create',
             'update',
             'delete',

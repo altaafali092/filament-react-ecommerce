@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
+use function Termwind\render;
+
 class FrontendController extends Controller
 {
     public function index()
@@ -118,7 +120,6 @@ class FrontendController extends Controller
 
     public function shopByCategory(Request $request, Category $category)
     {
-        // Load paginated products related to the category
 
         $products = $category->products()
             ->where('status', 'published')
@@ -140,5 +141,11 @@ class FrontendController extends Controller
                 ],
             ]),
         ]);
+    }
+
+    public function contact()
+    {
+        
+        return Inertia::render('Frontend/Contact/Index');
     }
 }

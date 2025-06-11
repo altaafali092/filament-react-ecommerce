@@ -148,7 +148,7 @@ const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null 
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-white/70 hover:text-pink-400 transition-colors">
+                <Link href={route('contact')} className="text-white/70 hover:text-pink-400 transition-colors">
                   Contact Us
                 </Link>
               </li>

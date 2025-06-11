@@ -42,10 +42,13 @@ Route::middleware(['verified'])->group(function () {
 Route::get('vendor-register', [FrontendController::class, 'vendorRegisterPage'])->name('vendor.registerPage');
 Route::post('vendor-register', [FrontendController::class, 'vendorRegister'])->name('vendor.register');
 
+Route::get('contact',[FrontendController::class, 'contact'])->name('contact');
+
 
 
 Route::get('/{slug}', [StaticPageController::class, 'show'])
     ->name('front.static');
+
 
 
 require __DIR__ . '/settings.php';

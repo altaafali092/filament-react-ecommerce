@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Contact\StoreContactMesaageRequest;
 use App\Http\Requests\Vendor\Register\StoreVendorRegisterRequest;
 use App\Http\Resources\BannerResource;
 use App\Http\Resources\BlogResource;
@@ -18,7 +19,7 @@ use App\Models\ProductVariation;
 use App\Models\ShippingAddress;
 use App\Models\Slider;
 use App\Models\Category;
-
+use App\Models\Contact;
 use App\Models\User;
 
 use App\Services\CartService;
@@ -145,7 +146,14 @@ class FrontendController extends Controller
 
     public function contact()
     {
-        
+
         return Inertia::render('Frontend/Contact/Index');
+    }
+    public function contactMessage(StoreContactMesaageRequest $request)
+    {
+        
+        Contact::create($request->validated());
+
+        return back()->with('success', 'Your message successfully submitted');
     }
 }

@@ -3,7 +3,7 @@ import CurrencyFormatter from "@/components/CurrencyFormatter"
 import AuthLayout from "@/pages/layout/AuthLayout"
 import type { IFrontProduct, PageProps, VariationTypeOption } from "@/types/frontend"
 import { Head, router, useForm, usePage } from "@inertiajs/react"
-import {  Minus, Plus, ShieldCheck, Truck } from "lucide-react"
+import { Minus, Plus, ShieldCheck, Truck } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import toast from "react-hot-toast"
 
@@ -17,7 +17,6 @@ const ProductDetail = () => {
 
 
     const { flash } = usePage<PageProps>().props;
-
 
     useEffect(() => {
         if (flash.success) {
@@ -268,7 +267,7 @@ const ProductDetail = () => {
                                 <div className="space-y-6">
                                     <div className="aspect-square bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden border">
                                         <img
-                                           src={images[activeImage]?.large || "/placeholder.svg"}
+                                            src={images[activeImage]?.large || "/placeholder.svg"}
                                             alt={product.title}
                                             className="w-full h-full object-cover transition-opacity duration-300"
                                         />

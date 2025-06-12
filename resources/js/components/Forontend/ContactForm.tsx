@@ -1,76 +1,83 @@
-import React, { useState } from 'react';
+import { useForm, usePage } from '@inertiajs/react';
+import  { useEffect } from 'react';
+import InputError from '../input-error';
+import { PageProps } from '@/types/frontend';
+import toast from 'react-hot-toast';
 
-interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  message: string;
-}
 
-const ContactForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
+
+const ContactForm = () => {
+
+  const { flash } = usePage<PageProps>().props;
+  useEffect(() => {
+    if (flash.success) {
+      toast.success(flash.success);
+    }
+    if (flash.error) {
+      toast.error(flash.error);
+    }
+  }, [flash]);
+
+  const { data, setData, post, errors, reset } = useForm({
+    first_name: '',
+    last_name: '',
     email: '',
-    phone:'',
+    phone: '',
     message: '',
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  })
+  const onSubmit = (e: any) => {
     e.preventDefault();
-    // You can send formData to backend here
-    console.log('Form submitted:', formData);
-  };
+    post(route('contactMessage'), {
+      onSuccess: () => {
+        reset();
+      }
+    })
+  }
+
+
+
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white/30 backdrop-blur-md rounded-lg shadow-md">
 
       <h2 className="text-2xl font-bold text-gray-800 mb-6 dark:text-white">Send Us a Message</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-6">
         {/* First Name & Last Name */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="first-name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-white">
+            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-white">
               First Name *
             </label>
             <input
-              id="first-name"
-              name="firstName"
+              id="first_name"
+              name="first_name"
               type="text"
               required
-              value={formData.firstName}
-              onChange={handleChange}
+              value={data.first_name}
+              onChange={(e) => setData('first_name', e.target.value)}
               className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="John"
+
             />
+            <InputError message={errors.first_name} className='mt-2' />
           </div>
 
           <div>
-            <label htmlFor="last-name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-white">
+            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-white">
               Last Name *
             </label>
             <input
-              id="last-name"
-              name="lastName"
+              id="last_name"
+              name="last_name"
               type="text"
               required
-              value={formData.lastName}
-              onChange={handleChange}
+              value={data.last_name}
+              onChange={(e) => setData('last_name', e.target.value)}
               className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="Doe"
             />
+            <InputError message={errors.last_name} className='mt-2' />
           </div>
         </div>
 
@@ -84,11 +91,12 @@ const ContactForm: React.FC = () => {
             name="email"
             type="email"
             required
-            value={formData.email}
-            onChange={handleChange}
+            value={data.email}
+            onChange={(e) => setData('email', e.target.value)}
             className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="you@example.com"
           />
+          <InputError message={errors.email} className='mt-2' />
         </div>
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 dark:text-white">
@@ -99,11 +107,12 @@ const ContactForm: React.FC = () => {
             name="phone"
             type="phone"
             required
-            value={formData.phone}
-            onChange={handleChange}
+            value={data.phone}
+            onChange={(e) => setData('phone', e.target.value)}
             className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="+977 9824598470"
           />
+          <InputError message={errors.phone} className='mt-2' />
         </div>
 
         {/* Message */}
@@ -116,11 +125,12 @@ const ContactForm: React.FC = () => {
             name="message"
             rows={5}
             required
-            value={formData.message}
-            onChange={handleChange}
+            value={data.message}
+            onChange={(e) => setData('message', e.target.value)}
             className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Write your message..."
           />
+          <InputError message={errors.message} className='mt-2' />
         </div>
 
         {/* Submit Button */}

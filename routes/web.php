@@ -43,6 +43,7 @@ Route::get('vendor-register', [FrontendController::class, 'vendorRegisterPage'])
 Route::post('vendor-register', [FrontendController::class, 'vendorRegister'])->name('vendor.register');
 
 Route::get('contact',[FrontendController::class, 'contact'])->name('contact');
+Route::post('contact',[FrontendController::class,'contactMessage'])->name('contactMessage');
 
 
 

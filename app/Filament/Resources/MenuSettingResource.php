@@ -22,7 +22,7 @@ class MenuSettingResource extends Resource
 {
     protected static ?string $model = MenuSetting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-4';
 
     public static function form(Form $form): Form
     {

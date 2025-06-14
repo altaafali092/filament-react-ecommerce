@@ -139,14 +139,12 @@ const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null 
               </li>
               <li>
                 <Link href={route('policyPage')} className="text-white/70 hover:text-pink-400 transition-colors">
-                  Privacy & Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/returns" className="text-white/70 hover:text-pink-400 transition-colors">
+                  Privacy & Policy <br/>
                   Terms & Conditions
+
                 </Link>
               </li>
+              
               <li>
                 <Link href={route('contact')} className="text-white/70 hover:text-pink-400 transition-colors">
                   Contact Us

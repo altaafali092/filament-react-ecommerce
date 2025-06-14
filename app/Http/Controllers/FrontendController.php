@@ -11,6 +11,7 @@ use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\SliderResource;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\PrivacyPolicyResource;
 use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\FAQ;
@@ -20,6 +21,7 @@ use App\Models\ShippingAddress;
 use App\Models\Slider;
 use App\Models\Category;
 use App\Models\Contact;
+use App\Models\PrivacyPolicy;
 use App\Models\User;
 
 use App\Services\CartService;
@@ -151,9 +153,21 @@ class FrontendController extends Controller
     }
     public function contactMessage(StoreContactMesaageRequest $request)
     {
-        
+
         Contact::create($request->validated());
 
         return back()->with('success', 'Your message successfully submitted');
     }
+
+    public function policyPage()
+{
+    $privacy = PrivacyPolicy::where('term', 'privacy_policy')->latest()->get();
+    $terms = PrivacyPolicy::where('term', 'term_and_condition')->latest()->get();
+
+    return Inertia::render('Frontend/FAQ/policy', [
+        'privacyPolicies' => PrivacyPolicyResource::collection($privacy)->toArray(request()),
+        'termsPolicies' => PrivacyPolicyResource::collection($terms)->toArray(request()),
+    ]);
+}
+
 }

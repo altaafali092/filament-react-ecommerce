@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PrivacyTermEnum;
 use App\Filament\Resources\PrivacyPolicyResource\Pages;
 use App\Filament\Resources\PrivacyPolicyResource\RelationManagers;
 use App\Models\PrivacyPolicy;
 use Dom\Text;
 use Filament\Forms;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -27,6 +29,9 @@ class PrivacyPolicyResource extends Resource
     {
         return $form
             ->schema([
+                Select::make('term')
+                    ->options(PrivacyTermEnum::class)
+                    ->required(),
                 RichEditor::make('content')
                 ->required()
                 ->columnSpanFull(),
@@ -37,6 +42,8 @@ class PrivacyPolicyResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('term')
+                  ->searchable(),
                 TextColumn::make('content')
                     ->limit(100)
                     ->html(false),
@@ -46,6 +53,7 @@ class PrivacyPolicyResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

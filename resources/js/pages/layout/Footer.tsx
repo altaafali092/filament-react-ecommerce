@@ -138,13 +138,13 @@ const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null 
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-white/70 hover:text-pink-400 transition-colors">
-                  Shipping Info
+                <Link href={route('policyPage')} className="text-white/70 hover:text-pink-400 transition-colors">
+                  Privacy & Policy
                 </Link>
               </li>
               <li>
                 <Link href="/returns" className="text-white/70 hover:text-pink-400 transition-colors">
-                  Returns & Exchanges
+                  Terms & Conditions
                 </Link>
               </li>
               <li>

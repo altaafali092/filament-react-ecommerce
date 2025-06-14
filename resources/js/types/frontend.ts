@@ -216,3 +216,11 @@ export interface CategoryWithProducts {
     image: string;
     products: PaginatedProducts;
 }
+
+
+
+export type IFrontPolicy = {
+    id: number;
+    term:string,
+    content: string;
+}

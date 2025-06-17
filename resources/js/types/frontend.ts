@@ -173,6 +173,7 @@ export type IFrontFAQ = {
 export type IfrontBanner = {
     id: number;
     title: string;
+    data:string;
 }
 export type IfrontCategory = {
     id: number;
@@ -224,3 +225,23 @@ export type IFrontPolicy = {
     term:string,
     content: string;
 }
+
+export interface IFrontMenu {
+    id: number;
+    menu_id: number | null; // Could be null depending on structure
+    title: string;
+    slug: string;
+    menu_type: string;
+    menuable_id: number | null; // Can vary based on polymorphic relation
+    menuable_key: string | null;
+    menu_url: string | null;
+    position: number;
+    is_active: boolean;
+    children: Array<{
+        id: number;
+        title: string;
+        slug: string;
+        
+      }>
+ 
+  }

@@ -2,7 +2,7 @@ import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
 export interface Auth {
-    user: User;
+    user: User | null;
 }
 
 export interface BreadcrumbItem {

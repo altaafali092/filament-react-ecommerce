@@ -124,6 +124,7 @@ class FrontendController extends Controller
     public function shopByCategory(Request $request, Category $category)
     {
 
+        
         $products = $category->products()
             ->where('status', 'published')
             ->orderBy('id', 'desc')

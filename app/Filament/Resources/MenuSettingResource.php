@@ -30,7 +30,7 @@ class MenuSettingResource extends Resource
             ->schema([
                 Select::make('menu_id')
                     ->label('Parent Menu')
-                    ->relationship('menu', 'title')
+                    ->relationship('parent', 'title')
                     ->searchable()
                     ->preload()
                     ->nullable(),
@@ -57,17 +57,10 @@ class MenuSettingResource extends Resource
 
                 Select::make('menuable_key')
                     ->label('Static Page')
-                    ->options([
-                        'index' => 'Index',
-                        'about' => 'About Us',
-                        'blogs'=>'Blogs',
-                        'faqs'=>'FAQs',
-                      
-                    ])
+                    ->options(config('MenuFile.static_pages'))
                     ->visible(fn(Forms\Get $get) => $get('menu_type') === 'static')
                     ->searchable()
                     ->preload(),
-
                 Forms\Components\TextInput::make('menu_url')
                     ->visible(fn(Forms\Get $get) => $get('menu_type') === 'url'),
 
@@ -84,7 +77,7 @@ class MenuSettingResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('menu.title')->label('Parent Title'),
+                TextColumn::make('parent.title')->label('Parent Title'),
                 Tables\Columns\TextColumn::make('title')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('menu_type')->badge(),
                 Tables\Columns\TextColumn::make('url')->label('Link'),

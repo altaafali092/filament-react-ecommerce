@@ -34,53 +34,49 @@ class MenuSetting extends Model
 
     protected $appends = ['url'];
 
-    protected $with = ['menus'];
+    // 👇 Eager load children
+    protected $with = ['children'];
 
-    /*
-     |--------------------------------------------------------------------------
-     | Accessors
-     |--------------------------------------------------------------------------
-     */
     public function url(): Attribute
     {
         return Attribute::get(function ($value, array $attributes) {
             $this->loadMissing('menuable');
-
             return match ($attributes['menu_type']) {
-            
-                MenuTypeEnum::CATEGORY->value,
+                // MenuTypeEnum::CATEGORY->value => route('front.shopByCategory', $attributes['slug']),
+                MenuTypeEnum::CATEGORY->value =>route('shopByCategory', ['category' => $attributes['slug']]),
                 MenuTypeEnum::STATIC->value => route('front.static', $attributes['slug']),
                 default => '#',
             };
         });
     }
 
-    
+
     protected static function booted(): void
     {
         static::saving(function ($menuSetting) {
+            $menuSetting->loadMissing('menuable');
             if ($menuSetting->menu_type === 'static') {
                 $menuSetting->menu_url = route('front.static', ['slug' => $menuSetting->slug]);
+            }
+            if ($menuSetting->menu_type === MenuTypeEnum::CATEGORY->value && $menuSetting->menuable) {
+                $menuSetting->menu_url = route('shopByCategory', [
+                    'category' => $menuSetting->menuable->name // or use slug if your route uses slug
+                ]);
             }
         });
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | Relationships
-     |--------------------------------------------------------------------------
-     */
-    public function menu(): BelongsTo
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(MenuSetting::class, 'menu_id');
     }
 
-    public function menus(): HasMany
+    public function children(): HasMany
     {
         return $this->hasMany(MenuSetting::class, 'menu_id');
     }
 
-    public function menuable() // 👈 Add this method
+    public function menuable()
     {
         return $this->morphTo();
     }

@@ -3,17 +3,18 @@
 namespace App\Filament\Resources\DepartmentResource\RelationManagers;
 
 use App\Models\Category;
-use BladeUI\Icons\Components\Icon;
-use Doctrine\DBAL\Query\From;
+use Illuminate\Support\Str;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 
 class CategoriesRelationManager extends RelationManager
 {
@@ -26,23 +27,28 @@ class CategoriesRelationManager extends RelationManager
             ->schema([
 
                 FileUpload::make('image')
-                ->label('Image')
-                ->disk('public') // or 's3' if you are using S3
-                ->directory('category') // folder inside storage/app/public
-                ->visibility('public')
-                ->image()
-                ->required()
-                ->maxSize(1024) // 5MB
-                ->helperText('Upload a JPG/PNG image (max: 5MB).'),
-
-                Forms\Components\TextInput::make('name')
+                    ->label('Image')
+                    ->disk('public') // or 's3' if you are using S3
+                    ->directory('category') // folder inside storage/app/public
+                    ->visibility('public')
+                    ->image()
                     ->required()
-                    ->maxLength(255),
+                    ->maxSize(1024) // 5MB
+                    ->helperText('Upload a JPG/PNG image (max: 5MB).'),
 
-                Forms\Components\TextInput::make('description')
-                ->label('Short Description'),
-              
-                Forms\Components\Select::make('parent_id')
+                TextInput::make('name')
+                    ->required()
+                    ->label('Category Name')
+                    ->maxLength(255)
+                    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state))),
+
+                TextInput::make('slug')
+                    ->required(),
+
+                TextInput::make('description')
+                    ->label('Short Description'),
+
+                Select::make('parent_id')
                     ->options(function () use ($department) {
                         return Category::query()
                             ->where('department_id', $department->id)

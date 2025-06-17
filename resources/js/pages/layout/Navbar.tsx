@@ -12,7 +12,11 @@ import {
 import { Link } from '@inertiajs/react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
 import Banner from '@/components/Forontend/Banner';
-import { IfrontBanner, IFrontOfficeSetting } from '@/types/frontend';
+import { IfrontBanner, IFrontMenu, IFrontOfficeSetting } from '@/types/frontend';
+import Logo from '@/components/Forontend/Menu/Logo';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import SearchBar from '@/components/Forontend/Menu/SearchBar';
 
 // Define CartItems type
 interface CartItems {
@@ -27,10 +31,10 @@ type Category = string | { name: string; dropdown: string[] };
 // Define props for auth and user
 interface Auth {
   user:
-    | {
-        name: string;
-      }
-    | null;
+  | {
+    name: string;
+  }
+  | null;
 }
 
 // Define Navbar props
@@ -41,24 +45,14 @@ interface NavbarProps {
   miniCartItems: CartItems[];
 }
 
-const categories: Category[] = [
-  'NEW DROPS',
-  'TRENDING NOW',
-  'SILK SAREES',
-  {
-    name: 'COTTON VIBES',
-    dropdown: ['Banarasi Cotton', 'Chanderi Cotton', 'Embroidered Cotton', 'Kanchi Cotton'],
-  },
-  'COLLECTIONS',
-  'FUSION FITS',
-  'READY TO SLAY',
-  'OUR STORY',
-];
 
 const Navbar = () => {
   const { props } = usePage<NavbarProps>();
   const { banners } = usePage<{ banners: IfrontBanner[] }>().props;
-  const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
+
+  const { menus } = usePage<{ menus: IFrontMenu[] }>().props;
+  const topLevelMenus = menus.filter((m) => m.menu_id === null)
+
   const { auth, totalQuantity = 0, totalPrice = 0, miniCartItems = [] } = props;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -73,7 +67,6 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
-
     const handleClickOutside = (event: MouseEvent) => {
       if (isCartOpen && !(event.target as Element).closest('.cart-dropdown')) {
         setIsCartOpen(false);
@@ -118,9 +111,8 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
-      }`}
+      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
+        }`}
     >
       {/* Announcement Banner */}
       <Banner banners={banners} />
@@ -128,22 +120,9 @@ const Navbar = () => {
       {/* Main Navbar Container */}
       <div className="flex justify-between items-center px-4 md:px-8 py-3">
         {/* Logo */}
-        <Link href={route('home')}>
-          <img
-            src={officeSettings?.office_logo ?? ''}
-            alt="RMKV Wedding Silks"
-            className="h-10 md:h-12 w-[100px]"
-          />
-        </Link>
-
+        <Logo />
         {/* Mobile Icons and Menu Toggle */}
         <div className="md:hidden flex items-center space-x-4">
-          <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="relative overflow-hidden group">
-            <Search
-              className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
-            />
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-          </button>
 
           {auth.user ? (
             <>
@@ -232,47 +211,72 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <ul
-          className={`hidden md:flex md:space-x-6 font-medium ${
-            scrolled ? 'text-gray-900' : 'text-white'
-          } transition-colors duration-300`}
-        >
-          {categories.map((item, index) =>
-            typeof item === 'string' ? (
-              <li key={index} className="cursor-pointer relative overflow-hidden group">
-                <span className="group-hover:text-pink-500 transition-colors">{item}</span>
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-              </li>
-            ) : (
-              <li key={index} className="relative group cursor-pointer">
-                <div className="relative overflow-hidden">
-                  <span
-                    className={`flex items-center group-hover:text-pink-500 transition-colors ${
-                      scrolled ? '' : 'text-white'
-                    }`}
-                    onClick={() => handleDropdownToggle(item.name)}
-                  >
-                    {item.name}{' '}
-                    <ChevronDown className="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" />
-                  </span>
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                </div>
-                <div className="absolute left-0 hidden group-hover:block bg-white/95 backdrop-blur-md shadow-lg rounded-xl p-3 mt-2 min-w-[250px] opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 border border-pink-100">
-                  {item.dropdown.map((subItem, subIndex) => (
-                    <a
-                      key={subIndex}
-                      href="#"
-                      className="block px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200 relative overflow-hidden group/item"
+        <ul className="hidden md:flex space-x-8 items-center">
+          {topLevelMenus.map((item) => {
+            const hasChildren = item.children?.data?.length > 0;
+
+            // Determine link based on menu_type
+            const getLink = () => {
+              if (item.menu_type === 'static') {
+                return route('front.static', { slug: item.slug });
+              } else if (item.menu_type === 'category') {
+                return `/shopByCategory/${item.slug}`;
+              }
+              return item.menu_url || '#';
+            };
+
+            return (
+              <li key={item.id}>
+                {hasChildren ? (
+                  // Dropdown Menu
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className={`px-2 py-1 text-md font-semibold flex items-center gap-1 transition-colors duration-200 ${scrolled ? 'text-gray-900' : 'text-white'
+                          } hover:text-pink-500`}
+                      >
+                        {item.title}
+                        <ChevronDown className="w-4 h-4 transition-transform duration-300" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="bg-white shadow-xl rounded-lg p-2 mt-1 border border-pink-100 min-w-[180px]"
+                      align="start"
                     >
-                      <span>{subItem}</span>
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover/item:w-full transition-all duration-300"></span>
-                    </a>
-                  ))}
-                </div>
+                      {item.children.data.map((child) => (
+                        <DropdownMenuItem key={child.id} asChild>
+                          <Link
+                            href={
+                              child.menu_type === 'static'
+                                ? route('front.static', { slug: child.slug })
+                                : child.menu_type === 'category'
+                                  ? `/shopByCategory/${child.slug}`
+                                  : child.menu_url || '#'
+                            }
+                            className="block px-3 py-2 text-sm text-gray-800 rounded-md hover:bg-pink-50 hover:text-pink-600 transition-all"
+                          >
+                            {child.title}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  // Regular Link
+                  <Link
+                    href={getLink()}
+                    className={`px-2 py-1 text-md font-semibold transition-colors duration-200 ${scrolled ? 'text-gray-900' : 'text-white'
+                      } hover:text-pink-500`}
+                  >
+                    {item.title}
+                  </Link>
+                )}
               </li>
-            ),
-          )}
+            );
+          })}
         </ul>
+
 
         {/* Desktop Icons */}
         <div className="hidden md:flex items-center space-x-5">
@@ -320,10 +324,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-md text-white hover:text-pink-500">
+              <Link href="/login" className={`text-md hover:text-pink-500 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
                 Log in
               </Link>
-              <Link href="/register" className="text-md text-white hover:text-pink-500">
+              <Link href="/register" className={`text-md w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
                 Register
               </Link>
             </>
@@ -384,71 +388,76 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Search Bar Overlay */}
-      {isSearchOpen && (
-        <div className="absolute top-full left-0 w-full bg-white shadow-md p-4 animate-slideDown">
-          <div className="relative max-w-3xl mx-auto">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="w-full py-3 pl-4 pr-10 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300"
-              autoFocus
-            />
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <button
-              className="absolute -top-1 -right-1 bg-gray-200 rounded-full p-1"
-              onClick={() => setIsSearchOpen(false)}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+
+
+      <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg animate-slideDown">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg animate-slideDown z-50">
           <ul className="flex flex-col p-4 font-medium divide-y divide-gray-100">
-            {categories.map((item, index) =>
-              typeof item === 'string' ? (
-                <li
-                  key={index}
-                  className="py-3 cursor-pointer hover:text-pink-500 transition-colors text-gray-900"
-                >
-                  {item}
+            {topLevelMenus.map((item) => {
+              const hasChildren = item.children?.data?.length > 0;
+
+              return (
+                <li key={item.id} className="py-3 cursor-pointer">
+                  {hasChildren ? (
+                    <>
+                      <div
+                        className="flex justify-between items-center"
+                        onClick={() => handleDropdownToggle(item.title)}
+                      >
+                        <span className="hover:text-pink-500 transition-colors text-gray-900">
+                          {item.title}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === item.title ? 'rotate-180 text-pink-500' : ''
+                            }`}
+                        />
+                      </div>
+
+                      {/* Submenu */}
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${activeDropdown === item.title ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                          }`}
+                      >
+                        <ul className="space-y-2 pl-4 bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
+                          {item.children.data.map((child) => (
+                            <li
+                              key={child.id}
+                              className="text-gray-700 hover:text-pink-600 transition-colors py-1.5"
+                            >
+                              <Link href={
+                                child.menu_type === 'static'
+                                  ? route('front.static', { slug: child.slug })
+                                  : child.menu_type === 'category'
+                                    ? `/shopByCategory/${child.slug}`
+                                    : child.menu_url || '#'
+                              }>
+                                {child.title}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <Link
+                      href={
+                        item.menu_type === 'static'
+                          ? route('front.static', { slug: item.slug })
+                          : item.menu_type === 'category'
+                            ? `/shopByCategory/${item.slug}`
+                            : item.menu_url || '#'
+                      }
+                      className="block hover:text-pink-500 transition-colors"
+                    >
+                      {item.title}
+                    </Link>
+                  )}
                 </li>
-              ) : (
-                <li key={index} className="py-3 cursor-pointer">
-                  <div
-                    className="flex justify-between items-center"
-                    onClick={() => handleDropdownToggle(item.name)}
-                  >
-                    <span className="hover:text-pink-500 transition-colors text-gray-900">{item.name}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        activeDropdown === item.name ? 'rotate-180 text-pink-500' : ''
-                      }`}
-                    />
-                  </div>
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      activeDropdown === item.name ? 'max-h-60 opacity-100 mt-2' : 'max-h-0 opacity-0'
-                    }`}
-                  >
-                    <ul className="space-y-2 pl-4 bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg">
-                      {item.dropdown.map((subItem, subIndex) => (
-                        <li
-                          key={subIndex}
-                          className="text-gray-700 hover:text-pink-600 transition-colors py-1.5"
-                        >
-                          {subItem}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-              ),
-            )}
+              );
+            })}
           </ul>
         </div>
       )}

@@ -134,7 +134,7 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <Link href="/login" className="text-sm text-white hover:text-pink-500">
+            <Link href="/login" className={`text-sm ${scrolled ? 'text-gray-700' : 'text-white'} hover:text-pink-500`}>
               Log in
             </Link>
           )}

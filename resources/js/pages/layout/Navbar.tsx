@@ -319,14 +319,21 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <div>
-              <Link href={route('login')} className={`text-md hover:text-pink-500 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
-                login
-              </Link>
-              <Link href="/register" className={`text-md w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
-                Register
-              </Link>
-            </div>
+            <div className="flex items-center">
+            <Link 
+              href={route('login')} 
+              className={`text-md font-medium px-4 py-2 rounded-lg  transition 
+                ${scrolled ? 'text-gray-700 border-gray-300 hover:bg-gray-100' : 'text-white border-white hover:bg-white hover:text-pink-500'}`}>
+              Login
+            </Link>
+            <Link 
+              href="/register" 
+              className={`text-md font-medium px-4 py-2 rounded-lg  transition 
+                ${scrolled ? 'text-gray-700 border-gray-300 hover:bg-gray-100' : 'text-white border-white hover:bg-white hover:text-pink-500'}`}>
+              Register
+            </Link>
+          </div>
+          
           )}
 
           {/* Cart Button for Desktop */}

@@ -1,5 +1,7 @@
 import AppLogoIcon from '@/components/app-logo-icon';
+import Logo from '@/components/Forontend/Menu/Logo';
 import { type SharedData } from '@/types';
+import { IFrontOfficeSetting } from '@/types/frontend';
 import { Link, usePage } from '@inertiajs/react';
 import { Home } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
@@ -11,6 +13,7 @@ interface AuthLayoutProps {
 
 export default function AuthSplitLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
     const { quote } = usePage<SharedData>().props;
+    const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
 
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
@@ -34,9 +37,9 @@ export default function AuthSplitLayout({ children, title, description }: PropsW
                         href={route('home')}
                         className="relative z-20 flex items-center text-lg font-medium hover:scale-105 transition-transform duration-300"
                     >
-                        <AppLogoIcon className="mr-2 size-8 fill-current text-white drop-shadow-lg" />
-                        <span className="bg-gradient-to-r from-white via-white to-purple-100 bg-clip-text text-transparent font-bold drop-shadow-lg">
-                            Xyz Fashion hub
+                       <Logo/>
+                        <span className="bg-gradient-to-r ml-2 from-white via-white to-purple-100 bg-clip-text text-transparent font-bold drop-shadow-lg">
+                            {officeSettings?.office_name}
                         </span>
                     </Link>
 

@@ -13,6 +13,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { LayoutGrid, Menu } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
+import Logo from './Forontend/Menu/Logo';
 
 const mainNavItems: NavItem[] = [
     {
@@ -84,7 +85,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <Link href="/dashboard" prefetch className="flex items-center space-x-2">
-                        <AppLogo />
+                        <Logo/>
                     </Link>
 
                     {/* Desktop Navigation */}

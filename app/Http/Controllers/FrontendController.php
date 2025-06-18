@@ -124,7 +124,7 @@ class FrontendController extends Controller
     public function shopByCategory(Request $request, Category $category)
     {
 
-        
+
         $products = $category->products()
             ->where('status', 'published')
             ->orderBy('id', 'desc')
@@ -161,14 +161,17 @@ class FrontendController extends Controller
     }
 
     public function policyPage()
-{
-    $privacy = PrivacyPolicy::where('term', 'privacy_policy')->latest()->get();
-    $terms = PrivacyPolicy::where('term', 'term_and_condition')->latest()->get();
+    {
+        $privacy = PrivacyPolicy::where('term', 'privacy_policy')->latest()->get();
+        $terms = PrivacyPolicy::where('term', 'term_and_condition')->latest()->get();
 
-    return Inertia::render('Frontend/FAQ/policy', [
-        'privacyPolicies' => PrivacyPolicyResource::collection($privacy)->toArray(request()),
-        'termsPolicies' => PrivacyPolicyResource::collection($terms)->toArray(request()),
-    ]);
-}
+        return Inertia::render('Frontend/FAQ/policy', [
+            'privacyPolicies' => PrivacyPolicyResource::collection($privacy)->toArray(request()),
+            'termsPolicies' => PrivacyPolicyResource::collection($terms)->toArray(request()),
+        ]);
+    }
 
+    public function check(){
+        return "hello";
+    }
 }

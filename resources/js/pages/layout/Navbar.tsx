@@ -12,23 +12,19 @@ import {
 import { Link } from '@inertiajs/react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
 import Banner from '@/components/Forontend/Banner';
-import { IfrontBanner, IFrontMenu, IFrontOfficeSetting } from '@/types/frontend';
+import { CartItems, IfrontBanner, IFrontMenu } from '@/types/frontend';
 import Logo from '@/components/Forontend/Menu/Logo';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/Forontend/Menu/SearchBar';
 
-// Define CartItems type
-interface CartItems {
-  id: number;
-  title: string;
-  price: number;
-}
 
-// Define Category type for the categories array
-type Category = string | { name: string; dropdown: string[] };
+// interface CartItems {
+//   id: number;
+//   title: string;
+//   price: number;
+// }
 
-// Define props for auth and user
 interface Auth {
   user:
   | {
@@ -134,7 +130,7 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <Link href="/login" className={`text-sm ${scrolled ? 'text-gray-700' : 'text-white'} hover:text-pink-500`}>
+            <Link href="/login" className="text-sm text-white hover:text-pink-500">
               Log in
             </Link>
           )}
@@ -211,7 +207,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-8 items-center">
+        <ul className="hidden md:flex space-x-4 items-center">
           {topLevelMenus.map((item) => {
             const hasChildren = item.children?.data?.length > 0;
 
@@ -323,14 +319,14 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <>
-              <Link href="/login" className={`text-md hover:text-pink-500 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
-                Log in
+            <div>
+              <Link href={route('login')} className={`text-md hover:text-pink-500 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
+                login
               </Link>
               <Link href="/register" className={`text-md w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
                 Register
               </Link>
-            </>
+            </div>
           )}
 
           {/* Cart Button for Desktop */}

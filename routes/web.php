@@ -47,10 +47,11 @@ Route::post('contact',[FrontendController::class,'contactMessage'])->name('conta
 Route::get('policy-page',[FrontendController::class, 'policyPage'])->name('policyPage');
 
 
-Route::get('/{slug}', [StaticPageController::class, 'show'])
-    ->name('front.static');
-
 
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
+
+
+Route::get('/{slug}', [StaticPageController::class, 'show'])
+    ->name('front.static');

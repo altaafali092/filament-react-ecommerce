@@ -237,11 +237,14 @@ export interface IFrontMenu {
     menu_url: string | null;
     position: number;
     is_active: boolean;
-    children: Array<{
-        id: number;
-        title: string;
-        slug: string;
-        
-      }>
+    children: {
+        data: Array<{
+            id: number;
+            title: string;
+            slug: string;
+            menu_type: string;
+            menu_url: string | null;
+        }>;
+    }
  
   }

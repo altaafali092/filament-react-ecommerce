@@ -10,7 +10,7 @@ import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'User Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
 ];
 
@@ -22,13 +22,7 @@ export default function Dashboard() {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
 
-    // const submit = (e: any) => {
-    //     e.preventDefault();
-    //     (route('profile.becomeVendor'), {
-    //         preserveScroll: true,
-    //     });
-    // };
-
+   
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="User Profile" />

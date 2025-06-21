@@ -19,10 +19,10 @@ class Order extends Model
     protected $fillable = [
         'payment_session_id',
         'user_id',
-        'vendor_user_id', // Add this field
+        'vendor_user_id', 
         'total_price',
         'status',
-        'payment_method', // Add this field
+        'payment_method', 
         'online_payment_commission',
         'website_subtotal',
         'vendor_subtotal',
@@ -47,18 +47,6 @@ class Order extends Model
         return $this->belongsTo(Vendor::class,'vendor_user_id','user_id');
     }
 
-
-    
-    
-
-
-    // protected function status(): Attribute
-    // {
-    //     return Attribute::make(
-    //         get: fn(string $value) => strtolower($value),
-    //         set: fn(string $value) => strtolower($value),
-    //     );
-    // }
 
 
     protected static function booted()

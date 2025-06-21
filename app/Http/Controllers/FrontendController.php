@@ -11,6 +11,7 @@ use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\SliderResource;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\OrderViewResource;
 use App\Http\Resources\PrivacyPolicyResource;
 use App\Models\Banner;
 use App\Models\Blog;
@@ -21,6 +22,7 @@ use App\Models\ShippingAddress;
 use App\Models\Slider;
 use App\Models\Category;
 use App\Models\Contact;
+use App\Models\Order;
 use App\Models\PrivacyPolicy;
 use App\Models\User;
 
@@ -171,7 +173,30 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function check(){
-        return "hello";
+    public function orderPage()
+    {
+        $user = Auth::user();
+        $totalOrder=Order::where('user_id', $user->id)->count();
+        $pending=Order::where('user_id', $user->id)->where('status','pending')->count();
+        $cancelled=Order::where('user_id', $user->id)->where('status','cancelled')->count();
+        $draft=Order::where('user_id',$user->id)->where('status','draft')->count();
+        $delivered=Order::where('user_id',$user->id)->where('status','delivered')->count();
+        
+        $orders = Order::with([
+            'vendorUser.vendor',  // ✅ load vendorUser and vendor
+        ])
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return Inertia::render('Frontend/OrderPage/Index', [
+            'orders' => OrderViewResource::collection($orders)->toArray(request()),
+            'totalOrder'=>$totalOrder,
+            'pending'=>$pending,
+            'cancelled'=>$cancelled,
+            'draft'=>$draft,
+            'delivered'=>$delivered
+            
+        ]);
     }
 }

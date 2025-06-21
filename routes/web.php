@@ -37,6 +37,7 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/checkout', [FrontendController::class, 'showCheckout'])->name('checkout.detail');
     Route::get('/payment/success', [PaymentControlller::class, 'success'])->name('payment.success');
     Route::get('/payment/fail', [PaymentControlller::class, 'failure'])->name('payment.fail');
+    Route::get('/order', [FrontendController::class, 'orderPage'])->name('orderPage');
 });
 
 Route::get('vendor-register', [FrontendController::class, 'vendorRegisterPage'])->name('vendor.registerPage');

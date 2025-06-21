@@ -176,27 +176,41 @@ class FrontendController extends Controller
     public function orderPage()
     {
         $user = Auth::user();
-        $totalOrder=Order::where('user_id', $user->id)->count();
-        $pending=Order::where('user_id', $user->id)->where('status','pending')->count();
-        $cancelled=Order::where('user_id', $user->id)->where('status','cancelled')->count();
-        $draft=Order::where('user_id',$user->id)->where('status','draft')->count();
-        $delivered=Order::where('user_id',$user->id)->where('status','delivered')->count();
-        
-        $orders = Order::with([
-            'vendorUser.vendor',  // ✅ load vendorUser and vendor
-        ])
+        $totalOrder = Order::where('user_id', $user->id)->count();
+        $pending = Order::where('user_id', $user->id)->where('status', 'pending')->count();
+        $cancelled = Order::where('user_id', $user->id)->where('status', 'cancelled')->count();
+        $draft = Order::where('user_id', $user->id)->where('status', 'draft')->count();
+        $delivered = Order::where('user_id', $user->id)->where('status', 'delivered')->count();
+    
+        $query = Order::query();
+        if (request('name')) {
+            $query->whereHas('orderItems', function ($query) {
+                $query->whereHas('product', function ($query) {
+                    $query->where('title', 'like', '%' . request('name') . '%');
+                });
+            });
+        }
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+    
+        $orders = $query->with(['vendorUser.vendor'])
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->get();
-
+    
         return Inertia::render('Frontend/OrderPage/Index', [
             'orders' => OrderViewResource::collection($orders)->toArray(request()),
-            'totalOrder'=>$totalOrder,
-            'pending'=>$pending,
-            'cancelled'=>$cancelled,
-            'draft'=>$draft,
-            'delivered'=>$delivered
-            
+            'totalOrder' => $totalOrder,
+            'pending' => $pending,
+            'cancelled' => $cancelled,
+            'draft' => $draft,
+            'delivered' => $delivered,
+            'filters' => [
+                'name' => request('name'),
+                'status' => request('status'),
+            ],
         ]);
     }
+    
 }

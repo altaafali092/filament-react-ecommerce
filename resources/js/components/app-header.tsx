@@ -10,7 +10,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Menu } from 'lucide-react';
+import { LayoutGrid, Menu, ShoppingBagIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import Logo from './Forontend/Menu/Logo';
@@ -24,7 +24,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Order Lists',
         href: route('orderPage'),
-        icon: LayoutGrid,
+        icon: ShoppingBagIcon,
     },
   
 ];

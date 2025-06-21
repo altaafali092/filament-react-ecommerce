@@ -4,22 +4,28 @@ import { usePage } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Eye } from "lucide-react"
+import { Eye, Search } from "lucide-react"
 import { Order } from "@/types/frontend"
+import StatusCard from "./StatusCard"
+import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 // ✅ Define your props type
 type OrdersPageProps = {
   orders: Order[]
-  totalOrder:number
-  pending:number
-  processing:number
-  cancelled:number
-  draft:number
-  delivered:number
+  totalOrder: number
+  pending: number
+  processing: number
+  cancelled: number
+  draft: number
+  delivered: number
 }
 
 export default function OrdersPage() {
-  const { orders,totalOrder,pending,processing,cancelled,draft,delivered } = usePage<OrdersPageProps>().props
+  const { orders, totalOrder, pending, processing, cancelled, draft, delivered } = usePage<OrdersPageProps>().props
+
+  const [searchTerm, setSearchTerm] = useState("")
+
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -34,6 +40,15 @@ export default function OrdersPage() {
       day: "numeric",
     })
   }
+  
+
+  const statusCards = [
+    { title: "Total Orders", value: totalOrder, color: "text-black" },
+    { title: "Processing", value: draft, color: "text-blue-600" },
+    { title: "Pending", value: pending, color: "text-yellow-600" },
+    { title: "Cancelled", value: cancelled, color: "text-red-600" },
+    { title: "Delivered", value: delivered, color: "text-green-600" }
+  ];
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -46,47 +61,32 @@ export default function OrdersPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Orders</CardDescription>
-              <CardTitle className="text-2xl">{totalOrder}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Processing</CardDescription>
-              <CardTitle className="text-2xl text-blue-600">{draft}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Pending</CardDescription>
-              <CardTitle className="text-2xl text-yellow-600">{pending}</CardTitle>
-            </CardHeader>
-          </Card>
-         
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Cancelled</CardDescription>
-              <CardTitle className="text-2xl text-red-600">{cancelled}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Delivered</CardDescription>
-              <CardTitle className="text-2xl text-green-600">{delivered}</CardTitle>
-            </CardHeader>
-          </Card>
-
-        
+          {statusCards.map((card, index) => (
+            <StatusCard key={index} title={card.title} value={card.value} color={card.color} />
+          ))}
         </div>
+
         <Card>
           <CardHeader>
             <CardTitle>Orders ({orders.length})</CardTitle>
-            <CardDescription>
-              {orders.length > 0 ? `Showing ${orders.length} orders` : "No orders found"}
-            </CardDescription>
+            <div className="flex gap-4">
+              <CardDescription>
+                {orders.length > 0 ? `Showing ${orders.length} orders` : "No orders found"}
+              </CardDescription>
+              <div className="relative w-full sm:w-[300px] ml-auto">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
           </CardHeader>
+
           <CardContent>
             <div className="rounded-md border">
               <Table>

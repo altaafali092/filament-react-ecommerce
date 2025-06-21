@@ -9,17 +9,15 @@ import OrderList from '@/components/Forontend/Order/OrderList';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
-    // {
-    //     title: 'Order Lists',
+    {
+        title: 'Order Lists',
 
-    //     href: route('orderPage'),
-    // },
+        href: route('orderPage'),
+    },
 ];
 
 export default function Index() {
-    // const { auth } = usePage<SharedData>().props;
-   
-
+  
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order Lists" />

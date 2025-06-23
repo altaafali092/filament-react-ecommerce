@@ -129,6 +129,9 @@ export type Order = {
     };
     orderItems: OrderItem[];
     flash: FlashProps;
+    user: User;
+    shippingAddress: Shipping[];
+    
 }
 
 export type Shipping = {

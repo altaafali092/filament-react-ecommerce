@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\UserResource as ResourcesUserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,6 +24,7 @@ class OrderViewResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
             'vendorUser' => new VendorUserResource($this->vendorUser),
+            'user' => new UserResource($this->user),
             'orderItems' => $this->orderItems->map(fn($item) => [
                 'id' => $this->id,
                 'quantity' => $item->quantity,

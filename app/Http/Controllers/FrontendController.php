@@ -181,7 +181,7 @@ class FrontendController extends Controller
         $cancelled = Order::where('user_id', $user->id)->where('status', 'cancelled')->count();
         $draft = Order::where('user_id', $user->id)->where('status', 'draft')->count();
         $delivered = Order::where('user_id', $user->id)->where('status', 'delivered')->count();
-    
+
         $query = Order::query();
         if (request('name')) {
             $query->whereHas('orderItems', function ($query) {
@@ -193,12 +193,12 @@ class FrontendController extends Controller
         if (request('status')) {
             $query->where('status', request('status'));
         }
-    
+
         $orders = $query->with(['vendorUser.vendor'])
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->get();
-    
+
         return Inertia::render('Frontend/OrderPage/Index', [
             'orders' => OrderViewResource::collection($orders)->toArray(request()),
             'totalOrder' => $totalOrder,
@@ -212,5 +212,12 @@ class FrontendController extends Controller
             ],
         ]);
     }
-    
+
+    public function orderDetail(Order $order)
+    {
+        $order->load(['user','user.shippingAddress']);
+        return Inertia::render('Frontend/OrderPage/OrderDetail', [
+            'order' => new OrderViewResource($order),
+        ]);
+    }
 }

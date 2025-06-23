@@ -1,6 +1,6 @@
 "use client"
 
-import { usePage } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -10,7 +10,7 @@ import StatusCard from "./StatusCard"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 
-// ✅ Define your props type
+
 type OrdersPageProps = {
   orders: Order[]
   totalOrder: number
@@ -40,7 +40,7 @@ export default function OrdersPage() {
       day: "numeric",
     })
   }
-  
+
 
   const statusCards = [
     { title: "Total Orders", value: totalOrder, color: "text-black" },
@@ -129,8 +129,10 @@ export default function OrdersPage() {
                         <TableCell className="font-medium">{formatCurrency(order.total_price)}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm">
-                            <Eye className="w-4 h-4" />
-                            <span className="sr-only">View order details</span>
+                            <Link href={route('orderDetail', order.id)} >
+                              <Eye className="w-4 h-4" />
+                            </Link>
+
                           </Button>
                         </TableCell>
                       </TableRow>

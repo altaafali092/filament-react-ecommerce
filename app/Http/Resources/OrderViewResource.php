@@ -17,6 +17,7 @@ class OrderViewResource extends JsonResource
     public static $wrap = false;
     public function toArray(Request $request): array
     {
+
         return [
 
             'id' => $this->id,
@@ -26,16 +27,16 @@ class OrderViewResource extends JsonResource
             'vendorUser' => new VendorUserResource($this->vendorUser),
             'user' => new UserResource($this->user),
             'orderItems' => $this->orderItems->map(fn($item) => [
-                'id' => $this->id,
+                'id' => $item->id,
                 'quantity' => $item->quantity,
                 'price' => $item->price,
-                'variation_type_option_ids' => $item->variation_type_option_ids,
+                'variation_type_options_ids' => $item->variation_type_options_ids,
                 'product' => [
                     'id' => $item->product->id,
                     'title' => $item->product->title,
                     'slug' => $item->product->slug,
                     'description' => $item->product->description,
-                    'image' => $item->product->getImagesForOptions($item->variation_type_option_ids ?: []),
+                    'image' => $item->product->getImagesForOptions($item->variation_type_options_ids ?: []),
                 ]
 
             ])

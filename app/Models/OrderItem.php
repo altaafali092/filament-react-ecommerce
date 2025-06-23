@@ -20,8 +20,9 @@ class OrderItem extends Model
     ];
 
     protected $casts = [
-        'variation_type_option_ids' => 'array'
+        'variation_type_options_ids' => 'array', 
     ];
+    
 
     public function order(): BelongsTo
     {

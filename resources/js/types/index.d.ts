@@ -1,5 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
+import { Shipping } from './frontend';
 
 export interface Auth {
     user: User | null;
@@ -42,6 +43,7 @@ export interface User {
     updated_at: string;
     status: number;
     [key: string]: unknown; // This allows for additional properties...
+    shippingAddress: Shipping;
 }
 
 

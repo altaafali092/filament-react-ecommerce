@@ -1,14 +1,13 @@
-"use client";
 
-import AppLayout from '@/layouts/app-layout';
-import { Head, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { Order } from '@/types/frontend';
-import { BreadcrumbItem, User } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Pencil } from 'lucide-react';
-import { UserInfo } from '@/components/user-info';
-import { UserDetail } from './UserDetail';
+import  UserDetail  from './UserDetail';
+import ShippingDetail from './ShippingDetail';
+import OrderSummary from './OrderSummary';
+import OrderItem from './OrderItem';
 
 export default function OrderDetailPage() {
   const { order } = usePage<{order:Order[]}>().props;
@@ -73,68 +72,16 @@ export default function OrderDetailPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Items</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {order.orderItems.map(item => (
-                    <div key={item.id} className="flex items-center gap-4 border rounded-lg p-4">
-                      <img src={item.product.image} alt={item.product.title} className="h-16 w-16 rounded" />
-                      <div className="flex-1">
-                        <p className="font-medium">{item.product.title}</p>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                      </div>
-                      <div className="font-medium">{formatCurrency(item.price)}</div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+           <OrderItem order={order}/>
           </div>
 
           {/* RIGHT SIDE */}
           <div className="flex flex-col gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>{formatCurrency(order.total_price)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>{formatCurrency(5.98)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>{formatCurrency(24.00)}</span>
-                </div>
-                <hr />
-                <div className="flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span>{formatCurrency(order.total_price + 5.98 + 24.00)}</span>
-                </div>
-              </CardContent>
-            </Card>
+           <OrderSummary order={order}/>
 
           <UserDetail order={order}/>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Shipping Address</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div>
-                  <p className="font-medium">{order.user?.shippingAddress?.full_address}</p>
-                  <p className="text-sm text-gray-500">{order.user?.shippingAddress?.city},{order.user?.shippingAddress?.district},{order.user?.shippingAddress?.province}</p>
-                  <p className="text-sm text-gray-500">{order.user?.shippingAddress?.nearest_landmarks},{order.user?.shippingAddress?.postal_code}</p>
-                </div>
-              </CardContent>
-            </Card>
+           <ShippingDetail order={order}/>
           </div>
         </div>
       </div>

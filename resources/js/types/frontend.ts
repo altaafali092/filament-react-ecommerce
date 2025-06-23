@@ -105,7 +105,7 @@ export type OrderItem = {
     id: number;
     quantity: number;
     price: number;
-    variation_type_option_ids: number[];
+    variation_type_option_ids: Record<number, number>; 
     product: {
         id: number;
         title: string;
@@ -113,8 +113,8 @@ export type OrderItem = {
         description: string;
         image: string;
     }
-
 }
+
 export type Order = {
     id: number;
     total_price: number;
@@ -130,7 +130,6 @@ export type Order = {
     orderItems: OrderItem[];
     flash: FlashProps;
     user: User;
-    shippingAddress: Shipping[];
     
 }
 

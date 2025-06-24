@@ -95,7 +95,6 @@ class OrderResource extends Resource
                         if ($user->hasRole('vendor')) {
                             return [
                                 'draft' => 'Draft',
-                                'pending' => 'Pending',
                                 'processing' => 'Processing',
                                 'vendor delivered at store' => 'Vendor Delivered at Store',
                             ];
@@ -104,15 +103,11 @@ class OrderResource extends Resource
                         // For super_admin or other roles
                         return [
                             'draft' => 'Draft',
-                            'pending' => 'Pending',
                             'processing' => 'Processing',
                             'vendor droped at store' => 'Vendor Delivered at Store',
                             'picked up' => 'Picked Up',
-                            'out for delivery' => 'Out for Delivery',
-                            'reached at store' => 'Reached at Store',
-                            'ready to deliver' => 'Ready to Deliver',
+                            'on the way' => 'On the way',
                             'delivered' => 'Delivered',
-                            'completed' => 'Completed',
                             'cancelled' => 'Cancelled',
                         ];
                     })

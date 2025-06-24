@@ -23,6 +23,7 @@ class OrderViewResource extends JsonResource
             'id' => $this->id,
             'total_price' => $this->total_price,
             'status' => $this->status,
+            'payment_method' => $this->payment_method,
             'created_at' => $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
             'vendorUser' => new VendorUserResource($this->vendorUser),
             'user' => new UserResource($this->user),

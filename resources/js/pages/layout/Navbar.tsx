@@ -19,12 +19,6 @@ import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/Forontend/Menu/SearchBar';
 
 
-// interface CartItems {
-//   id: number;
-//   title: string;
-//   price: number;
-// }
-
 interface Auth {
   user:
   | {
@@ -299,6 +293,12 @@ const Navbar = () => {
                       className="block px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200"
                     >
                       Profile
+                    </Link>
+                    <Link
+                      href={route('orderPage')}
+                      className="block px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200"
+                    >
+                      Order List
                     </Link>
                     <Link
                       href={route('logout')}

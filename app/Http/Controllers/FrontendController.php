@@ -221,4 +221,12 @@ class FrontendController extends Controller
             'order' => new OrderViewResource($order),
         ]);
     }
+
+    public function invoice(Order $order)
+    {
+        $order->load(['user', 'user.shippingAddress', 'orderItems.product']);
+        return Inertia::render('Frontend/OrderPage/InvoicePage', [
+            'order' => new OrderViewResource($order),
+        ]);
+    }
 }

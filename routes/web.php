@@ -38,16 +38,16 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/payment/success', [PaymentControlller::class, 'success'])->name('payment.success');
     Route::get('/payment/fail', [PaymentControlller::class, 'failure'])->name('payment.fail');
     Route::get('order', [FrontendController::class, 'orderPage'])->name('orderPage');
-    Route::get('order-detail/{order}',[FrontendController::class, 'orderDetail'])->name('orderDetail');
-
+    Route::get('order-detail/{order}', [FrontendController::class, 'orderDetail'])->name('orderDetail');
+    Route::get('orders/{order}/invoice', [FrontendController::class, 'invoice'])->name('orders.invoice');
 });
 
 Route::get('vendor-register', [FrontendController::class, 'vendorRegisterPage'])->name('vendor.registerPage');
 Route::post('vendor-register', [FrontendController::class, 'vendorRegister'])->name('vendor.register');
 
-Route::get('contact',[FrontendController::class, 'contact'])->name('contact');
-Route::post('contact',[FrontendController::class,'contactMessage'])->name('contactMessage');
-Route::get('policy-page',[FrontendController::class, 'policyPage'])->name('policyPage');
+Route::get('contact', [FrontendController::class, 'contact'])->name('contact');
+Route::post('contact', [FrontendController::class, 'contactMessage'])->name('contactMessage');
+Route::get('policy-page', [FrontendController::class, 'policyPage'])->name('policyPage');
 
 
 

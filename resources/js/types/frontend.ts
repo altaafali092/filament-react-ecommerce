@@ -26,7 +26,7 @@ export type VariationTypeOption = {
     name: string;
     images: Image[];
     type: VariationType;
-    
+    price: number;
 };
 
 export interface IFrontProduct {
@@ -122,6 +122,7 @@ export type Order = {
     total_price: number;
     status: string;
     created_at: string;
+    payment_method:string
     vendorUser: {
         id: string;
         name: string;

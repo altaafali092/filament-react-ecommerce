@@ -215,8 +215,8 @@ class FrontendController extends Controller
 
     public function orderDetail(Order $order)
     {
-       
-        $order->load(['user','user.shippingAddress']);
+        $order->load(['user', 'user.shippingAddress', 'orderItems.product']);
+
         return Inertia::render('Frontend/OrderPage/OrderDetail', [
             'order' => new OrderViewResource($order),
         ]);

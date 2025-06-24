@@ -26,13 +26,14 @@ export type VariationTypeOption = {
     name: string;
     images: Image[];
     type: VariationType;
+    
 };
 
 export interface IFrontProduct {
     id: number;
     title: string;
-    sale_price:number| null;
-    is_featured:boolean;
+    sale_price: number | null;
+    is_featured: boolean;
     slug: string;
     price: number;
     quantity: number;
@@ -105,7 +106,8 @@ export type OrderItem = {
     id: number;
     quantity: number;
     price: number;
-    variation_type_option_ids: Record<number, number>; 
+    variation_type_option_ids: Record<number, number>;
+    variation_details: VariationTypeOption[];
     product: {
         id: number;
         title: string;
@@ -130,7 +132,7 @@ export type Order = {
     orderItems: OrderItem[];
     flash: FlashProps;
     user: User;
-    
+
 }
 
 export type Shipping = {
@@ -175,7 +177,7 @@ export type IFrontFAQ = {
 export type IfrontBanner = {
     id: number;
     title: string;
-    data:string;
+    data: string;
 }
 export type IfrontCategory = {
     id: number;
@@ -183,7 +185,7 @@ export type IfrontCategory = {
     image: string;
     is_featured: boolean;
     description: string;
-    product:IFrontProduct[] 
+    product: IFrontProduct[]
 }
 
 export type IFrontOfficeSetting = {
@@ -224,7 +226,7 @@ export interface CategoryWithProducts {
 
 export type IFrontPolicy = {
     id: number;
-    term:string,
+    term: string,
     content: string;
 }
 
@@ -248,5 +250,5 @@ export interface IFrontMenu {
             menu_url: string | null;
         }>;
     }
- 
-  }
+
+}

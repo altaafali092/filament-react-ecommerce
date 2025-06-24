@@ -34,4 +34,30 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function getVariationDetailsAttribute()
+{
+    $result = [];
+
+    if (!is_array($this->variation_type_options_ids)) {
+        return $result;
+    }
+
+    foreach ($this->variation_type_options_ids as $variationTypeId => $optionId) {
+        $type = \App\Models\VariationType::find($variationTypeId);
+        $option = \App\Models\VariationTypeOption::find($optionId);
+
+        if ($type && $option) {
+            $result[] = [
+                'type_id' => $type->id,
+                'type_name' => $type->name,
+                'option_id' => $option->id,
+                'option_name' => $option->name,
+            ];
+        }
+    }
+
+    return $result;
+}
+
 }

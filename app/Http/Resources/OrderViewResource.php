@@ -31,6 +31,7 @@ class OrderViewResource extends JsonResource
                 'quantity' => $item->quantity,
                 'price' => $item->price,
                 'variation_type_options_ids' => $item->variation_type_options_ids,
+                  'variation_details' => $item->variation_details,
                 'product' => [
                     'id' => $item->product->id,
                     'title' => $item->product->title,

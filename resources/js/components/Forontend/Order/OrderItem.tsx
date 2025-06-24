@@ -8,9 +8,7 @@ type OrderItemProps = {
 }
 
 const OrderItem = ({ order }: OrderItemProps) => {
-    console.log(order)
     return (
-
         <Card>
             <CardHeader>
                 <CardTitle>Order Items</CardTitle>
@@ -23,16 +21,15 @@ const OrderItem = ({ order }: OrderItemProps) => {
                             <div className="flex-1">
                                 <p className="font-medium">{item.product.title}</p>
                                 <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                                <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+
                                 <div className="text-sm text-gray-500">
                                     Variations:{" "}
-                                    {Object.entries(item.variation_type_options_ids).map(([typeId, optionId]) => (
-                                        <span key={typeId} className="mr-2">
-                                            Type {typeId}: Option {optionId}
+                                    {item.variation_details.map((variation, index) => (
+                                        <span key={index} className="mr-2">
+                                            {variation.type_name}: {variation.option_name}
                                         </span>
                                     ))}
                                 </div>
-
                             </div>
                             <div className="font-medium"><CurrencyFormatter amount={item.price} /></div>
                         </div>

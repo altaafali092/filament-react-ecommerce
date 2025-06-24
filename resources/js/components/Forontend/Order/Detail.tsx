@@ -3,7 +3,7 @@ import { useReactToPrint } from 'react-to-print';
 import { usePage } from '@inertiajs/react';
 import { IFrontOfficeSetting, Order } from '@/types/frontend';
 import { Button } from '@/components/ui/button';
-import { Download, Pencil, Printer } from 'lucide-react';
+import { Pencil, Printer } from 'lucide-react';
 import UserDetail from './UserDetail';
 import ShippingDetail from './ShippingDetail';
 import OrderSummary from './OrderSummary';
@@ -14,12 +14,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 export default function OrderDetailPage() {
   const { order } = usePage<{ order: Order }>().props;
-   const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
+  const { officeSettings } = usePage<{ officeSettings: IFrontOfficeSetting | null }>().props;
   const [open, setOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    documentTitle: 'Invoice',
+    content: () => printRef.current as HTMLElement,
   });
+
 
   const formatDateTime = (dateString: string): string => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -67,7 +70,7 @@ export default function OrderDetailPage() {
           </div>
 
           <div className="flex justify-end mt-4">
-            <Button onClick={handlePrint}><Download className="w-4 h-4 mr-2" /> Download</Button>
+            <Button onClick={handlePrint}><Printer className="w-4 h-4 mr-2" /> Download</Button>
           </div>
         </DialogContent>
       </Dialog>

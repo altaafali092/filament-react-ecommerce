@@ -60,7 +60,7 @@ export default function OrderDetailPage() {
 
       {/* Invoice Popup */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="lg:max-w-4xl">
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:w-10 md:w-auto md:max-w-2xl lg:max-w-4xl">
           <DialogHeader>
             <DialogTitle>Invoice</DialogTitle>
           </DialogHeader>

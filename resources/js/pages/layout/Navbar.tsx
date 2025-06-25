@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  ShoppingCartIcon,
 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import CurrencyFormatter from '@/components/CurrencyFormatter';
@@ -119,8 +120,13 @@ const Navbar = () => {
               <button>
                 <User className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
               </button>
-              <button>
-                <Heart className={`w-5 h-5 ${scrolled ? 'text-gray-700' : 'text-white'}`} />
+            <button className="relative overflow-hidden group">
+               <Link href={route('orderPage')}>
+                <ShoppingCartIcon
+                  className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
+                />
+               </Link>
+
               </button>
             </>
           ) : (
@@ -294,12 +300,7 @@ const Navbar = () => {
                     >
                       Profile
                     </Link>
-                    <Link
-                      href={route('orderPage')}
-                      className="block px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-pink-600 rounded-lg transition-all duration-200"
-                    >
-                      Order List
-                    </Link>
+                    
                     <Link
                       href={route('logout')}
                       method="post"
@@ -312,10 +313,12 @@ const Navbar = () => {
                 )}
               </div>
               <button className="relative overflow-hidden group">
-                <Heart
+               <Link href={route('orderPage')}>
+                <ShoppingCartIcon
                   className={`w-5 h-5 cursor-pointer ${scrolled ? 'text-gray-700' : 'text-white'} group-hover:text-pink-500 transition-colors`}
                 />
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+               </Link>
+
               </button>
             </>
           ) : (

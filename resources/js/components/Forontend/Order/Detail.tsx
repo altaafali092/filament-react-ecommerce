@@ -73,6 +73,7 @@ export default function OrderDetailPage() {
             <Button onClick={handlePrint}><Printer className="w-4 h-4 mr-2" /> Download</Button>
           </div>
         </DialogContent>
+        
       </Dialog>
     </div>
   );

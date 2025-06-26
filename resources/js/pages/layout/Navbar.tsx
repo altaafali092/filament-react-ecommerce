@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import {
   Search,
   User,
-  Heart,
   ShoppingBag,
   Menu,
   X,

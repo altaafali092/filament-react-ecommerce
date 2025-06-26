@@ -166,8 +166,6 @@ const ProductDetail = () => {
             const foundOption = type.options.find((op) => op.id === selectedOptionId) || type.options[0]
             chooseOption(type.id, foundOption, false)
         }
-
-        // Initialize price with the default computed price
         form.setData("price", product.price)
     }, [])
 

@@ -18,7 +18,6 @@ export default function Dashboard() {
     const { auth } = usePage<SharedData>().props;
     const isVendor = auth.user.role?.toLowerCase() === 'vendor';
     const isActive = auth.user.status === 1;
-    const [ setShowForm] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
 
 

@@ -34,10 +34,6 @@ const ContactForm = () => {
   });
 };
 
-
-
-
-
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white/30 backdrop-blur-md rounded-lg shadow-md">
 

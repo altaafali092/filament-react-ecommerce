@@ -1,11 +1,9 @@
 
-
 import AppLayout from '@/layouts/app-layout';
-import { Head, router, usePage } from '@inertiajs/react';
-import { SharedData, type BreadcrumbItem } from '@/types';
+
+import { type BreadcrumbItem } from '@/types';
 import Detail from '@/components/Forontend/Order/Detail';
-
-
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

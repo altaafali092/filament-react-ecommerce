@@ -52,9 +52,15 @@ export default function SliderMain({
     setIsDragging(true)
   }
 
-  const handleTouchMove = (_e: React.TouchEvent | React.MouseEvent) => {
+  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (!isDragging) return
-    // Implementation would go here for drag effect
+    
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
+    const diff = startX - clientX
+
+    // Add visual feedback during drag
+    const element = e.currentTarget as HTMLElement
+    element.style.transform = `translateX(${-diff}px)`
   }
 
   const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {

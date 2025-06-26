@@ -15,14 +15,14 @@ type OrdersPageProps = {
   orders: Order[]
   totalOrder: number
   pending: number
-  processing: number
   cancelled: number
   draft: number
   delivered: number
 }
 
 export default function OrdersPage() {
-  const { orders, totalOrder, pending, processing, cancelled, draft, delivered } = usePage<OrdersPageProps>().props
+const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<OrdersPageProps>().props
+
 
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -44,7 +44,7 @@ export default function OrdersPage() {
 
   const statusCards = [
     { title: "Total Orders", value: totalOrder, color: "text-black" },
-    { title: "Processing", value: draft, color: "text-blue-600" },
+    { title: "Draft", value: draft, color: "text-blue-600" },
     { title: "Pending", value: pending, color: "text-yellow-600" },
     { title: "Cancelled", value: cancelled, color: "text-red-600" },
     { title: "Delivered", value: delivered, color: "text-green-600" }

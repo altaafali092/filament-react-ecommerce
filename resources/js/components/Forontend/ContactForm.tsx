@@ -25,14 +25,15 @@ const ContactForm = () => {
     phone: '',
     message: '',
   })
-  const onSubmit = (e: any) => {
-    e.preventDefault();
-    post(route('contactMessage'), {
-      onSuccess: () => {
-        reset();
-      }
-    })
-  }
+ const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  post(route('contactMessage'), {
+    onSuccess: () => {
+      reset();
+    },
+  });
+};
+
 
 
 

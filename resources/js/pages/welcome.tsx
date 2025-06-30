@@ -34,7 +34,9 @@ export default function Welcome() {
                     <Slider  sliders={sliders}/>
                 </div>
                 <div className="relative z-10">
+
                     <ShopByCategory  categories={categories} />
+                    
                 </div>
                 <div className="relative z-10">
                 <NewArrivial products={products?.data ?? []} />

@@ -5,8 +5,7 @@ import { usePage } from "@inertiajs/react";
 
 
 export default function Home() {
-  // Sample FAQ data
-  const { faqs } = usePage<{ faqs: IFrontFAQ[] }>().props;
+  const { faqs } = usePage<{ faqs: IFrontFAQ }>().props;
 
   return (
     <main className="bg-pink-50">

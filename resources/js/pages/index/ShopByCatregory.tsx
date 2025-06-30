@@ -68,7 +68,7 @@ export default function ShopByCategory() {
                                 >
                                     {category.description}
                                 </p>
-                                {/* <Link
+                                <Link
                                    href={route('shopByCategory', { category: category.slug })}
                                     className={`inline-flex items-center text-sm font-medium bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-full border border-white/30 hover:bg-white hover:text-pink-600 transition-all duration-300 ${
                                         hoveredId === category.id
@@ -77,7 +77,7 @@ export default function ShopByCategory() {
                                     }`}
                                 >
                                     Shop Now <ArrowRight className="ml-2 h-4 w-4" />
-                                </Link> */}
+                                </Link>
                             </div>
                         </div>
                     ))}

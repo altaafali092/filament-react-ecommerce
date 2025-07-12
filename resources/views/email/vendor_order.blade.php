@@ -5,8 +5,17 @@
 </head>
 <body>
     <h1>New Order #{{ $order->id }}</h1>
-    <p>A new order has been received from {{ $order->user->name ?? 'Customer' }}.</p>
-    <p>Total Amount: {{ $order->total_price }}</p>
+
+    <p>
+        A new order has been received from
+        {{ optional($order->user)->name ?? 'Customer' }}.
+    </p>
+
+    <p>
+        Store: {{ optional($order->vendor)->store_name ?? 'Unknown Store' }}
+    </p>
+
+    <p>Total Amount: ₹{{ number_format($order->total_price, 2) }}</p>
     <p>Please process it as soon as possible.</p>
 </body>
 </html>

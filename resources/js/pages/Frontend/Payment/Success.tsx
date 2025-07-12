@@ -56,7 +56,7 @@ function Success({ orders }: PageProps<{ orders: { data: Order[] } }>) {
                     href="#"
                     className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                   >
-                    {order.vendorUser.store_name}
+                    {order.vendorUser?.store_name}
                   </Link>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -70,7 +70,7 @@ function Success({ orders }: PageProps<{ orders: { data: Order[] } }>) {
                   </span>
                 </div>
                 <Separator className="my-2" />
-                <Link href="#">
+                <Link href={route('orderDetail', { order: order.id })}>
                   <Button
                     variant="outline"
                     className="w-full bg-transparent border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-gray-900 transition-colors"

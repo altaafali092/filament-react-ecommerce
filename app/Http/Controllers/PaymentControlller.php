@@ -46,7 +46,7 @@ class PaymentControlller extends Controller
         // Get most recent orders for this user
         $orders = Order::where('user_id', $user->id)
             ->orderByDesc('created_at')
-            ->limit(10) // or however many you want to show
+            ->limit(1) // or however many you want to show
             ->get();
 
         if ($orders->isEmpty()) {

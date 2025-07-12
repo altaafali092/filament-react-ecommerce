@@ -58,6 +58,7 @@ export interface IFrontProduct {
         quantity: number;
         price: number;
     }>;
+    is_out_of_stock: boolean;
 
 }
 export type paginationProps<T> = {
@@ -122,7 +123,7 @@ export type Order = {
     total_price: number;
     status: string;
     created_at: string;
-    payment_method:string
+    payment_method: string
     vendorUser: {
         id: string;
         name: string;

@@ -30,19 +30,16 @@ class ProductDetailResource extends JsonResource
                     'thumb' => $image->getUrl('thumb'),
                     'small' => $image->getUrl('small'),
                     'large' => $image->getUrl('large'),
-
                 ];
             }),
             'user' => [
                 'id' => $this->created_by,
-                'name' => $this->user->name,
+                'name' => $this->user?->name,
             ],
             'department' => [
-                'id' => $this->department->id,
-                'name' => $this->department->name,
+                'id' => $this->department?->id,
+                'name' => $this->department?->name,
             ],
-
-
             'variationTypes' => $this->variationTypes->map(function ($variationType) {
                 return [
                     'id' => $variationType->id,
@@ -64,16 +61,18 @@ class ProductDetailResource extends JsonResource
                     }),
                 ];
             }),
-
             'variations' => $this->variations->map(function ($variation) {
                 return [
                     'id' => $variation->id,
                     'variation_type_option_ids' => $variation->variation_types_option_ids,
                     'quantity' => $variation->quantity,
                     'price' => $variation->price,
+                    'stock_quantity' => $variation->stock_quantity,
+                    'in_stock' => !$variation->isOutOfStock(),
                 ];
-            })
-
+            }),
+            'in_stock' => !$this->isOutOfStock(),
+            'has_in_stock_variation' => $this->hasInStockVariation(), // optional
         ];
     }
 }

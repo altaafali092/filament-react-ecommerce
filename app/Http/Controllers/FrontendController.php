@@ -38,7 +38,7 @@ class FrontendController extends Controller
 {
     public function index()
     {
-        $products = Product::where('status', 'published')->paginate(10);
+        $products = Product::where('status', 'published')->latest()->paginate(10);
         $blogs = Blog::where('status', 1)->limit(3)->latest()->get();
         $sliders = Slider::where('status', 1)->latest()->get();
         $faqs = FAQ::where('status', 1)->limit(5)->latest()->get();

@@ -96,9 +96,6 @@ export default function NewArrivals({ products }: IndexProps) {
                                         Buy Now
                                     </Link>
 
-
-
-
                                 </div>
 
                             </div>

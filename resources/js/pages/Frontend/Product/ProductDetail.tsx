@@ -54,7 +54,6 @@ const ProductDetail = () => {
             .map((op) => op.id)
             .sort();
 
-        // Ensure product.variations exists before calling find
         const matchedVariation = product.variations?.find(v =>
             arraysAreEqual(
                 (v.variation_type_option_ids || []).sort(),
@@ -65,9 +64,11 @@ const ProductDetail = () => {
         return matchedVariation ? {
             price: matchedVariation.price,
             quantity: matchedVariation.quantity ?? 0,
+            in_stock: matchedVariation.in_stock,
         } : {
             price: product.price,
             quantity: product.quantity,
+            in_stock: product.in_stock,
         };
     }, [product, selectedOptions]);
 
@@ -247,7 +248,7 @@ const ProductDetail = () => {
         return product.images
     }, [product, selectedOptions])
 
-    const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
+    const isInStock = useMemo(() => computedProduct.in_stock, [computedProduct])
 
 
 
@@ -260,20 +261,15 @@ const ProductDetail = () => {
                 <AuthLayout>
                     <div className="min-h-screen">
                         <div className="container mx-auto px-4 py-12 max-w-6xl">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-40">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-30">
                                 {/* Image Gallery */}
                                 <div className="space-y-6">
-                                    <div className="aspect-square bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden border">
+                                    <div className="aspect-square bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden border relative">
                                         <img
                                             src={images[activeImage]?.large || "/placeholder.svg"}
                                             alt={product.title}
                                             className="w-full h-full object-cover transition-opacity duration-300"
                                         />
-                                        {!isInStock && (
-                                            <div className="absolute inset-0 bg-white/90 dark:bg-black/90 backdrop-blur-sm flex items-center justify-center">
-                                                <div className="text-xl font-medium">Out of Stock</div>
-                                            </div>
-                                        )}
                                     </div>
 
                                     {images.length > 1 && (
@@ -298,12 +294,13 @@ const ProductDetail = () => {
                                     )}
                                 </div>
 
+
                                 {/* Product Info */}
-                                <div className="space-y-8">
+                                <div className="space-y-2">
                                     {/* Header Section */}
-                                    <div className="space-y-4 pb-2 border-b dark:border-gray-800">
+                                    <div className="space-y-2 pb-2 border-b dark:border-gray-800">
                                         <div>
-                                            <h1 className="text-3xl font-light text-gray-900 dark:text-white mb-1">
+                                            <h1 className="text-2xl font-light text-gray-900 dark:text-white mb-1">
                                                 {product.title}
                                             </h1>
                                             <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -340,78 +337,65 @@ const ProductDetail = () => {
 
                                     {/* Quantity & Cart */}
                                     <div className="space-y-6">
-                                        {isInStock ? (
-                                            <div className="space-y-6">
-                                                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                                                    {/* Selected Options */}
-                                                    {Object.keys(selectedOptions).length > 0 && (
-                                                        <div className="flex-1">
-                                                            <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 lg:mb-0">
-                                                                Selected options
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {Object.entries(selectedOptions).map(([typeId, option]) => (
-                                                                    <div
-                                                                        key={typeId}
-                                                                        className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 rounded-full"
-                                                                    >
-                                                                        {option.name}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
+                                        <div className="space-y-6">
+                                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                                                {/* Selected Options */}
+                                                {Object.keys(selectedOptions).length > 0 && (
+                                                    <div className="flex-1">
+                                                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 lg:mb-0">
+                                                            Selected options
                                                         </div>
-                                                    )}
-
-                                                    {/* Quantity Controls */}
-                                                    <div className="w-full lg:w-auto flex items-center justify-between gap-4">
-                                                        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full p-1">
-                                                            <button
-                                                                onClick={decrementQuantity}
-                                                                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
-                                                                disabled={form.data.quantity <= 1}
-                                                            >
-                                                                <Minus className="w-5 h-5" />
-                                                            </button>
-                                                            <span className="w-8 text-center">
-                                                                {form.data.quantity}
-                                                            </span>
-                                                            <button
-                                                                onClick={incrementQuantity}
-                                                                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
-                                                                disabled={form.data.quantity >= computedProduct.quantity}
-                                                            >
-                                                                <Plus className="w-5 h-5" />
-                                                            </button>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {Object.entries(selectedOptions).map(([typeId, option]) => (
+                                                                <div
+                                                                    key={typeId}
+                                                                    className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 rounded-full"
+                                                                >
+                                                                    {option.name}
+                                                                </div>
+                                                            ))}
                                                         </div>
+                                                    </div>
+                                                )}
 
+                                                {/* Quantity Controls & Add to Cart */}
+                                                <div className="w-full lg:w-auto flex items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full p-1">
                                                         <button
-                                                            onClick={addToCart}
-                                                            className="py-3.5 px-6 text-sm font-medium bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full transition-colors"
+                                                            onClick={decrementQuantity}
+                                                            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                                                            disabled={form.data.quantity <= 1 || !isInStock}
                                                         >
-                                                            Add to Cart —
-                                                            <CurrencyFormatter amount={Number((computedProduct.price * form.data.quantity).toFixed(2))} />
+                                                            <Minus className="w-5 h-5" />
+                                                        </button>
+                                                        <span className="w-8 text-center">
+                                                            {form.data.quantity}
+                                                        </span>
+                                                        <button
+                                                            onClick={incrementQuantity}
+                                                            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                                                            disabled={form.data.quantity >= computedProduct.quantity || !isInStock}
+                                                        >
+                                                            <Plus className="w-5 h-5" />
                                                         </button>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-center">
-                                                <div className="text-gray-500 dark:text-gray-400">
-                                                    Get notified when back in stock
-                                                </div>
-                                                <div className="mt-3 flex gap-2">
-                                                    <input
-                                                        type="email"
-                                                        placeholder="Enter your email"
-                                                        className="flex-1 px-4 py-2 text-sm bg-white dark:bg-gray-900 rounded-full border"
-                                                    />
-                                                    <button className="px-4 py-2 text-sm bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-full">
-                                                        Notify Me
+
+                                                    <button
+                                                        onClick={addToCart}
+                                                        disabled={!isInStock}
+                                                        className="py-3.5 px-6 text-sm font-medium rounded-full transition-colors
+                        bg-gray-900 text-white hover:bg-gray-800
+                        dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200
+                        disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Add to Cart —
+                                                        <CurrencyFormatter amount={Number((computedProduct.price * form.data.quantity).toFixed(2))} />
                                                     </button>
                                                 </div>
                                             </div>
-                                        )}
+                                        </div>
 
+                                        {/* Shipping/Checkout Info */}
                                         <div className="pt-4 border-t dark:border-gray-800">
                                             <div className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
                                                 <div className="flex items-center gap-3">
@@ -427,6 +411,7 @@ const ProductDetail = () => {
                                             </div>
                                         </div>
                                     </div>
+
 
                                     {/* Product Description */}
                                     <div className="pt-6">

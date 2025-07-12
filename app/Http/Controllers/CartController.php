@@ -41,23 +41,54 @@ class CartController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, CartService $cartService, Product $product)
-    {
-        $request->mergeIfMissing([
-            'quantity' => 1,
-        ]);
-        $data = $request->validate([
-            'option_ids' => ['nullable', 'array'],
-            'quantity' => ['required', 'integer', 'min:1'],
-        ]);
-        $cartService->addItemToCart(
-            $product,
-            $data['quantity'],
-            $data['option_ids'] ?: [],
+    // public function store(Request $request, CartService $cartService, Product $product)
+    // {
+    //     $request->mergeIfMissing([
+    //         'quantity' => 1,
+    //     ]);
+    //     $data = $request->validate([
+    //         'option_ids' => ['nullable', 'array'],
+    //         'quantity' => ['required', 'integer', 'min:1'],
+    //     ]);
+    //     $cartService->addItemToCart(
+    //         $product,
+    //         $data['quantity'],
+    //         $data['option_ids'] ?: [],
 
-        );
-        return back()->with('success', 'Item added to Cart Sucessfully');
+    //     );
+    //     return back()->with('success', 'Item added to Cart Sucessfully');
+    // }
+public function store(Request $request, CartService $cartService, Product $product)
+{
+    $request->mergeIfMissing([
+        'quantity' => 1,
+    ]);
+
+    $data = $request->validate([
+        'option_ids' => ['nullable', 'array'],
+        'quantity' => ['required', 'integer', 'min:1'],
+    ]);
+
+    // Check stock availability before adding to cart
+    $selectedVariation = $product->variations->first(function ($variation) use ($data) {
+        return collect($variation->variation_type_option_ids)->sort()->values()
+            ->toArray() === collect($data['option_ids'])->sort()->values()->toArray();
+    });
+
+    $availableQuantity = $selectedVariation->quantity ?? $product->quantity;
+
+    if ($data['quantity'] > $availableQuantity) {
+        return back()->with('error', 'Requested quantity exceeds available stock.');
     }
+
+    $cartService->addItemToCart(
+        $product,
+        $data['quantity'],
+        $data['option_ids'] ?: []
+    );
+
+    return back()->with('success', 'Item added to Cart Successfully');
+}
 
 
     /**
@@ -142,6 +173,7 @@ class CartController extends Controller
                 $shippingAddress = ShippingAddress::where('user_id', $order->user_id)->first();
                 //Send email to user
                 Mail::to($request->user()->email)->send(new UserOrderConfirmationMail($order, $shippingAddress));
+                
 
                 //  Send email to vendor
                 $vendorEmail = $user['email'] ?? null;

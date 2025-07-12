@@ -8,9 +8,12 @@ class ProductVariation extends Model
 {
     protected $guarded = [];
 
-   protected $casts = [
-    'variation_types_option_ids' => 'array',
-];
+    protected $casts = [
+        'variation_types_option_ids' => 'array',
+    ];
 
-
+    public function isOutOfStock(): bool
+    {
+        return $this->stock_quantity <= 0;
+    }
 }

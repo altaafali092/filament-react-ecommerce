@@ -2,14 +2,26 @@
 
 import { Link, usePage } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Eye, Search } from "lucide-react"
 import { Order } from "@/types/frontend"
 import StatusCard from "./StatusCard"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-
 
 type OrdersPageProps = {
   orders: Order[]
@@ -21,8 +33,14 @@ type OrdersPageProps = {
 }
 
 export default function OrdersPage() {
-const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<OrdersPageProps>().props
-
+  const {
+    orders,
+    totalOrder,
+    pending,
+    cancelled,
+    draft,
+    delivered,
+  } = usePage<OrdersPageProps>().props
 
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -41,15 +59,20 @@ const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<Ord
     })
   }
 
-
   const statusCards = [
     { title: "Total Orders", value: totalOrder, color: "text-black" },
     { title: "Draft", value: draft, color: "text-blue-600" },
     { title: "Pending", value: pending, color: "text-yellow-600" },
     { title: "Cancelled", value: cancelled, color: "text-red-600" },
-    { title: "Delivered", value: delivered, color: "text-green-600" }
-  ];
+    { title: "Delivered", value: delivered, color: "text-green-600" },
+  ]
 
+  // Corrected filtering logic
+  const filteredOrders = orders.filter((order) =>
+    order.orderItems.some((item) =>
+      item.product?.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  )
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="flex flex-col gap-6">
@@ -62,16 +85,23 @@ const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<Ord
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
           {statusCards.map((card, index) => (
-            <StatusCard key={index} title={card.title} value={card.value} color={card.color} />
+            <StatusCard
+              key={index}
+              title={card.title}
+              value={card.value}
+              color={card.color}
+            />
           ))}
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Orders ({orders.length})</CardTitle>
-            <div className="flex gap-4">
+            <CardTitle>Orders ({filteredOrders.length})</CardTitle>
+            <div className="flex gap-4 w-full">
               <CardDescription>
-                {orders.length > 0 ? `Showing ${orders.length} orders` : "No orders found"}
+                {filteredOrders.length > 0
+                  ? `Showing ${filteredOrders.length} orders`
+                  : "No orders found"}
               </CardDescription>
               <div className="relative w-full sm:w-[300px] ml-auto">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -84,7 +114,6 @@ const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<Ord
                 />
               </div>
             </div>
-
           </CardHeader>
 
           <CardContent>
@@ -101,42 +130,46 @@ const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<Ord
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.length === 0 ? (
+                  {filteredOrders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         No orders found matching your criteria
                       </TableCell>
                     </TableRow>
                   ) : (
-                    orders.map((order) => (
+                    filteredOrders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell className="font-medium">
                           {order.vendorUser?.store_name}
                         </TableCell>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium space-y-2">
                           {order.orderItems.map((item) => (
-                            <div key={item.id} className="flex gap-1">
-                              <img className="h-20 w-20 rounded-full" src={item.product.image} alt="" />
-                              <div key={item.id}>{item.product.title}</div>
-
+                            <div key={item.id} className="flex gap-2 items-center">
+                              <img
+                                className="h-12 w-12 rounded"
+                                src={item.product?.image}
+                                alt={item.product?.title}
+                              />
+                              <div>{item.product?.title}</div>
                             </div>
                           ))}
-
                         </TableCell>
-
                         <TableCell>{formatDate(order.created_at)}</TableCell>
                         <TableCell>{order.status}</TableCell>
-                        <TableCell className="font-medium">{formatCurrency(order.total_price)}</TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(order.total_price)}
+                        </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            <Link href={route('orderDetail', order.id)} >
+                          <Link href={route("orderDetail", order.id)}>
+                            <Button variant="ghost" size="sm">
                               <Eye className="w-4 h-4" />
-                            </Link>
-
-                          </Button>
+                            </Button>
+                          </Link>
                         </TableCell>
                       </TableRow>
-
                     ))
                   )}
                 </TableBody>
@@ -145,6 +178,6 @@ const { orders, totalOrder, pending, cancelled, draft, delivered } = usePage<Ord
           </CardContent>
         </Card>
       </div>
-    </div >
+    </div>
   )
 }

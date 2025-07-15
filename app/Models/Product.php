@@ -63,25 +63,7 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductVariation::class, 'product_id');
     }
     
-    public function isOutOfStock(): bool
-    {
-        // If product has variations, check if all are out of stock
-        if ($this->variations()->exists()) {
-            return $this->variations->every(fn($variation) => $variation->isOutOfStock());
-        }
-        return $this->stock_quantity <= 0;
-    }
-
-
-    public function hasInStockVariation(): bool
-    {
-        if (!$this->variations()->exists()) {
-            return !$this->isOutOfStock();
-        }
-        return $this->variations->contains(fn($variation) => !$variation->isOutOfStock());
-    }
-
-
+ 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

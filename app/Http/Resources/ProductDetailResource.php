@@ -67,12 +67,9 @@ class ProductDetailResource extends JsonResource
                     'variation_type_option_ids' => $variation->variation_types_option_ids,
                     'quantity' => $variation->quantity,
                     'price' => $variation->price,
-                    'stock_quantity' => $variation->stock_quantity,
-                    'in_stock' => !$variation->isOutOfStock(),
                 ];
             }),
-            'in_stock' => !$this->isOutOfStock(),
-            'has_in_stock_variation' => $this->hasInStockVariation(), // optional
+         
         ];
     }
 }

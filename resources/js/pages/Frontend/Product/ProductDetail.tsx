@@ -64,12 +64,11 @@ const ProductDetail = () => {
         return matchedVariation ? {
             price: matchedVariation.price,
             quantity: matchedVariation.quantity ?? 0,
-            in_stock: matchedVariation.in_stock,
         } : {
             price: product.price,
             quantity: product.quantity,
-            in_stock: product.in_stock,
         };
+
     }, [product, selectedOptions]);
 
     // In renderProductVariationTypes (stock check):
@@ -248,9 +247,7 @@ const ProductDetail = () => {
         return product.images
     }, [product, selectedOptions])
 
-    const isInStock = useMemo(() => computedProduct.in_stock, [computedProduct])
-
-
+const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
 
 

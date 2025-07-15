@@ -99,8 +99,6 @@ class ProductResource extends Resource
                 Select::make('status')
                     ->options(ProductEnum::labels())
                     ->default(ProductEnum::Draft->value)
-
-
             ]);
     }
 

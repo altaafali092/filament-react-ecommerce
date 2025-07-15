@@ -58,7 +58,7 @@ export interface IFrontProduct {
         quantity: number;
         price: number;
     }>;
-    is_out_of_stock: boolean;
+  
 
 }
 export type paginationProps<T> = {

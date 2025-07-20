@@ -50,17 +50,13 @@ const ProductDetail = () => {
 
 
     const computedProduct = useMemo(() => {
-        const selectedOptionIds = Object.values(selectedOptions)
-            .map((op) => op.id)
-            .sort();
-
+        const selectedOptionIds = Object.values(selectedOptions).map((op) => op.id).sort();
         const matchedVariation = product.variations?.find(v =>
             arraysAreEqual(
                 (v.variation_type_option_ids || []).sort(),
                 selectedOptionIds,
             )
         );
-
         return matchedVariation ? {
             price: matchedVariation.price,
             quantity: matchedVariation.quantity ?? 0,
@@ -68,7 +64,6 @@ const ProductDetail = () => {
             price: product.price,
             quantity: product.quantity,
         };
-
     }, [product, selectedOptions]);
 
     // In renderProductVariationTypes (stock check):
@@ -247,7 +242,7 @@ const ProductDetail = () => {
         return product.images
     }, [product, selectedOptions])
 
-const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
+    const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
 
 
@@ -310,8 +305,7 @@ const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
 
                                                 <CurrencyFormatter amount={computedProduct.price} />
                                             </div>
-                                            <div className={`flex items-center gap-2 text-sm ${isInStock ? 'text-green-600' : 'text-red-600'
-                                                }`}>
+                                            <div className={`flex items-center gap-2 text-sm ${isInStock ? 'text-green-600' : 'text-red-600'}`}>
                                                 {isInStock ? (
                                                     <>
                                                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -388,6 +382,7 @@ const isInStock = useMemo(() => computedProduct.quantity > 0, [computedProduct])
                                                         Add to Cart —
                                                         <CurrencyFormatter amount={Number((computedProduct.price * form.data.quantity).toFixed(2))} />
                                                     </button>
+
                                                 </div>
                                             </div>
                                         </div>

@@ -49,6 +49,20 @@ class CartService
             $this->updateItemQuantityInCookies($productId, $quantity, $optionIds);
         }
     }
+
+
+
+    public function clearCart()
+    {
+        if (Auth::check()) {
+            $userId = Auth::id();
+            CartItem::where('user_id', $userId)->delete();
+            $this->cachedCartItems = null;
+        } else {
+            Cookie::queue(Cookie::forget(self::COOKIE_NAME));
+            $this->cachedCartItems = null;
+        }
+    }
     public function removeItemFromCart(int $productId, $optionIds = null)
 
     {

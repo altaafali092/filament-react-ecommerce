@@ -11,6 +11,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Models\ShippingAddress;
 use App\Services\CartService;
 use Illuminate\Http\Request;
@@ -36,59 +37,51 @@ class CartController extends Controller
         ]);
     }
 
+    public function store(Request $request, CartService $cartService, Product $product)
+    {
+        // Merge default quantity if not provided
+        $request->mergeIfMissing([
+            'quantity' => 1,
+        ]);
 
+        // Validate input
+        $data = $request->validate([
+            'option_ids' => ['nullable', 'array'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request, CartService $cartService, Product $product)
-    // {
-    //     $request->mergeIfMissing([
-    //         'quantity' => 1,
-    //     ]);
-    //     $data = $request->validate([
-    //         'option_ids' => ['nullable', 'array'],
-    //         'quantity' => ['required', 'integer', 'min:1'],
-    //     ]);
-    //     $cartService->addItemToCart(
-    //         $product,
-    //         $data['quantity'],
-    //         $data['option_ids'] ?: [],
+        // Normalize option IDs
+        $optionIds = $data['option_ids'] ?? [];
 
-    //     );
-    //     return back()->with('success', 'Item added to Cart Sucessfully');
-    // }
-public function store(Request $request, CartService $cartService, Product $product)
-{
-    $request->mergeIfMissing([
-        'quantity' => 1,
-    ]);
+        // Sort and stringify for comparison
+        $normalizedOptionIds = collect($optionIds)->sort()->values()->toArray();
 
-    $data = $request->validate([
-        'option_ids' => ['nullable', 'array'],
-        'quantity' => ['required', 'integer', 'min:1'],
-    ]);
+        // Find the matching variation
+        $selectedVariation = $product->variations->first(function (ProductVariation $variation) use ($normalizedOptionIds) {
+            $variationOptionIds = is_string($variation->variation_type_option_ids)
+                ? json_decode($variation->variation_type_option_ids, true)
+                : $variation->variation_type_option_ids;
 
-    // Check stock availability before adding to cart
-    $selectedVariation = $product->variations->first(function ($variation) use ($data) {
-        return collect($variation->variation_type_option_ids)->sort()->values()
-            ->toArray() === collect($data['option_ids'])->sort()->values()->toArray();
-    });
+            return collect($variationOptionIds)->sort()->values()->toArray() === $normalizedOptionIds;
+        });
 
-    $availableQuantity = $selectedVariation->quantity ?? $product->quantity;
+        // Optional: fallback to product-level stock validation
+        if (!$selectedVariation) {
+            // Just validate, don't decrease
+            if ($product->quantity < $data['quantity']) {
+                return back()->with('error', 'Requested quantity exceeds available stock.');
+            }
+        } else {
+            if ($selectedVariation->quantity < $data['quantity']) {
+                return back()->with('error', 'Requested quantity exceeds available stock.');
+            }
+        }
 
-    if ($data['quantity'] > $availableQuantity) {
-        return back()->with('error', 'Requested quantity exceeds available stock.');
+        // ✅ Add to cart — no stock decrease
+        $cartService->addItemToCart($product, $data['quantity'], $optionIds);
+
+        return back()->with('success', 'Item added to Cart Successfully');
     }
-
-    $cartService->addItemToCart(
-        $product,
-        $data['quantity'],
-        $data['option_ids'] ?: []
-    );
-
-    return back()->with('success', 'Item added to Cart Successfully');
-}
 
 
     /**
@@ -120,35 +113,64 @@ public function store(Request $request, CartService $cartService, Product $produ
 
 
 
+
     public function checkout(Request $request, CartService $cartService)
     {
         $vendorId = $request->input('vendor_user_id');
-        $allCartItems = $cartService->getCartItemsGrouped();
+        $allCartItemsGrouped = $cartService->getCartItemsGrouped();
 
-        if (empty($allCartItems)) {
+        if (empty($allCartItemsGrouped)) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
         DB::beginTransaction();
 
         try {
-            $checkoutCartItems = $allCartItems;
+            $checkoutCartItems = $allCartItemsGrouped;
 
-            if ($vendorId && isset($allCartItems[$vendorId])) {
-                $checkoutCartItems = [$vendorId => $allCartItems[$vendorId]];
+            if ($vendorId && isset($allCartItemsGrouped[$vendorId])) {
+                $checkoutCartItems = [$vendorId => $allCartItemsGrouped[$vendorId]];
             }
 
             $orders = [];
 
-            foreach ($checkoutCartItems as $vendorUserId => $item) {
-                $user = $item['user'];
-                $cartItems = $item['items'];
+            foreach ($checkoutCartItems as $vendorUserId => $vendorCart) {
+                $cartItems = $vendorCart['items'];
 
-                $totalPrice = $item['totalPrice'] ?? 0;
+                // Validate stock before proceeding
+                foreach ($cartItems as $item) {
+                    $product = Product::with('variations')->find($item['product_id']);
+                    $optionIds = $item['option_ids'] ?? [];
+
+                    // Find variation
+                    $selectedVariation = $product->variations->first(function ($variation) use ($optionIds) {
+                        $variationOptionIds = is_string($variation->variation_type_option_ids)
+                            ? json_decode($variation->variation_type_option_ids, true)
+                            : $variation->variation_type_option_ids;
+
+                        return collect($variationOptionIds)->sort()->values()->toArray() === collect($optionIds)->sort()->values()->toArray();
+                    });
+
+                    // Check variation stock
+                    if ($selectedVariation && $selectedVariation->quantity < $item['quantity']) {
+                        DB::rollBack();
+                        return back()->with('error', "Some items in your cart are no longer available.");
+                    }
+
+                    // Fallback to product-level stock
+                    if (!$selectedVariation && $product->quantity < $item['quantity']) {
+                        DB::rollBack();
+                        return back()->with('error', "Some items in your cart are no longer available.");
+                    }
+                }
+
+                // All stock is valid — proceed to create order
+                $user = $request->user();
+                $totalPrice = $vendorCart['totalPrice'] ?? 0;
 
                 $order = Order::create([
-                    'user_id' => $request->user()->id,
-                    'vendor_user_id' => $user['id'],
+                    'user_id' => $user->id,
+                    'vendor_user_id' => $vendorCart['user']['id'],
                     'total_price' => $totalPrice,
                     'status' => OrderStatusEnum::Draft->value,
                     'payment_method' => 'cash_on_delivery',
@@ -167,16 +189,34 @@ public function store(Request $request, CartService $cartService, Product $produ
                         'price' => $cartItem['price'],
                         'variation_type_options_ids' => json_encode($cartItem['option_ids'] ?? []),
                     ]);
+
+                    // Decrease stock now
+                    $product = Product::with('variations')->find($cartItem['product_id']);
+                    $optionIds = $cartItem['option_ids'] ?? [];
+
+                    $selectedVariation = $product->variations->first(function ($variation) use ($optionIds) {
+                        $variationOptionIds = is_string($variation->variation_type_option_ids)
+                            ? json_decode($variation->variation_type_option_ids, true)
+                            : $variation->variation_type_option_ids;
+
+                        return collect($variationOptionIds)->sort()->values()->toArray() === collect($optionIds)->sort()->values()->toArray();
+                    });
+
+                    if ($selectedVariation) {
+                        $selectedVariation->quantity -= $cartItem['quantity'];
+                        $selectedVariation->in_stock = $selectedVariation->quantity > 0;
+                        $selectedVariation->save();
+                    } else {
+                        $product->quantity -= $cartItem['quantity'];
+                        $product->save();
+                    }
                 }
 
+                // Email logic
+                $shippingAddress = ShippingAddress::where('user_id', $user->id)->first();
+                Mail::to($user->email)->send(new UserOrderConfirmationMail($order, $shippingAddress));
 
-                $shippingAddress = ShippingAddress::where('user_id', $order->user_id)->first();
-                //Send email to user
-                Mail::to($request->user()->email)->send(new UserOrderConfirmationMail($order, $shippingAddress));
-                
-
-                //  Send email to vendor
-                $vendorEmail = $user['email'] ?? null;
+                $vendorEmail = $vendorCart['user']['email'] ?? null;
                 if ($vendorEmail) {
                     Mail::to($vendorEmail)->send(new VendorOrderNotificationMail($order));
                 }
@@ -184,24 +224,15 @@ public function store(Request $request, CartService $cartService, Product $produ
                 $orders[] = $order;
             }
 
-            // Optionally, delete items from the cart if the order is confirmed
-            $deleted = CartItem::query()
-                ->where('user_id', $order->user_id)
-                ->whereIn('product_id', $order->orderItems->pluck('product_id')->toArray())
-                ->where('saved_for_later', false)
-                ->delete();
+            // ✅ Clear cart after order is created
+            $cartService->clearCart();
 
             DB::commit();
 
-
             return redirect()->route('payment.success')->with('success', 'Thank you for your order!');
-            // return redirect(route('payment.success'));
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Checkout Error: ' . $e->getMessage(), [
-                'trace' => $e->getTrace()
-            ]);
-
+            Log::error('Checkout Error: ' . $e->getMessage(), ['trace' => $e->getTrace()]);
             return back()->with('error', 'Order placement failed. Please try again.');
         }
     }

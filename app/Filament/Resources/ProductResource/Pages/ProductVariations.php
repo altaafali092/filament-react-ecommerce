@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use App\Models\Product;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -11,24 +13,20 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
-use function Pest\Laravel\json;
-
 class ProductVariations extends EditRecord
 {
     protected static string $resource = ProductResource::class;
 
     protected static ?string $title = 'Variations';
 
-    public function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
     {
         $types = $this->record->variationTypes;
         $fields = [];
 
-        foreach ($types as $i => $type) {
-            $fields[] = TextInput::make('variation_type_' . ($type->id) . '.id')
-                ->hidden();
-            $fields[] = TextInput::make('variation_type_' . ($type->id) . '.name')
-                ->label($type->name);
+        foreach ($types as $type) {
+            $fields[] = TextInput::make("variation_type_{$type->id}.id")->hidden();
+            $fields[] = TextInput::make("variation_type_{$type->id}.name")->label($type->name);
         }
 
         return $form->schema([
@@ -41,37 +39,69 @@ class ProductVariations extends EditRecord
                     Section::make()
                         ->schema($fields)
                         ->columns(3),
+
                     TextInput::make('quantity')
-                        ->label('Quantity')
-                        ->numeric(),
+                        ->label('Stock')
+                        ->numeric()
+                        ->required(),
+
                     TextInput::make('price')
                         ->label('Price')
-                        ->numeric(),
+                        ->numeric()
+                        ->required(),
+
+                    TextInput::make('in_stock')
+                        ->label('Status')
+                        ->default(fn(array $state): string => $state['quantity'] > 0 ? 'In Stock' : 'Out of Stock')
+                        ->dehydrated(false),
                 ])
                 ->columns(2)
-                ->columnSpan(2)
+                ->columnSpan(2),
         ]);
     }
 
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make()];
+        return [
+            Actions\DeleteAction::make(),
+            $this->getRestockAction(),
+        ];
+    }
+
+    protected function getRestockAction(): Action
+    {
+        return Action::make('restock')
+            ->label('Restock All')
+            ->icon('heroicon-o-plus-circle')
+            ->form([
+                TextInput::make('quantity')
+                    ->label('Add to Stock')
+                    ->numeric()
+                    ->default(10)
+                    ->required(),
+            ])
+            ->action(function (array $data, Product $record) {
+                $quantity = $data['quantity'];
+
+                foreach ($record->variations as $variation) {
+                    $variation->restock($quantity);
+                }
+            });
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
-{
-    // Safely get variations as an array
-    $variations = $this->record->variations
-        ? $this->record->variations->toArray()
-        : [];
+    {
+        $variations = $this->record->variations
+            ? $this->record->variations->toArray()
+            : [];
 
-    $data['variations'] = $this->mergeCartesianWithExisting(
-        $this->record->variationTypes,
-        $variations
-    );
+        $data['variations'] = $this->mergeCartesianWithExisting(
+            $this->record->variationTypes,
+            $variations
+        );
 
-    return $data;
-}
+        return $data;
+    }
 
     private function mergeCartesianWithExisting($variationTypes, $existingData): array
     {
@@ -84,7 +114,7 @@ class ProductVariations extends EditRecord
         foreach ($cartesianProduct as $product) {
             $optionIds = collect($product)
                 ->filter(fn($value, $key) => str_starts_with($key, 'variation_type_'))
-                ->map(fn($option) => $option['id']) // Prevent "Undefined array key 'id'"
+                ->map(fn($option) => $option['id'])
                 ->filter()
                 ->values()
                 ->toArray();
@@ -119,7 +149,7 @@ class ProductVariations extends EditRecord
             foreach ($variationType->options as $option) {
                 foreach ($result as $combination) {
                     $newCombination = $combination + [
-                        'variation_type_' . ($variationType->id) => [
+                        "variation_type_{$variationType->id}" => [
                             'id'    => $option->id ?? null,
                             'name'  => $option->name,
                             'label' => $variationType->name,
@@ -150,20 +180,17 @@ class ProductVariations extends EditRecord
             $variationTypeOptionIds = [];
 
             foreach ($this->record->variationTypes as $variationType) {
-                $variationTypeOptionIds[]= $option['variation_type_' . ($variationType->id)]['id'];
-
+                $variationTypeOptionIds[] = $option["variation_type_{$variationType->id}"]['id'];
             }
 
-            $quantity =$option ['quantity'];
-                $price = $option['price'];
+            $quantity = $option['quantity'];
+            $price = $option['price'];
 
-
-                $formattedData[] = [
-                    'variation_types_option_ids' => $variationTypeOptionIds,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                ];
-
+            $formattedData[] = [
+                'variation_types_option_ids' => $variationTypeOptionIds,
+                'quantity' => $quantity,
+                'price' => $price,
+            ];
         }
 
         $data['variations'] = $formattedData;
@@ -172,27 +199,22 @@ class ProductVariations extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        $variations = $data['variations'];
-        unset($data['variations']);
-
-        $variations = collect($variations)->map(function ($variation) {
+        $variations = collect($data['variations'])->map(function ($variation) {
             return [
                 'variation_types_option_ids' => json_encode($variation['variation_types_option_ids']),
                 'quantity' => $variation['quantity'],
                 'price' => $variation['price'],
             ];
-        })->all(); // Convert to array
+        })->all();
 
         $record->variations()->delete();
 
         $record->variations()->upsert(
             $variations,
-            ['variation_types_option_ids'], // Or use 'id' if you're confident each item has it
+            ['variation_types_option_ids'],
             ['quantity', 'price']
         );
 
         return $record;
     }
-
-
 }

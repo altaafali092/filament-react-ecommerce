@@ -6,9 +6,9 @@ A brief description of the project.
 
 ### Prerequisites
 
-- PHP (specify version, e.g., ^8.1)
+- PHP: ^8.2
 - Composer
-- Node.js (specify version, e.g., ^18.0)
+- Node.js: ^18.0
 - NPM or Yarn
 - MySQL or other database (specify version if necessary)
 
@@ -60,6 +60,16 @@ A brief description of the project.
 
 The application should now be accessible at `http://localhost:8000` (or the configured port).
 
+## Running Tests
+
+To run the automated tests for this project, use the following command:
+
+```bash
+php artisan test
+```
+
+This will run all the feature and unit tests in the `tests/` directory.
+
 ## Project Structure
 
 Here's a brief overview of the main directories in the project:
@@ -89,6 +99,48 @@ Here's a brief overview of the main directories in the project:
 - **`.github/`**: Contains GitHub Actions workflow files for CI/CD (linting, tests).
 
 This structure generally follows the standard Laravel application layout.
+
+## Project Statistics
+
+Here are some statistics about the project's codebase, generated using `tokei`:
+
+```
+===============================================================================
+ Language            Files        Lines         Code     Comments       Blanks
+===============================================================================
+ CSS                     8          215          180            8           27
+ JavaScript             21          523          476           31           16
+ JSON                    6         8121         8113            0            8
+ PHP                   210        11822         8023         1919         1880
+ SVG                     4           53           51            2            0
+ Plain Text              1            2            0            2            0
+ TSX                   121         9831         8777           68          986
+ TypeScript              8          382          337            3           42
+ XML                     1           33           33            0            0
+-------------------------------------------------------------------------------
+ Markdown                1          138            0          117           21
+ |- BASH                 1           21           15            6            0
+ (Total)                            159           15          123           21
+===============================================================================
+ Total                 381        31120        25990         2150         2980
+===============================================================================
+```
+
+## Technologies Used
+
+This project is built with the following main technologies:
+
+- **Backend:**
+    - [Laravel](https://laravel.com/) - A PHP web application framework.
+    - [Filament](https://filamentphp.com/) - A TALL stack admin panel for Laravel.
+    - [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission/v6/introduction) - for role and permission management.
+- **Frontend:**
+    - [React](https://react.dev/) - A JavaScript library for building user interfaces.
+    - [Inertia.js](https://inertiajs.com/) - To build single-page apps using classic server-side routing.
+    - [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework.
+    - [Vite](https://vitejs.dev/) - A fast frontend build tool.
+- **Database:**
+    - MySQL (or other compatible database)
 
 ## Main Features
 

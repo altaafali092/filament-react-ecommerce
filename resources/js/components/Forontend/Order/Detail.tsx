@@ -42,7 +42,7 @@ export default function OrderDetailPage() {
           <Button variant="outline" onClick={() => setOpen(true)}>
             <Printer className="w-4 h-4 mr-2" /> Invoice
           </Button>
-          <Button variant="outline"><Pencil className="w-4 h-4 mr-2" /> Edit Order</Button>
+          <Button variant="outline"><Pencil className="w-4 h-4 mr-2" />Edit Order</Button>
         </div>
       </div>
 

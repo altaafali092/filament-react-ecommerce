@@ -39,6 +39,7 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/payment/fail', [PaymentControlller::class, 'failure'])->name('payment.fail');
     Route::get('order', [FrontendController::class, 'orderPage'])->name('orderPage');
     Route::get('order-detail/{order}', [FrontendController::class, 'orderDetail'])->name('orderDetail');
+    Route::get('order-cancel/{order}', [FrontendController::class, 'cancelOrder'])->name('cancelOrder');
     Route::get('orders/{order}/invoice', [FrontendController::class, 'invoice'])->name('orders.invoice');
 });
 

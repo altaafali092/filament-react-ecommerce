@@ -18,16 +18,16 @@ const InvoiceContent = forwardRef<HTMLDivElement, Props>(({ order, officeSetting
     <div ref={ref} className="bg-white p-8 rounded shadow max-w-3xl mx-auto">
       <div className="flex justify-between mb-10">
         <div>
-        
-          <img 
-            src={officeSettings?.office_logo ?? ''} 
-            alt="Office Logo" 
-            className="h-10 md:h-12 w-25" 
+
+          <img
+            src={officeSettings?.office_logo ?? ''}
+            alt="Office Logo"
+            className="h-10 md:h-12 w-25"
           />
           <h2 className="text-md font-bold my-auto">{officeSettings?.office_name}</h2>
           <p>{officeSettings?.office_address}</p>
           <p>{officeSettings?.office_phone},{officeSettings?.office_email}</p>
-         
+
         </div>
         <div className="text-right">
           <p className="text-sm text-gray-500">Invoice # {order.id}</p>

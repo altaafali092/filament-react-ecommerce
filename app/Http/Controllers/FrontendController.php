@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatusEnum;
 use App\Http\Requests\Contact\StoreContactMesaageRequest;
 use App\Http\Requests\Vendor\Register\StoreVendorRegisterRequest;
 use App\Http\Resources\BannerResource;
@@ -220,6 +221,17 @@ class FrontendController extends Controller
         return Inertia::render('Frontend/OrderPage/OrderDetail', [
             'order' => new OrderViewResource($order),
         ]);
+    }
+
+    public function cancelOrder(Order $order)
+    {
+        if($order->created_at->diffInMinutes(now())>30 ){
+            return back()->with('error','You Cannot make Order Cancel');
+        };
+        $order->update([
+            'status' => OrderStatusEnum::Cancelled->value,
+        ]);
+        return to_route('orderPage')>with('success', 'Order has been cancelled successfully.');
     }
 
     public function invoice(Order $order)

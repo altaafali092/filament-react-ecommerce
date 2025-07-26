@@ -58,9 +58,9 @@ class CartController extends Controller
 
         // Find the matching variation
         $selectedVariation = $product->variations->first(function (ProductVariation $variation) use ($normalizedOptionIds) {
-            $variationOptionIds = is_string($variation->variation_type_option_ids)
-                ? json_decode($variation->variation_type_option_ids, true)
-                : $variation->variation_type_option_ids;
+            $variationOptionIds = is_string($variation->variation_types_option_ids)
+                ? json_decode($variation->variation_types_option_ids, true)
+                : $variation->variation_types_option_ids;
 
             return collect($variationOptionIds)->sort()->values()->toArray() === $normalizedOptionIds;
         });
@@ -110,10 +110,6 @@ class CartController extends Controller
         return back()->with('success', 'Product removed successfully');
     }
 
-
-
-
-
     public function checkout(Request $request, CartService $cartService)
     {
         $vendorId = $request->input('vendor_user_id');
@@ -144,9 +140,9 @@ class CartController extends Controller
 
                     // Find variation
                     $selectedVariation = $product->variations->first(function ($variation) use ($optionIds) {
-                        $variationOptionIds = is_string($variation->variation_type_option_ids)
-                            ? json_decode($variation->variation_type_option_ids, true)
-                            : $variation->variation_type_option_ids;
+                        $variationOptionIds = is_string($variation->variation_types_option_ids)
+                            ? json_decode($variation->variation_types_option_ids, true)
+                            : $variation->variation_types_option_ids;
 
                         return collect($variationOptionIds)->sort()->values()->toArray() === collect($optionIds)->sort()->values()->toArray();
                     });
@@ -195,9 +191,9 @@ class CartController extends Controller
                     $optionIds = $cartItem['option_ids'] ?? [];
 
                     $selectedVariation = $product->variations->first(function ($variation) use ($optionIds) {
-                        $variationOptionIds = is_string($variation->variation_type_option_ids)
-                            ? json_decode($variation->variation_type_option_ids, true)
-                            : $variation->variation_type_option_ids;
+                        $variationOptionIds = is_string($variation->variation_types_option_ids)
+                            ? json_decode($variation->variation_types_option_ids, true)
+                            : $variation->variation_types_option_ids;
 
                         return collect($variationOptionIds)->sort()->values()->toArray() === collect($optionIds)->sort()->values()->toArray();
                     });
@@ -232,7 +228,12 @@ class CartController extends Controller
             return redirect()->route('payment.success')->with('success', 'Thank you for your order!');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Checkout Error: ' . $e->getMessage(), ['trace' => $e->getTrace()]);
+            \Log::error('Checkout Error: ' . $e->getMessage(), [
+                'trace' => $e->getTrace(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'cart_items' => $cartItems ?? null,
+            ]);
             return back()->with('error', 'Order placement failed. Please try again.');
         }
     }

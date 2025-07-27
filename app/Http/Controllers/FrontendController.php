@@ -225,13 +225,13 @@ class FrontendController extends Controller
 
     public function cancelOrder(Order $order)
     {
-        if($order->created_at->diffInMinutes(now())>30 ){
-            return back()->with('error','You Cannot make Order Cancel');
-        };
+        // if($order->created_at->diffInMinutes(now())>30 ){
+        //     return back()->with('error','You Cannot make Order Cancel');
+        // };
         $order->update([
             'status' => OrderStatusEnum::Cancelled->value,
         ]);
-        return to_route('orderPage')>with('success', 'Order has been cancelled successfully.');
+        return to_route('orderPage')->with('success', 'Order has been cancelled successfully.');
     }
 
     public function invoice(Order $order)

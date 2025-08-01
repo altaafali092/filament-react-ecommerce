@@ -30,8 +30,8 @@ export default function NewArrivals({ products }: IndexProps) {
         <section className="py-12 px-4 md:px-6 bg-gradient-to-b from-gray-50 to-gray-100 text-gray-800">
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
-                <div className="text-center mb-8 relative">
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl">✨</div>
+                <div className=" text-center mb-8 relative">
+                
                     <h2 className="text-4xl font-black bg-gradient-to-r from-fuchsia-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-1">
                         DROP ALERT!
                     </h2>

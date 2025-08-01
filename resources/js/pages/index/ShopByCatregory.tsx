@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 import { IfrontCategory } from "@/types/frontend";
 
@@ -9,9 +9,11 @@ interface CategoryProps {
     categories: IfrontCategory[];
 }
 
-export default function ShopByCategory() {
+export default function FeaturedCategories() {
     const { props: { categories } } = usePage<{ props: CategoryProps }>();
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
 
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
         return (
@@ -21,68 +23,107 @@ export default function ShopByCategory() {
         );
     }
 
+    const checkScrollButtons = () => {
+        if (scrollRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+        }
+    };
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const scrollAmount = 220;
+            const newScrollLeft = direction === 'left' 
+                ? scrollRef.current.scrollLeft - scrollAmount
+                : scrollRef.current.scrollLeft + scrollAmount;
+            
+            scrollRef.current.scrollTo({
+                left: newScrollLeft,
+                behavior: 'smooth'
+            });
+            
+            setTimeout(checkScrollButtons, 150);
+        }
+    };
+
+    useEffect(() => {
+        checkScrollButtons();
+    }, []);
+
     return (
-        <section className="py-12 px-4 md:px-8 bg-gradient-to-b from-white to-pink-50">
+        <section className="py-8 px-4 md:px-8 bg-gray-50">
             <div className="container mx-auto max-w-7xl">
                 {/* Section Header */}
-                
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-                        Shop by Category
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800">
+                        Featured Categories
                     </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
-                        Explore our curated collections and find your perfect style statement
-                    </p>
+                    
+                    {/* Navigation Buttons */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => scroll('left')}
+                            disabled={!canScrollLeft}
+                            className={`p-2 rounded-full border transition-all duration-200 ${
+                                canScrollLeft 
+                                    ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                            }`}
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => scroll('right')}
+                            disabled={!canScrollRight}
+                            className={`p-2 rounded-full border transition-all duration-200 ${
+                                canScrollRight 
+                                    ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                            }`}
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
 
-                {/* Category Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto">
-                    {categories.map((category) => (
-                        <div
-                            key={category.id}
-                            className={`group relative rounded-xl overflow-hidden shadow-md transition-all duration-500 ${
-                                category.is_featured ? "sm:col-span-2 lg:col-span-1 lg:row-span-2" : ""
-                            }`}
-                            onMouseEnter={() => setHoveredId(category.id)}
-                            onMouseLeave={() => setHoveredId(null)}
-                        >
-                            {/* Image with Overlay */}
-                            <div className="relative w-full h-full aspect-[4/3]">
-                                <img
-                                    src={category.image || "/placeholder.svg"}
-                                    alt={category.name}
-                                    className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ${
-                                        hoveredId === category.id ? "scale-110" : "scale-100"
-                                    }`}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                            </div>
+                {/* Category Carousel */}
+                <div className="relative">
+                    <div 
+                        ref={scrollRef}
+                        onScroll={checkScrollButtons}
+                        className="flex gap-12 overflow-x-auto scrollbar-hide pb-2"
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                        {categories.map((category) => (
+                            <Link
+                                key={category.id}
+                                href={route('shopByCategory', { category: category.slug })}
+                                className="flex-shrink-0 w-52"
+                            >
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="group relative w-full h-52 rounded-full overflow-hidden bg-gray-100">
+                                        {/* Full Card Image */}
+                                        <img
+                                            src={category.image || "/placeholder.svg"}
+                                            alt={category.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
 
-                            {/* Content */}
-                            <div className="absolute bottom-0 left-0 right-0 p-5 text-white transform transition-transform duration-500">
-                                <h3 className="text-xl md:text-2xl font-bold mb-2">{category.name}</h3>
-                                <p
-                                    className={`text-white/80 text-sm mb-4 transition-opacity duration-500 ${
-                                        hoveredId === category.id ? "opacity-100" : "opacity-0 sm:opacity-100"
-                                    }`}
-                                >
-                                    {category.description}
-                                </p>
-                                <Link
-                                   href={route('shopByCategory', { category: category.slug })}
-                                    className={`inline-flex items-center text-sm font-medium bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-full border border-white/30 hover:bg-white hover:text-pink-600 transition-all duration-300 ${
-                                        hoveredId === category.id
-                                            ? "opacity-100 translate-y-0"
-                                            : "opacity-0 translate-y-4 sm:opacity-100 sm:translate-y-0"
-                                    }`}
-                                >
-                                    Shop Now <ArrowRight className="ml-2 h-4 w-4" />
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
+                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+                                    </div>
+                                    
+                                    {/* Category Name Below Image */}
+                                    <h3 className="text-lg font-semibold text-gray-800 text-center">
+                                        {category.name}
+                                    </h3>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
+
         </section>
     );
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatusEnum;
 use App\Http\Requests\Contact\StoreContactMesaageRequest;
 use App\Http\Requests\Vendor\Register\StoreVendorRegisterRequest;
-use App\Http\Resources\BannerResource;
 use App\Http\Resources\BlogResource;
 use App\Http\Resources\FAQResource;
 use App\Http\Resources\ProductDetailResource;
@@ -14,11 +13,9 @@ use App\Http\Resources\SliderResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\OrderViewResource;
 use App\Http\Resources\PrivacyPolicyResource;
-use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\FAQ;
 use App\Models\Product;
-use App\Models\ProductVariation;
 use App\Models\ShippingAddress;
 use App\Models\Slider;
 use App\Models\Category;
@@ -26,10 +23,11 @@ use App\Models\Contact;
 use App\Models\Order;
 use App\Models\PrivacyPolicy;
 use App\Models\User;
-
 use App\Services\CartService;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -44,12 +42,25 @@ class FrontendController extends Controller
         $sliders = Slider::where('status', 1)->latest()->get();
         $faqs = FAQ::where('status', 1)->limit(5)->latest()->get();
         $categories = Category::where('active', 1)->get();
+
+
+        $mostOrderedProducts = Product::select('products.*')
+            ->withCount(['orderItems as total_ordered_quantity' => function ($query) {
+                $query->select(DB::raw('SUM(quantity)'));
+            }])
+            ->where('status', 'published')
+            ->orderByDesc('total_ordered_quantity')
+            ->limit(6)
+            ->get();
+
         return Inertia::render('welcome', [
             'products' => ProductResource::collection($products),
             'blogs' => BlogResource::collection($blogs)->toArray(request()),
             'sliders' => SliderResource::collection($sliders)->toArray(request()),
             'faqs' => FAQResource::collection($faqs)->toArray(request()),
             'categories' => CategoryResource::collection($categories)->toArray(request()),
+            'mostOrderedProducts' => ProductResource::collection($mostOrderedProducts),
+
 
         ]);
     }

@@ -48,9 +48,9 @@ export default function Welcome() {
                     <NewsAndBlogs  blogs={blogs}/>
                 </div>
                   
-                <div className="relative z-10">
+                {/* <div className="relative z-10">
                     <FrquentlyAskQues  faqs={faqs}/>
-                </div>
+                </div> */}
                 <div className="relative z-10">
                     <CustomerReviews />
                 </div>

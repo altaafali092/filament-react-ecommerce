@@ -92,7 +92,7 @@ class OrderResource extends Resource
                     ->options(function () {
                         $user = Auth::user();
 
-                        if ($user->hasRole('vendor')) {
+                        if ($user->hasRole ('vendor')) {
                             return [
                                 'draft' => 'Draft',
                                 'processing' => 'Processing',

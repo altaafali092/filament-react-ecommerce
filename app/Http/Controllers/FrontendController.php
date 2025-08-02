@@ -131,7 +131,7 @@ class FrontendController extends Controller
         $products = $category->products()
             ->where('status', 'published')
             ->orderBy('id', 'desc')
-            ->paginate(2)
+            ->paginate(20)
             ->appends($request->query());
         $total = $products->count();
         return Inertia::render('Frontend/Product/CategoryProduct', [

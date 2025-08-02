@@ -123,17 +123,17 @@ class FrontendController extends Controller
         ]);
     }
 
-
     public function shopByCategory(Request $request, Category $category)
     {
-
-
         $products = $category->products()
             ->where('status', 'published')
+            ->with(['user', 'department']) // <-- eager load these relations here
             ->orderBy('id', 'desc')
             ->paginate(20)
             ->appends($request->query());
-        $total = $products->count();
+
+        $total = $products->total(); // use total() for total items in pagination
+
         return Inertia::render('Frontend/Product/CategoryProduct', [
             'category' => new CategoryResource($category),
             'products' => ProductResource::collection($products)->additional([
@@ -144,7 +144,6 @@ class FrontendController extends Controller
                     'prev_page_url' => $products->previousPageUrl(),
                     'per_page' => $products->perPage(),
                     'total' => $total,
-
                 ],
             ]),
         ]);

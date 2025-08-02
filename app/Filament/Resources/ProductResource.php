@@ -44,8 +44,12 @@ class ProductResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->forVendor();
+        return parent::getEloquentQuery()
+            ->with(['user', 'department'])
+            ->forVendor();
     }
+
+
 
     public static function form(Form $form): Form
     {

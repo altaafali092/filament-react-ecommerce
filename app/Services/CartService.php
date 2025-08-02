@@ -309,9 +309,13 @@ class CartService
     {
         $cookie = Cookie::get(self::COOKIE_NAME);
 
-        $decoded = json_decode($cookie, true); // decode as associative array
+        if (is_null($cookie)) {
+            return [];
+        }
 
-        return is_array($decoded) ? $decoded : []; // fallback if cookie is null or malformed
+        $decoded = json_decode($cookie, true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
 

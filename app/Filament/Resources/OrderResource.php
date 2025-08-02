@@ -96,7 +96,7 @@ class OrderResource extends Resource
                             return [
                                 'draft' => 'Draft',
                                 'processing' => 'Processing',
-                                'vendor delivered at store' => 'Vendor Delivered at Store',
+                                'vendor_delivered_at_store' => 'Vendor Delivered at Store',
                             ];
                         }
 

@@ -37,6 +37,7 @@ export interface IFrontProduct {
     slug: string;
     price: number;
     quantity: number;
+    gender: string;
     short_description: string;
     description: string;
     image: string;

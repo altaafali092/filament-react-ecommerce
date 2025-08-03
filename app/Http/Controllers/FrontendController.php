@@ -50,7 +50,7 @@ class FrontendController extends Controller
             }])
             ->where('status', 'published')
             ->orderByDesc('total_ordered_quantity')
-            ->limit(6)
+            ->limit(10)
             ->get();
 
         return Inertia::render('welcome', [
@@ -60,7 +60,6 @@ class FrontendController extends Controller
             'faqs' => FAQResource::collection($faqs)->toArray(request()),
             'categories' => CategoryResource::collection($categories)->toArray(request()),
             'mostOrderedProducts' => ProductResource::collection($mostOrderedProducts),
-
 
         ]);
     }

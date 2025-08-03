@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\GenderEnum;
 use App\Enums\ProductEnum;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\Pages\EditProduct;
@@ -98,11 +99,16 @@ class ProductResource extends Resource
                     ->required()
                     ->numeric(),
                 TextInput::make('quantity')
-
                     ->integer(),
+
                 Select::make('status')
                     ->options(ProductEnum::labels())
-                    ->default(ProductEnum::Draft->value)
+                    ->default(ProductEnum::Draft->value),
+
+                Select::make('gender')
+                ->label('Select Gender')
+                    ->options(GenderEnum::labels())
+                    ->default(GenderEnum::UNISEX->value),
             ]);
     }
 

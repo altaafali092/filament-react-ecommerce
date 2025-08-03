@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { IFrontProduct } from "@/types/frontend"
-import { ArrowRight } from "lucide-react"
-import { Link } from "@inertiajs/react"
 import ProductCard from "@/components/product/ProductCard"
 
-// Gender tabs (including "All" for no filter)
+
+
+
 const GENDER_TABS = ["All", "Mens", "Womens", "Kids", "Unisex"] as const
 
 const genderLabels: Record<string, string> = {

@@ -71,7 +71,7 @@ export default function MostOrdered({ mostOrderedProducts }: MostOrderedProps) {
                     )}
                 </div>
 
-                {/* Optional View More */}
+                
                 {/* <div className="mt-5 text-center">
           <Link
             href="#"

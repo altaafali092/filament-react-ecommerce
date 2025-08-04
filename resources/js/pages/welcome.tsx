@@ -12,7 +12,11 @@ import MostOdered from './index/MostOdered';
 import FrquentlyAskQues from './index/FrequentlyAskQues';
 import { IFrontBlogs, IfrontCategory, IFrontFAQ, IFrontProduct, IFrontSlider } from '@/types/frontend';
 import Slider from './index/Slider';
-import MostOrdered from './index/MostOdered';
+
+import MensWear from './index/MensWear';
+import WomensWear from './index/WomensWear';
+import KidsWear from './index/KidsWear';
+import BothWear from './index/BothWear';
 
 
 export default function Welcome() {
@@ -23,15 +27,24 @@ export default function Welcome() {
         blogs,
         sliders,
         faqs,
-        categories
+        categories,
+        menWears,
+        womenWears,
+        kidWears,
+        unisexWears
     } = usePage<{
         products: { data: IFrontProduct[] },
         mostOrderedProducts: { data: IFrontProduct[] },
         blogs: IFrontBlogs[],
         sliders: IFrontSlider[],
         faqs: IFrontFAQ[],
-        categories: IfrontCategory[]
+        categories: IfrontCategory[],
+        menWears: IFrontProduct[],
+        womenWears:  IFrontProduct[] ,
+        kidWears:  IFrontProduct[] ,
+        unisexWears: IFrontProduct[],
     }>().props;
+
 
 
 
@@ -62,6 +75,47 @@ export default function Welcome() {
                             </div>
                         )
                     }
+
+
+                    {
+                        menWears?.length > 0 && (
+                            <div className="relative z-10">
+                                <MensWear menWears={menWears} />
+                            </div>
+                        )
+                    }
+
+                    {
+                        womenWears?.length > 0 && (
+                            <div className="relative z-10">
+                                <WomensWear womenWears={womenWears} />
+                            </div>
+                        )
+                    }
+
+                     {
+                        unisexWears?.length > 0 && (
+                            <div className="relative z-10">
+                                <BothWear unisexWears={unisexWears} />
+                            </div>
+                        )
+                    }
+                    
+                    {
+                        kidWears?.length > 0 && (
+                            <div className="relative z-10">
+                                <KidsWear kidWears={kidWears} />
+                            </div>
+                        )
+                    }
+
+                   
+
+
+
+
+
+
                     <div className="relative z-10">
                         <Trending />
                     </div>

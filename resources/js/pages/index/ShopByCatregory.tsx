@@ -92,7 +92,7 @@ export default function FeaturedCategories() {
                     <div 
                         ref={scrollRef}
                         onScroll={checkScrollButtons}
-                        className="flex gap-12 overflow-x-auto scrollbar-hide pb-2"
+                        className="flex gap-1o overflow-x-auto scrollbar-hide pb-2"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {categories.map((category) => (
@@ -102,7 +102,7 @@ export default function FeaturedCategories() {
                                 className="flex-shrink-0 w-52"
                             >
                                 <div className="flex flex-col items-center gap-3">
-                                    <div className="group relative w-full h-52 rounded-full overflow-hidden bg-gray-100">
+                                    <div className="group relative w-40 h-40 rounded-full overflow-hidden bg-gray-100">
                                         {/* Full Card Image */}
                                         <img
                                             src={category.image || "/placeholder.svg"}

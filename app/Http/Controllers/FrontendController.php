@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatusEnum;
+use App\Filament\Resources\ProductResource as ResourcesProductResource;
 use App\Http\Requests\Contact\StoreContactMesaageRequest;
 use App\Http\Requests\Vendor\Register\StoreVendorRegisterRequest;
 use App\Http\Resources\BlogResource;
@@ -53,6 +54,27 @@ class FrontendController extends Controller
             ->limit(10)
             ->get();
 
+        $menWears = Product::where([
+            ['gender', '=', 'Mens'],
+            ['status', '=', 'published']
+        ])->latest()->get();
+
+
+        $womenWears = Product::where([
+            ['gender', '=', 'Womens'],
+            ['status', '=', 'published']
+        ])->latest()->get();
+
+        $kidWears = Product::where([
+            ['gender', '=', 'Kids'],
+            ['status', '=', 'published']
+        ])->latest()->get();
+        $unisexWears = Product::where([
+            ['gender', '=', 'Unisex'],
+            ['status', '=', 'published']
+        ])->latest()->get();
+
+
         return Inertia::render('welcome', [
             'products' => ProductResource::collection($products),
             'blogs' => BlogResource::collection($blogs)->toArray(request()),
@@ -60,6 +82,10 @@ class FrontendController extends Controller
             'faqs' => FAQResource::collection($faqs)->toArray(request()),
             'categories' => CategoryResource::collection($categories)->toArray(request()),
             'mostOrderedProducts' => ProductResource::collection($mostOrderedProducts),
+            'menWears' => ProductResource::collection($menWears)->toArray(request()),
+            'womenWears' => ProductResource::collection($womenWears)->toArray(request()),
+            'kidWears' => ProductResource::collection($kidWears)->toArray(request()),
+            'unisexWears' => ProductResource::collection($unisexWears)->toArray(request()),
 
         ]);
     }
@@ -142,7 +168,7 @@ class FrontendController extends Controller
             ->paginate(20)
             ->appends($request->query());
 
-        $total = $products->total(); // use total() for total items in pagination
+        $total = $products->total();
 
         return Inertia::render('Frontend/Product/CategoryProduct', [
             'category' => new CategoryResource($category),
